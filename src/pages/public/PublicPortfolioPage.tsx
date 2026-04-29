@@ -16,6 +16,8 @@ export default function PublicPortfolioPage() {
   const [sending, setSending] = useState(false);
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [clientInfo, setClientInfo] = useState({ name: '', email: '' });
+  const [showClientForm, setShowClientForm] = useState(true);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -60,7 +62,9 @@ export default function PublicPortfolioPage() {
     
     setSending(true);
     try {
-      const clientId = 'guest-' + Date.now();
+      // For demo purposes, create conversation with freelancer as both parties
+      // In production, you'd want to create a proper guest user system
+      const clientId = profile.id + '-guest-' + Date.now();
       
       // Create conversation if not exists
       let conversation = currentConversation;
@@ -71,15 +75,8 @@ export default function PublicPortfolioPage() {
         });
         
         if (conversationResult.error) {
-          // Fallback
-          const fallbackResult = await createConversation({
-            freelancer_id: profile.id,
-            client_id: profile.id
-          });
-          
-          if (fallbackResult.data) {
-            conversation = fallbackResult.data;
-          }
+          console.error('Error creating conversation:', conversationResult.error);
+          return;
         } else if (conversationResult.data) {
           conversation = conversationResult.data;
         }
@@ -87,23 +84,32 @@ export default function PublicPortfolioPage() {
       
       if (conversation) {
         const messageContent = messageText.trim();
+        const clientDisplayName = clientInfo.name || 'Anonymous Client';
+        
+        // Format message with client information
+        const formattedMessage = clientInfo.email 
+          ? `📧 ${clientDisplayName} (${clientInfo.email}): ${messageContent}`
+          : `👤 ${clientDisplayName}: ${messageContent}`;
+        
         const newMessage = {
           id: Date.now().toString(),
           conversation_id: conversation.id,
           sender_id: clientId,
           content: messageContent,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          client_name: clientDisplayName,
+          client_email: clientInfo.email
         };
         
         // Add message to UI immediately
         setMessages(prev => [...prev, newMessage]);
         setMessageText('');
         
-        // Send to backend
+        // Send to backend with client information
         await createMessage({
           conversation_id: conversation.id!,
           sender_id: clientId,
-          content: messageContent
+          content: formattedMessage
         });
         
         setCurrentConversation(conversation);
@@ -117,6 +123,13 @@ export default function PublicPortfolioPage() {
       console.error('Error sending message:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleClientInfoSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (clientInfo.name.trim()) {
+      setShowClientForm(false);
     }
   };
 
@@ -338,7 +351,7 @@ export default function PublicPortfolioPage() {
       {/* WhatsApp-style Chat Modal */}
       {showMessageModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0B0F19] rounded-2xl border border-slate-800/60 shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
+          <div className="bg-[#0B0F19] rounded-2xl border border-slate-800/60 shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
             {/* Chat Header */}
             <div className="bg-[#151B2B] p-4 border-b border-slate-800/60 flex items-center justify-between rounded-t-2xl">
               <div className="flex items-center gap-3">
@@ -372,55 +385,103 @@ export default function PublicPortfolioPage() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F19]">
-              {messages.length === 0 ? (
-                <div className="text-center text-slate-400 py-8">
-                  <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="h-8 w-8 text-slate-400" />
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F19] min-h-0">
+              {showClientForm ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="w-full max-w-md">
+                    <div className="text-center mb-6">
+                      <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageCircle className="h-8 w-8 text-indigo-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Introduce Yourself</h3>
+                      <p className="text-slate-400 text-sm">Please provide your name so {profile?.display_name || profile?.name || 'the freelancer'} can identify you</p>
+                    </div>
+                    <form onSubmit={handleClientInfoSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                        <input
+                          type="text"
+                          value={clientInfo.name}
+                          onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
+                          className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          placeholder="John Doe"
+                          required
+                          autoFocus
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Email (Optional)</label>
+                        <input
+                          type="email"
+                          value={clientInfo.email}
+                          onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
+                          className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          placeholder="john@example.com"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
+                      >
+                        Start Conversation
+                      </button>
+                    </form>
                   </div>
-                  <p className="text-sm">Start the conversation!</p>
-                  <p className="text-xs text-slate-500 mt-2">Introduce yourself and let them know about your project</p>
                 </div>
               ) : (
-                messages.map((message) => (
-                  <div key={message.id} className="flex justify-end">
-                    <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-indigo-600 text-white rounded-br-sm">
-                      <p className="text-sm">{message.content}</p>
-                      <div className="flex items-center gap-1 mt-1 text-xs text-indigo-200">
-                        <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <>
+                  {messages.length === 0 ? (
+                    <div className="text-center text-slate-400 py-8">
+                      <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageCircle className="h-8 w-8 text-slate-400" />
                       </div>
+                      <p className="text-sm">Start the conversation!</p>
+                      <p className="text-xs text-slate-500 mt-2">Introduce yourself and let them know about your project</p>
                     </div>
-                  </div>
-                ))
+                  ) : (
+                    messages.map((message) => (
+                      <div key={message.id} className="flex justify-end">
+                        <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-indigo-600 text-white rounded-br-sm">
+                          <p className="text-sm">{message.content}</p>
+                          <div className="flex items-center gap-1 mt-1 text-xs text-indigo-200">
+                            <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <div ref={messagesEndRef} />
+                </>
               )}
-              <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input */}
-            <div className="bg-[#151B2B] p-4 border-t border-slate-800/60 rounded-b-2xl">
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                  <Paperclip className="h-4 w-4 text-slate-400" />
-                </button>
-                <input
-                  type="text"
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                  placeholder="Type a message..."
-                  disabled={sending}
-                  className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
-                  autoFocus
-                />
-                <button 
-                  onClick={handleSendMessage}
-                  disabled={sending || !messageText.trim()}
-                  className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Send className="h-4 w-4 text-white" />
-                </button>
+            {/* Message Input - Only show after client form is completed */}
+            {!showClientForm && (
+              <div className="bg-[#151B2B] p-4 border-t border-slate-800/60 rounded-b-2xl">
+                <div className="flex items-center gap-2">
+                  <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                    <Paperclip className="h-4 w-4 text-slate-400" />
+                  </button>
+                  <input
+                    type="text"
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                    placeholder="Type a message..."
+                    disabled={sending}
+                    className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
+                    autoFocus
+                  />
+                  <button 
+                    onClick={handleSendMessage}
+                    disabled={sending || !messageText.trim()}
+                    className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Send className="h-4 w-4 text-white" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

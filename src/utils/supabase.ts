@@ -92,7 +92,6 @@ export interface Conversation {
   client_id: string;
   created_at?: string;
   last_message_at?: string;
-  last_message?: string;
   freelancer_user?: {
     username?: string;
     display_name?: string;
@@ -532,12 +531,11 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
       client_id,
       created_at,
       last_message_at,
-      last_message,
-      freelancer_user:users(
+      freelancer_user:users!freelancer_id(
         username,
         display_name
       ),
-      client_user:users(
+      client_user:users!client_id(
         username,
         display_name
       )
@@ -595,12 +593,11 @@ export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>)
       });
     }
     
-    // Update conversation's last_message and last_message_at
+    // Update conversation's last_message_at
     if (data && !error) {
       await supabase
         .from('conversations')
         .update({
-          last_message: message.content,
           last_message_at: new Date().toISOString()
         })
         .eq('id', message.conversation_id);
@@ -642,33 +639,39 @@ export const createConversation = async (conversation: Omit<Conversation, 'id' |
     
     return { data, error };
   } catch (err) {
-    console.error('Unexpected error in createConversation:', err);
+    console.error('Unexpected error in createMessage:', err);
     return { data: null, error: { message: 'Unexpected error occurred' } };
   }
 };
 
-export const getRecentActivity = async (userId: string) => {
-  const { data } = await supabase
+export const getRecentActivity = async (userId: string): Promise<ActivityItem[]> => {
+  console.log('Getting recent activity for user:', userId);
+  const { data, error } = await supabase
     .from('conversations')
     .select(`
       id,
       created_at,
       client_id,
-      last_message,
+      last_message_at,
       updated_at
     `)
-    .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
+    .or(`freelancer_id.eq.${userId}`)
     .order('updated_at', { ascending: false })
-    .limit(5)
+    .limit(10);
+  
+  if (error) {
+    console.error('Error fetching recent activity:', error);
+    return [];
+  }
   
   return data?.map((conv: any): ActivityItem => ({
     id: conv.id,
     name: conv.client_id ? 'Client Message' : 'System Update',
-    message: conv.last_message || 'New conversation started',
+    message: 'New conversation started',
     time: formatTimeAgo(conv.updated_at),
     type: conv.client_id ? 'message' : 'system'
-  })) || []
-}
+  })) || [];
+};
 
 export interface ActivityItem {
   id: string;

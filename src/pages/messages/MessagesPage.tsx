@@ -188,7 +188,7 @@ export default function MessagesPage() {
                         <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
                         <span className="text-xs text-slate-500">{formatTimeAgo(conversation.last_message_at)}</span>
                       </div>
-                      <p className="text-xs text-slate-400 truncate">{conversation.last_message || 'No messages yet'}</p>
+                      <p className="text-xs text-slate-400 truncate">Click to view messages</p>
                     </div>
                   </div>
                 </div>
