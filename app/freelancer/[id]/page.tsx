@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquare, Share2, CheckCircle2, Zap, ArrowRight, Clock, DollarSign } from "lucide-react";
+import { MessageSquare, Share2, CheckCircle2, Zap, ArrowRight, Clock, DollarSign, ExternalLink } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { initiateDealRoom } from "./actions";
 import { notFound } from "next/navigation";
@@ -132,11 +132,31 @@ export default async function FreelancerPublicProfile(props: { params: Promise<{
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {portfolios.map((item: any, i: number) => (
               <div key={item.id || i} className="group cursor-pointer">
-                <div className="w-full aspect-[4/3] rounded-[2.5rem] bg-slate-200 dark:bg-slate-800 mb-6 overflow-hidden relative shadow-sm group-hover:shadow-2xl transition-all duration-500 border border-slate-200/50 dark:border-slate-700/50">
-                  {/* Mock logic for the background gradient images */}
-                  <div className={`absolute inset-0 mix-blend-overlay group-hover:scale-105 transition-transform duration-700 ${item.image || (i % 2 === 0 ? "bg-gradient-to-br from-indigo-500/20 to-purple-600/40" : "bg-gradient-to-br from-blue-500/20 to-cyan-600/40")}`} />
+                <div className="w-full aspect-[4/3] rounded-[2.5rem] bg-slate-800 mb-6 overflow-hidden relative shadow-sm group-hover:shadow-2xl transition-all duration-500 border border-slate-800/50">
+                  {/* Real Image or Decorative Gradient Fallback */}
+                  {item.image_url ? (
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+                      style={{ backgroundImage: `url(${item.image_url})` }}
+                    />
+                  ) : (
+                    <div className={`absolute inset-0 group-hover:scale-105 transition-transform duration-700 ${i % 2 === 0 ? "bg-gradient-to-br from-indigo-500/10 to-purple-600/20" : "bg-gradient-to-br from-blue-500/10 to-cyan-600/20"}`} />
+                  )}
+                  
+                  {/* Hover Overlay for External Link */}
+                  {item.external_link && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                       <Link 
+                         href={item.external_link} 
+                         target="_blank" 
+                         className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-full font-bold shadow-xl hover:bg-indigo-600 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
+                       >
+                         View Live Project <ExternalLink className="h-4 w-4" />
+                       </Link>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-2xl font-bold mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                <h3 className="text-2xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">
                   {item.title}
                 </h3>
                 <p className="text-slate-500 leading-relaxed max-w-lg">
