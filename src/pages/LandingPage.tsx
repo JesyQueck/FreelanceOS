@@ -267,7 +267,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-slate-400" />
-            <span className="font-semibold text-slate-900 dark:text-white">FreelanceOS</span>
+            <span className="font-semibold text-slate-900 dark:text-white font-bold">FreelanceOS</span>
           </div>
           <p>© 2026 FreelanceOS. Designed for world-class talent.</p>
           <div className="flex gap-6">

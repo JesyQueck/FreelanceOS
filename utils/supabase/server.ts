@@ -1,23 +1,16 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
 
 /**
  * Sanitize environment variables to remove accidental quotes or spaces
  */
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/["]+/g, '').trim();
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/["]+/g, '').trim();
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL?.replace(/["']+/g, '').trim();
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY?.replace(/["']+/g, '').trim();
 
-export async function createClient() {
-  let cookieStore;
-  try {
-    cookieStore = await cookies();
-  } catch (e) {
-    // Fallback for static generation where cookies() is not available
-    cookieStore = {
-      getAll: () => [],
-      set: () => {},
-    };
-  }
+export async function createClient(cookieOptions?: { getAll: () => { name: string; value: string }[], set: (name: string, value: string, options?: any) => void }) {
+  const cookieStore = cookieOptions || {
+    getAll: () => [],
+    set: () => {},
+  };
 
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error("Missing Supabase Environment Variables");
