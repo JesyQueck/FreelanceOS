@@ -24,7 +24,7 @@ export default function LandingPage() {
             <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center">
               Log in
             </Link>
-            <Link to="/login" className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm flex items-center">
+            <Link to="/signup" className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm flex items-center">
               Get Started
             </Link>
           </div>
@@ -56,7 +56,7 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-8">
             <Link
-              to="/login"
+              to="/signup"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm hover:shadow-md gap-2"
             >
               Get Started <ArrowRight className="h-4 w-4 shrink-0 transition-transform hover:translate-x-1" />
