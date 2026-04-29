@@ -1,17 +1,41 @@
 import { useState, useEffect } from "react";
 import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile } from "../../utils/supabase";
+import { getUserProfile, createOrUpdateUserProfile, UserProfile } from "../../utils/supabase";
 
 export default function ProfilePage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Helper function to get relative time
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    const diffInMonths = Math.floor(diffInDays / 30);
+    const diffInYears = Math.floor(diffInDays / 365);
+
+    if (diffInDays < 30) {
+      return 'Recently joined';
+    } else if (diffInMonths === 1) {
+      return '1 month ago';
+    } else if (diffInMonths <= 11) {
+      return `${diffInMonths} months ago`;
+    } else if (diffInYears === 1) {
+      return '1 year ago';
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -30,10 +54,6 @@ export default function ProfilePage() {
     fetchProfile();
   }, [user]);
 
-  const handleEditProfile = () => {
-    navigate('/dashboard/profile/edit');
-  };
-
   const startEditing = (field: string, value: string) => {
     setEditingField(field);
     setEditingValue(value);
@@ -49,10 +69,23 @@ export default function ProfilePage() {
     
     setIsSaving(true);
     try {
-      let updateData: any = {
-        display_name: profile?.display_name || ''
+      // Get current profile to preserve existing data
+      const currentProfile = await getUserProfile(user.id);
+      
+      // Create update data with all existing fields
+      const updateData: UserProfile = {
+        display_name: currentProfile?.display_name || profile?.display_name || '',
+        name: currentProfile?.name || profile?.name,
+        bio: currentProfile?.bio || profile?.bio,
+        skills: currentProfile?.skills || profile?.skills,
+        profile_image: currentProfile?.profile_image || profile?.profile_image,
+        created_at: currentProfile?.created_at || profile?.created_at,
+        email: currentProfile?.email || profile?.email,
+        id: currentProfile?.id || profile?.id,
+        updated_at: new Date().toISOString()
       };
       
+      // Only update the field being edited
       if (editingField === 'name') {
         updateData.name = editingValue;
       } else if (editingField === 'professional-name') {
@@ -101,12 +134,6 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Profile</h1>
-        <button 
-          onClick={handleEditProfile}
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-500 gap-2"
-        >
-          <Edit className="h-4 w-4" /> Edit Profile
-        </button>
       </div>
 
       {/* Profile Card */}
@@ -116,7 +143,7 @@ export default function ProfilePage() {
             <div className="relative">
               {profile?.profile_image ? (
                 <img 
-                  src={profile.profile_image} 
+                  src={profile?.profile_image} 
                   alt="Profile" 
                   className="w-32 h-32 rounded-2xl object-cover"
                 />
@@ -177,7 +204,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <p className="text-slate-400">
-                {profile?.bio || 'Freelancer'}
+                {profile?.bio || 'Professional freelancer'}
               </p>
               <div className="flex items-center justify-center gap-1 mt-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -307,13 +334,7 @@ export default function ProfilePage() {
                   <p className="text-xs text-slate-500">Member Since</p>
                   <p className="text-sm text-white">
                     {profile?.created_at ? (
-                      <span>
-                        Started {new Date(profile.created_at).toLocaleDateString('en-US', { 
-                          month: 'long', 
-                          day: 'numeric', 
-                          year: 'numeric' 
-                        })}
-                      </span>
+                      <span>{getRelativeTime(profile?.created_at)}</span>
                     ) : (
                       <span className="text-slate-400">Recently joined</span>
                     )}

@@ -46,6 +46,18 @@ export const getUser = async () => {
   return user
 }
 
+export interface UserProfile {
+  display_name?: string;
+  name?: string;
+  bio?: string;
+  skills?: string[];
+  profile_image?: string;
+  created_at?: string;
+  email?: string;
+  id?: string;
+  updated_at?: string;
+}
+
 export const getServicesCount = async (userId: string) => {
   const { count } = await supabase
     .from('services')
@@ -116,11 +128,11 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   }
 }
 
-export const getUserProfile = async (userId: string) => {
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   console.log('Getting user profile for ID:', userId);
   const { data, error } = await supabase
     .from('users')
-    .select('display_name, name')
+    .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at')
     .eq('id', userId)
     .single()
   
