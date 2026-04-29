@@ -509,124 +509,179 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Portfolio Preview */}
+      {/* Portfolio Section */}
       <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Portfolio Items</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-white">Portfolio</h3>
           <button 
-            onClick={() => setShowAddPortfolio(true)}
-            className="flex items-center gap-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors"
+            onClick={() => setShowAddPortfolio(!showAddPortfolio)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors shadow-sm"
           >
-            <Plus className="h-4 w-4" />
-            Add Project
+            {showAddPortfolio ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Add Project
+              </>
+            )}
           </button>
         </div>
         
         {showAddPortfolio && (
-          <div className="mb-6 p-4 bg-slate-800 rounded-lg border border-slate-700">
-            <h4 className="text-white font-medium mb-4">Add New Project</h4>
-            <div className="space-y-4">
+          <div className="mb-6 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
+                <Plus className="h-5 w-5 text-indigo-400" />
+              </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Project Title *</label>
+                <h4 className="text-white font-semibold">Add New Project</h4>
+                <p className="text-slate-400 text-sm">Showcase your best work</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Project Title *</label>
                 <input
                   type="text"
                   value={newPortfolio.title}
                   onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                   placeholder="Enter project title"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                 <textarea
                   value={newPortfolio.description}
                   onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-24 resize-none"
-                  placeholder="Describe your project"
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none transition-all"
+                  placeholder="Describe your project, what you built, and your role"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">External Link</label>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Project Image URL</label>
+                <input
+                  type="url"
+                  value={newPortfolio.image_url}
+                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">External Link</label>
                 <input
                   type="url"
                   value={newPortfolio.external_link}
                   onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="https://example.com"
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  placeholder="https://github.com/username/project"
                 />
               </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => {
-                    setShowAddPortfolio(false);
-                    setNewPortfolio({
-                      title: '',
-                      description: '',
-                      image_url: '',
-                      external_link: ''
-                    });
-                  }}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddPortfolio}
-                  disabled={isSaving || !newPortfolio.title?.trim()}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                >
-                  {isSaving ? (
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowAddPortfolio(false);
+                  setNewPortfolio({
+                    title: '',
+                    description: '',
+                    image_url: '',
+                    external_link: ''
+                  });
+                }}
+                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddPortfolio}
+                disabled={isSaving || !newPortfolio.title?.trim()}
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+              >
+                {isSaving ? (
+                  <>
                     <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <span>Add Project</span>
-                  )}
-                </button>
-              </div>
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Add Project
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolioItems.length > 0 ? (
             portfolioItems.map((item) => (
-              <div key={item.id} className="bg-slate-800 rounded-xl p-4 hover:bg-slate-700 transition-colors group">
-                <div className="relative">
-                  <div className="h-32 bg-slate-700 rounded-lg mb-3 flex items-center justify-center">
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.title} className="w-full h-full object-cover rounded-lg" />
-                    ) : (
-                      <span className="text-slate-400">No image</span>
-                    )}
-                  </div>
+              <div key={item.id} className="group relative bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300">
+                <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
+                  {item.image_url ? (
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-slate-600/50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <Briefcase className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <span className="text-slate-400 text-sm">No Image</span>
+                      </div>
+                    </div>
+                  )}
                   <button
                     onClick={() => handleDeletePortfolio(item.id!)}
-                    className="absolute top-2 left-2 p-1 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-3 right-3 p-2 bg-red-600/90 backdrop-blur-sm text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 shadow-lg"
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                <h4 className="text-sm font-medium text-white mb-2">{item.title}</h4>
-                <p className="text-xs text-slate-400 mb-3 line-clamp-2">{item.description}</p>
-                {item.external_link && (
-                  <a
-                    href={item.external_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                    View Project
-                  </a>
-                )}
+                <div className="p-5">
+                  <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
+                  <p className="text-slate-400 text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                  {item.external_link && (
+                    <a
+                      href={item.external_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View Project
+                    </a>
+                  )}
+                </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-8">
-              <div className="h-32 bg-slate-700 rounded-lg mb-4 flex items-center justify-center mx-auto w-32">
-                <span className="text-slate-400">No projects</span>
+            <div className="col-span-full">
+              <div className="text-center py-12 px-6">
+                <div className="w-24 h-24 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-600/50">
+                  <Briefcase className="h-12 w-12 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">No Projects Yet</h3>
+                <p className="text-slate-400 mb-6 max-w-md mx-auto">
+                  Start building your portfolio by adding your first project. Showcase your best work and impress potential clients.
+                </p>
+                <button
+                  onClick={() => setShowAddPortfolio(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-sm"
+                >
+                  <Plus className="h-5 w-5" />
+                  Add Your First Project
+                </button>
               </div>
-              <h4 className="text-sm font-medium text-white mb-2">No portfolio items yet</h4>
-              <p className="text-xs text-slate-400">Click "Add Project" to showcase your work</p>
             </div>
           )}
         </div>
