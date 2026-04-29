@@ -83,6 +83,24 @@ export interface Service {
   updated_at?: string;
 }
 
+// TypeScript interfaces for messaging
+export interface Conversation {
+  id?: string;
+  freelancer_id: string;
+  client_id: string;
+  created_at?: string;
+  last_message_at?: string;
+  last_message?: string;
+}
+
+export interface Message {
+  id?: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at?: string;
+}
+
 export const getServicesCount = async (userId: string) => {
   const { count } = await supabase
     .from('services')
@@ -386,6 +404,124 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
   } catch (err) {
     console.error('Unexpected error in deleteService:', err);
     return { error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+// Messaging CRUD functions
+export const getConversations = async (userId: string): Promise<Conversation[]> => {
+  console.log('Getting conversations for user:', userId);
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      id,
+      freelancer_id,
+      client_id,
+      created_at,
+      last_message_at,
+      last_message
+    `)
+    .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
+    .order('last_message_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching conversations:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const getMessages = async (conversationId: string): Promise<Message[]> => {
+  console.log('Getting messages for conversation:', conversationId);
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true });
+  
+  if (error) {
+    console.error('Error fetching messages:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>): Promise<{ data: Message | null; error: any }> => {
+  console.log('Creating message:', message);
+  
+  const messageData = {
+    ...message,
+    created_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert(messageData)
+      .select()
+      .single();
+    
+    console.log('Message creation result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    // Update conversation's last_message and last_message_at
+    if (data && !error) {
+      await supabase
+        .from('conversations')
+        .update({
+          last_message: message.content,
+          last_message_at: new Date().toISOString()
+        })
+        .eq('id', message.conversation_id);
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createMessage:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const createConversation = async (conversation: Omit<Conversation, 'id' | 'created_at'>): Promise<{ data: Conversation | null; error: any }> => {
+  console.log('Creating conversation:', conversation);
+  
+  const conversationData = {
+    ...conversation,
+    created_at: new Date().toISOString(),
+    last_message_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert(conversationData)
+      .select()
+      .single();
+    
+    console.log('Conversation creation result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createConversation:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
   }
 };
 

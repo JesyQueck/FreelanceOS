@@ -430,29 +430,6 @@ export default function ServicesPage() {
           </button>
         </div>
       )}
-
-      {/* Tips Section */}
-      <div className="bg-gradient-to-r from-indigo-600/10 to-purple-600/10 rounded-2xl p-6 border border-indigo-500/20">
-        <h3 className="text-lg font-semibold text-white mb-3">Tips for Great Services</h3>
-        <ul className="space-y-2 text-sm text-slate-300">
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-400 mt-1">•</span>
-            <span>Be specific about deliverables and timelines</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-400 mt-1">•</span>
-            <span>Use clear, professional descriptions</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-400 mt-1">•</span>
-            <span>Price competitively based on your experience</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-indigo-400 mt-1">•</span>
-            <span>Include examples of similar work</span>
-          </li>
-        </ul>
-      </div>
     </div>
   );
 }
