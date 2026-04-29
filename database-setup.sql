@@ -10,9 +10,19 @@ CREATE TABLE IF NOT EXISTS users (
 -- Enable RLS (Row Level Security)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Create policy for users to manage their own profile
-CREATE POLICY "Users can manage their own profile" ON users
-  FOR ALL USING (auth.uid() = id);
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can manage their own profile" ON users;
+DROP POLICY IF EXISTS "Users can view their own profile" ON users;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON users;
+DROP POLICY IF EXISTS "Users can update their own profile" ON users;
+
+-- Create policy for users to insert their own profile during signup
+CREATE POLICY "Users can insert their own profile" ON users
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Create policy for users to update their own profile
+CREATE POLICY "Users can update their own profile" ON users
+  FOR UPDATE USING (auth.uid() = id);
 
 -- Create policy for users to view their own profile
 CREATE POLICY "Users can view their own profile" ON users
@@ -28,6 +38,7 @@ END;
 $$ language 'plpgsql';
 
 -- Create trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON users
   FOR EACH ROW
