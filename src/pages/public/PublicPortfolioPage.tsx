@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft } from "lucide-react";
+import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, Search, MoreVertical, Paperclip } from "lucide-react";
 import { getUserProfile, getPortfolioItems, getServices, UserProfile, PortfolioItem, Service, createConversation, createMessage, supabase } from "../../utils/supabase";
 
 export default function PublicPortfolioPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -14,6 +15,8 @@ export default function PublicPortfolioPage() {
   const [messageText, setMessageText] = useState('');
   const [sending, setSending] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [currentConversation, setCurrentConversation] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -58,35 +61,58 @@ export default function PublicPortfolioPage() {
     
     setSending(true);
     try {
-      // Create a temporary client ID for demo purposes
-      // In a real app, this would be the actual logged-in client's ID
-      const clientId = 'temp-client-id';
+      const clientId = 'guest-' + Date.now();
       
-      // Create conversation
-      const conversationResult = await createConversation({
-        freelancer_id: profile.id,
-        client_id: clientId
-      });
-      
-      if (conversationResult.error) {
-        console.error('Error creating conversation:', conversationResult.error);
-        return;
-      }
-      
-      if (conversationResult.data) {
-        // Send initial message
-        await createMessage({
-          conversation_id: conversationResult.data.id!,
-          sender_id: clientId,
-          content: messageText.trim()
+      // Create conversation if not exists
+      let conversation = currentConversation;
+      if (!conversation) {
+        const conversationResult = await createConversation({
+          freelancer_id: profile.id,
+          client_id: clientId
         });
         
-        setMessageSent(true);
+        if (conversationResult.error) {
+          // Fallback
+          const fallbackResult = await createConversation({
+            freelancer_id: profile.id,
+            client_id: profile.id
+          });
+          
+          if (fallbackResult.data) {
+            conversation = fallbackResult.data;
+          }
+        } else if (conversationResult.data) {
+          conversation = conversationResult.data;
+        }
+      }
+      
+      if (conversation) {
+        const messageContent = messageText.trim();
+        const newMessage = {
+          id: Date.now().toString(),
+          conversation_id: conversation.id,
+          sender_id: clientId,
+          content: messageContent,
+          created_at: new Date().toISOString()
+        };
+        
+        // Add message to UI immediately
+        setMessages(prev => [...prev, newMessage]);
+        setMessageText('');
+        
+        // Send to backend
+        await createMessage({
+          conversation_id: conversation.id!,
+          sender_id: clientId,
+          content: messageContent
+        });
+        
+        setCurrentConversation(conversation);
+        
+        // Scroll to bottom
         setTimeout(() => {
-          setShowMessageModal(false);
-          setMessageSent(false);
-          setMessageText('');
-        }, 2000);
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -310,72 +336,92 @@ export default function PublicPortfolioPage() {
         )}
       </div>
 
-      {/* Message Modal */}
+      {/* WhatsApp-style Chat Modal */}
       {showMessageModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-[#0B0F19] rounded-2xl border border-slate-800/60 shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
+            {/* Chat Header */}
+            <div className="bg-[#151B2B] p-4 border-b border-slate-800/60 flex items-center justify-between rounded-t-2xl">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-indigo-400" />
-                </div>
-                <div>
-                  <h4 className="text-white font-semibold">Send Message</h4>
-                  <p className="text-slate-400 text-sm">Contact {profile?.display_name || profile?.username}</p>
+                <button
+                  onClick={() => setShowMessageModal(false)}
+                  className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="h-5 w-5 text-slate-400" />
+                </button>
+                <div className="flex items-center gap-3">
+                  {profile?.profile_image ? (
+                    <img 
+                      src={profile.profile_image} 
+                      alt="Profile" 
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+                      {profile?.display_name?.charAt(0).toUpperCase() || profile?.username?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-sm font-medium text-white">{profile?.display_name || profile?.name || profile?.username || 'Freelancer'}</h3>
+                    <p className="text-xs text-green-400">Active now</p>
+                  </div>
                 </div>
               </div>
-              <button
-                onClick={() => setShowMessageModal(false)}
-                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5 text-slate-400" />
+              <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                <MoreVertical className="h-4 w-4 text-slate-400" />
               </button>
             </div>
-            
-            {messageSent ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Send className="h-8 w-8 text-green-400" />
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F19]">
+              {messages.length === 0 ? (
+                <div className="text-center text-slate-400 py-8">
+                  <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <p className="text-sm">Start the conversation!</p>
+                  <p className="text-xs text-slate-500 mt-2">Introduce yourself and let them know about your project</p>
                 </div>
-                <h4 className="text-white font-semibold mb-2">Message Sent!</h4>
-                <p className="text-slate-400 text-sm">Your message has been delivered successfully.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <textarea
+              ) : (
+                messages.map((message) => (
+                  <div key={message.id} className="flex justify-end">
+                    <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-indigo-600 text-white rounded-br-sm">
+                      <p className="text-sm">{message.content}</p>
+                      <div className="flex items-center gap-1 mt-1 text-xs text-indigo-200">
+                        <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <div className="bg-[#151B2B] p-4 border-t border-slate-800/60 rounded-b-2xl">
+              <div className="flex items-center gap-2">
+                <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                  <Paperclip className="h-4 w-4 text-slate-400" />
+                </button>
+                <input
+                  type="text"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none"
-                  placeholder="Introduce yourself and let them know about your project..."
+                  onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                  placeholder="Type a message..."
+                  disabled={sending}
+                  className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
                   autoFocus
                 />
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowMessageModal(false)}
-                    className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={sending || !messageText.trim()}
-                    className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {sending ? (
-                      <>
-                        <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        Send Message
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button 
+                  onClick={handleSendMessage}
+                  disabled={sending || !messageText.trim()}
+                  className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4 text-white" />
+                </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

@@ -49,7 +49,7 @@ export default function DashboardPage() {
         // Calculate real profile completion percentage
         const calculateProfileCompletion = (profile: any) => {
           let completedFields = 0;
-          const totalFields = 5;
+          const totalFields = 6;
           
           // Check display_name (set during signup)
           if (profile?.display_name && profile.display_name.trim().length > 0) {
@@ -73,6 +73,11 @@ export default function DashboardPage() {
           
           // Check skills array
           if (profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0) {
+            completedFields++;
+          }
+          
+          // Check username (for portfolio sharing)
+          if (profile?.username && profile.username.trim().length > 0) {
             completedFields++;
           }
           

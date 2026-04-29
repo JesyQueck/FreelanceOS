@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, generateShareLink } from "../../utils/supabase";
+import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, generateShareLink, ensureUserHasSlug } from "../../utils/supabase";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -51,6 +51,14 @@ export default function ProfilePage() {
     const fetchProfileData = async () => {
       if (user) {
         try {
+          // First ensure user has username and slug
+          const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
+          
+          if (slugResult.error) {
+            console.error('Error ensuring user has slug:', slugResult.error);
+          }
+          
+          // Then fetch profile data
           const [profileData, portfolioData] = await Promise.all([
             getUserProfile(user.id),
             getPortfolioItems(user.id)
@@ -152,12 +160,30 @@ export default function ProfilePage() {
     }
   };
 
-  const handleShareProfile = () => {
-    const shareLink = generateShareLink(profile?.username, profile?.slug);
+  const handleShareProfile = async () => {
+    if (!user) return;
+    
+    // First ensure user has username and slug
+    const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
+    
+    if (slugResult.error) {
+      alert('Error generating portfolio link. Please try again.');
+      return;
+    }
+    
+    // Refresh profile data to get the new username/slug
+    const updatedProfile = await getUserProfile(user.id);
+    setProfile(updatedProfile);
+    
+    const shareLink = generateShareLink(updatedProfile?.username, updatedProfile?.slug);
     if (shareLink) {
-      navigator.clipboard.writeText(shareLink);
-      // You could add a toast notification here
-      alert('Portfolio link copied to clipboard!');
+      navigator.clipboard.writeText(shareLink).then(() => {
+        alert('Portfolio link copied to clipboard!\n\n' + shareLink);
+      }).catch(() => {
+        alert('Portfolio link: ' + shareLink);
+      });
+    } else {
+      alert('No portfolio link available. Please complete your profile first.');
     }
   };
 

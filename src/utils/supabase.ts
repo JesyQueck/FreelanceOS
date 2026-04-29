@@ -181,6 +181,10 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
         hint: error.hint,
         code: error.code
       });
+    } else {
+      // Clear cache for this user after successful update
+      userProfileCache.delete(userId);
+      console.log('Cache cleared for user:', userId);
     }
     
     return { data, error };
@@ -196,20 +200,105 @@ export const generateShareLink = (username?: string, slug?: string) => {
   return identifier ? `${baseUrl}/portfolio/${identifier}` : null;
 }
 
+// Function to ensure user has username and slug (for existing users)
+export const ensureUserHasSlug = async (userId: string, displayName?: string, email?: string): Promise<{ data: UserProfile | null; error: any }> => {
+  try {
+    // First get current profile
+    const currentProfile = await getUserProfile(userId);
+    
+    if (!currentProfile || (!currentProfile.username && !currentProfile.slug)) {
+      // Generate username and slug
+      let username = currentProfile?.username;
+      let slug = currentProfile?.slug;
+      
+      if (!username) {
+        // Generate from display name or email
+        const baseName = displayName || email?.split('@')[0] || 'user';
+        username = baseName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 1000);
+      }
+      
+      if (!slug) {
+        slug = username;
+      }
+      
+      // Update the user with username and slug
+      const { data, error } = await supabase
+        .from('users')
+        .update({ username, slug, updated_at: new Date().toISOString() })
+        .eq('id', userId)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error updating user with slug:', error);
+        return { data: null, error };
+      }
+      
+      // Clear cache
+      userProfileCache.delete(userId);
+      
+      console.log('Generated username/slug for user:', { userId, username, slug });
+      return { data, error: null };
+    }
+    
+    return { data: currentProfile, error: null };
+  } catch (error) {
+    console.error('Error ensuring user has slug:', error);
+    return { data: null, error };
+  }
+}
+
+// Cache for user profiles to prevent concurrent requests
+const userProfileCache = new Map<string, Promise<UserProfile | null>>();
+const pendingRequests = new Map<string, Promise<UserProfile | null>>();
+
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   console.log('Getting user profile for ID:', userId);
-  const { data, error } = await supabase
-    .from('users')
-    .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at')
-    .eq('id', userId)
-    .single()
   
-  if (error) {
-    console.error('Error fetching user profile:', error);
+  // Check if there's already a pending request for this user
+  if (pendingRequests.has(userId)) {
+    console.log('Using pending request for user:', userId);
+    return pendingRequests.get(userId)!;
   }
   
-  console.log('User profile data:', data);
-  return data
+  // Check cache first
+  if (userProfileCache.has(userId)) {
+    console.log('Using cached profile for user:', userId);
+    return userProfileCache.get(userId)!;
+  }
+  
+  // Create new request promise
+  const requestPromise = (async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      } else {
+        console.log('User profile data:', data);
+        return data;
+      }
+    } catch (error) {
+      console.error('Unexpected error in getUserProfile:', error);
+      return null;
+    } finally {
+      // Clean up pending request
+      pendingRequests.delete(userId);
+    }
+  })();
+  
+  // Store pending request
+  pendingRequests.set(userId, requestPromise);
+  
+  // Cache the result
+  userProfileCache.set(userId, requestPromise);
+  
+  return requestPromise;
 }
 
 // Portfolio items functions
