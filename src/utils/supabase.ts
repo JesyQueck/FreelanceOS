@@ -70,15 +70,24 @@ export const getConversationsCount = async (userId: string) => {
   return count || 0
 }
 
-export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string) => {
-  console.log('createOrUpdateUserProfile called with:', { userId, email, displayName });
+export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string, name?: string, bio?: string, skills?: string[]) => {
+  console.log('createOrUpdateUserProfile called with:', { userId, email, displayName, name, bio, skills });
   
-  const profileData = {
+  const profileData: any = {
     id: userId,
     email: email,
-    display_name: displayName || email.split('@')[0],
     updated_at: new Date().toISOString()
   };
+  
+  // Set created_at for new profiles (when displayName is provided during signup)
+  if (displayName && !name && !bio && !skills) {
+    profileData.created_at = new Date().toISOString();
+  }
+  
+  if (displayName) profileData.display_name = displayName;
+  if (name) profileData.name = name;
+  if (bio) profileData.bio = bio;
+  if (skills) profileData.skills = skills;
   
   console.log('Profile data to upsert:', profileData);
   
