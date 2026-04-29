@@ -7,15 +7,16 @@ import { cookies } from "next/headers";
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
   const cookieStore = await cookies();
-  const allCookies = cookieStore.getAll().map(c => c.name).join(", ");
+  const allCookies = cookieStore.getAll().map((c: any) => c.name).join(", ");
   
-  const { data: { user } } = await supabase.auth.getUser();
+  // High-reliability check for Next.js 15
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!user) {
-    console.error("SESSION ERROR: No user found. Cookies present: ", allCookies);
+  if (authError || !user) {
+    console.error("Profile Update Auth Error:", authError, "Cookies found:", allCookies);
     return { 
       success: false, 
-      error: `Authentication failed. (Found cookies: ${allCookies || 'NONE'}). Please clear cookies for localhost and log in again.` 
+      error: `Auth failed. Cookies seen: [${allCookies || 'NONE'}]. Error: ${authError?.message || 'No Session'}` 
     };
   }
 
@@ -34,9 +35,7 @@ export async function updateProfile(formData: FormData) {
     .eq("id", user.id);
 
   if (error) {
-    console.error("DATABASE ERROR:", error.message);
-    if (error.code === "PGRST116") return { success: false, error: "User profile not found in database." };
-    return { success: false, error: "Database error: " + error.message };
+    return { success: false, error: "Database: " + error.message };
   }
 
   revalidatePath("/dashboard/profile");
@@ -46,10 +45,9 @@ export async function updateProfile(formData: FormData) {
 
 export async function addPortfolioItem(formData: FormData) {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user;
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return { success: false, error: "Unauthorized. Please re-login." };
+  if (!user) return { success: false, error: "Unauthorized" };
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
@@ -75,10 +73,9 @@ export async function addPortfolioItem(formData: FormData) {
 
 export async function deletePortfolioItem(id: string) {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user;
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return { success: false, error: "Unauthorized. Please re-login." };
+  if (!user) return { success: false, error: "Unauthorized" };
 
   const { error } = await supabase
     .from("portfolios")
