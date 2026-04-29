@@ -57,6 +57,8 @@ export interface UserProfile {
   email?: string;
   id?: string;
   updated_at?: string;
+  username?: string;
+  slug?: string;
 }
 
 // TypeScript interface for portfolio items
@@ -91,6 +93,14 @@ export interface Conversation {
   created_at?: string;
   last_message_at?: string;
   last_message?: string;
+  freelancer_user?: {
+    username?: string;
+    display_name?: string;
+  }[];
+  client_user?: {
+    username?: string;
+    display_name?: string;
+  }[];
 }
 
 export interface Message {
@@ -144,6 +154,15 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   if (bio) profileData.bio = bio;
   if (skills) profileData.skills = skills;
   
+  // Generate username and slug if not present
+  if (!profileData.username && displayName) {
+    profileData.username = displayName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 1000);
+  }
+  
+  if (!profileData.slug && profileData.username) {
+    profileData.slug = profileData.username;
+  }
+  
   console.log('Profile data to upsert:', profileData);
   
   try {
@@ -169,6 +188,12 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
     console.error('Unexpected error in createOrUpdateUserProfile:', err);
     return { data: null, error: { message: 'Unexpected error occurred' } };
   }
+}
+
+export const generateShareLink = (username?: string, slug?: string) => {
+  const baseUrl = window.location.origin;
+  const identifier = slug || username;
+  return identifier ? `${baseUrl}/portfolio/${identifier}` : null;
 }
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
@@ -418,7 +443,15 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
       client_id,
       created_at,
       last_message_at,
-      last_message
+      last_message,
+      freelancer_user:users(
+        username,
+        display_name
+      ),
+      client_user:users(
+        username,
+        display_name
+      )
     `)
     .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
     .order('last_message_at', { ascending: false });

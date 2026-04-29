@@ -128,8 +128,20 @@ export default function MessagesPage() {
     return `${diffDays}d ago`;
   };
 
-  const getOtherUserId = (conversation: Conversation) => {
-    return conversation.freelancer_id === user?.id ? conversation.client_id : conversation.freelancer_id;
+  const getOtherUser = (conversation: Conversation) => {
+    const isFreelancer = conversation.freelancer_id === user?.id;
+    const userData = isFreelancer ? conversation.client_user : conversation.freelancer_user;
+    return userData?.[0] || {};
+  };
+
+  const getDisplayName = (conversation: Conversation) => {
+    const otherUser = getOtherUser(conversation);
+    return otherUser.display_name || otherUser.username || 'Unknown User';
+  };
+
+  const getInitials = (conversation: Conversation) => {
+    const name = getDisplayName(conversation);
+    return name.substring(0, 2).toUpperCase();
   };
 
   return (
@@ -169,11 +181,11 @@ export default function MessagesPage() {
                 >
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
-                      {getOtherUserId(conversation).substring(0, 2).toUpperCase()}
+                      {getInitials(conversation)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-sm font-medium text-white truncate">{getOtherUserId(conversation).substring(0, 8)}...</h3>
+                        <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
                         <span className="text-xs text-slate-500">{formatTimeAgo(conversation.last_message_at)}</span>
                       </div>
                       <p className="text-xs text-slate-400 truncate">{conversation.last_message || 'No messages yet'}</p>
@@ -193,10 +205,10 @@ export default function MessagesPage() {
               <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
-                    {getOtherUserId(selectedConversation).substring(0, 2).toUpperCase()}
+                    {getInitials(selectedConversation)}
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-white">{getOtherUserId(selectedConversation).substring(0, 8)}...</h3>
+                    <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
                     <p className="text-xs text-green-400">Active now</p>
                   </div>
                 </div>

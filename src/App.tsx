@@ -11,6 +11,7 @@ import ProfilePage from './pages/profile/ProfilePage'
 import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import MessagesPage from './pages/messages/MessagesPage'
+import PublicPortfolioPage from './pages/public/PublicPortfolioPage'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/portfolio/:slug" element={<PublicPortfolioPage />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardLayout />

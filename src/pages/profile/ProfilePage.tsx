@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save, Plus, ExternalLink, Trash2 } from "lucide-react";
+import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem } from "../../utils/supabase";
+import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, generateShareLink } from "../../utils/supabase";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -152,6 +152,15 @@ export default function ProfilePage() {
     }
   };
 
+  const handleShareProfile = () => {
+    const shareLink = generateShareLink(profile?.username, profile?.slug);
+    if (shareLink) {
+      navigator.clipboard.writeText(shareLink);
+      // You could add a toast notification here
+      alert('Portfolio link copied to clipboard!');
+    }
+  };
+
   const saveField = async () => {
     if (!user || !editingField) return;
     
@@ -222,6 +231,13 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Profile</h1>
+        <button 
+          onClick={handleShareProfile}
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors shadow-sm"
+        >
+          <Share2 className="h-4 w-4" />
+          Share Portfolio
+        </button>
       </div>
 
       {/* Profile Card */}
