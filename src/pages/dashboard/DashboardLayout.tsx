@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell } from "lucide-react";
+import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell, Menu, X } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../utils/supabase";
@@ -9,6 +9,7 @@ export default function DashboardLayout() {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<{ display_name?: string; name?: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -60,10 +61,49 @@ export default function DashboardLayout() {
   return (
     <div className="flex h-screen bg-[#0B0F19] text-slate-50 overflow-hidden font-sans">
       
+      {/* MOBILE OVERLAY */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* MOBILE NAVBAR */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0F1523]/80 backdrop-blur-xl border-b border-slate-800/60">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link 
+            className="flex items-center gap-2.5 group" 
+            to="/dashboard"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
+              <Briefcase className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
+          </Link>
+          
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg bg-[#151B2B]/50 hover:bg-[#151B2B] transition-colors"
+          >
+            {sidebarOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
+          </button>
+        </div>
+      </header>
+
       {/* SIDEBAR */}
-      <aside className="w-64 border-r border-slate-800/60 bg-[#0F1523]/50 backdrop-blur-xl flex-shrink-0 flex flex-col z-20">
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-40 w-64 border-r border-slate-800/60 bg-[#0F1523]/50 backdrop-blur-xl flex-shrink-0 flex flex-col 
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         <div className="h-20 flex items-center px-6 border-b border-transparent">
-          <Link className="flex items-center gap-2.5 group" to="/dashboard">
+          <Link 
+          className="flex items-center gap-2.5 group" 
+          to="/dashboard"
+          onClick={() => setSidebarOpen(false)}
+        >
             <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
               <Briefcase className="h-5 w-5 text-white" />
             </div>
@@ -76,7 +116,11 @@ export default function DashboardLayout() {
             Overview
           </p>
           <nav className="space-y-1">
-            <Link to="/dashboard" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+            <Link 
+              to="/dashboard" 
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group"
+              onClick={() => setSidebarOpen(false)}
+            >
               <div className="flex items-center gap-3">
                 <LayoutDashboard className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-medium">Dashboard</span>
@@ -84,7 +128,11 @@ export default function DashboardLayout() {
               <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
             
-            <Link to="/dashboard/profile" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+            <Link 
+              to="/dashboard/profile" 
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group"
+              onClick={() => setSidebarOpen(false)}
+            >
               <div className="flex items-center gap-3">
                 <UserCircle className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-medium">Profile</span>
@@ -92,7 +140,11 @@ export default function DashboardLayout() {
               <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
             
-            <Link to="/dashboard/services" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+            <Link 
+              to="/dashboard/services" 
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group"
+              onClick={() => setSidebarOpen(false)}
+            >
               <div className="flex items-center gap-3">
                 <Target className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-medium">Services</span>
@@ -100,7 +152,11 @@ export default function DashboardLayout() {
               <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
             
-            <Link to="/dashboard/messages" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+            <Link 
+              to="/dashboard/messages" 
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group"
+              onClick={() => setSidebarOpen(false)}
+            >
               <div className="flex items-center gap-3">
                 <MessageSquare className="h-4 w-4 group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-medium">Messages</span>
@@ -163,7 +219,7 @@ export default function DashboardLayout() {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto pt-16 lg:pt-0 p-4 lg:p-6">
           <Outlet />
         </div>
       </main>

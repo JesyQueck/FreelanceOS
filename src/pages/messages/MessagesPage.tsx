@@ -159,21 +159,21 @@ export default function MessagesPage() {
 
   return (
     <div className="h-full flex flex-col bg-[#0B0F19]">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-white">Messages</h1>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search conversations..."
-            className="pl-10 pr-4 py-2 bg-[#151B2B] border border-slate-800/60 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50"
+            className="pl-10 pr-4 py-2 bg-[#151B2B] border border-slate-800/60 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 w-full sm:w-auto"
           />
         </div>
       </div>
 
-      <div className="flex-1 flex gap-4 min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
         {/* Conversations List */}
-        <div className="w-80 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col">
+        <div className="w-full lg:w-80 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col">
           <div className="p-4 border-b border-slate-800/60">
             <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">All Conversations</h2>
           </div>
@@ -211,7 +211,7 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col">
+        <div className="flex-1 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col min-w-0">
           {selectedConversation ? (
             <>
               {/* Chat Header */}

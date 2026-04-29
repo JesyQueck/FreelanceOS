@@ -141,27 +141,27 @@ export default function DashboardPage() {
       </div>
 
       {/* Profile Completion Indicator */}
-      <div className="bg-[#151B2B] rounded-xl p-8 border border-slate-800/60 shadow-sm relative overflow-hidden group mb-8">
+      <div className="bg-[#151B2B] rounded-xl p-6 border border-slate-800/60 shadow-sm relative overflow-hidden group mb-8">
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-amber-500" />
               <h3 className="font-semibold text-lg text-white">Profile is {data.progressPercent}% complete</h3>
             </div>
-            <div className="w-full bg-slate-800 rounded-lg h-3 mb-4">
+            <div className="w-full bg-slate-800 rounded-lg h-2 mb-3">
               <div 
-                className="bg-gradient-to-r from-amber-500 to-orange-500 h-3 rounded-lg transition-all duration-500"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-lg transition-all duration-500"
                 style={{ width: `${data.progressPercent}%` }}
               />
             </div>
-            <p className="text-base text-slate-400">
+            <p className="text-sm text-slate-400">
               Complete your profile to attract more clients and appear in search results.
             </p>
           </div>
           <button 
             onClick={() => navigate('/dashboard/profile')}
-            className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             Complete Profile
           </button>
@@ -169,49 +169,49 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-[#151B2B] rounded-xl p-8 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-indigo-600/10 rounded-lg">
-              <Target className="h-6 w-6 text-indigo-400" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-[#151B2B] rounded-xl p-4 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-indigo-600/10 rounded-lg">
+              <Target className="h-5 w-5 text-indigo-400" />
             </div>
             <span className="text-xs text-slate-500 font-medium">{data.servicesCount > 0 ? '+12%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">{data.servicesCount}</h3>
-          <p className="text-base text-slate-400">Active Services</p>
+          <h3 className="text-xl font-bold text-white mb-1">{data.servicesCount}</h3>
+          <p className="text-sm text-slate-400">Active Services</p>
         </div>
 
-        <div className="bg-[#151B2B] rounded-xl p-8 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-green-600/10 rounded-lg">
-              <Eye className="h-6 w-6 text-green-400" />
+        <div className="bg-[#151B2B] rounded-xl p-4 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-green-600/10 rounded-lg">
+              <Eye className="h-5 w-5 text-green-400" />
             </div>
             <span className="text-xs text-slate-500 font-medium">{data.portfoliosCount > 0 ? '+25%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">{data.portfoliosCount}</h3>
-          <p className="text-base text-slate-400">Portfolio Items</p>
+          <h3 className="text-xl font-bold text-white mb-1">{data.portfoliosCount}</h3>
+          <p className="text-sm text-slate-400">Portfolio Items</p>
         </div>
 
-        <div className="bg-[#151B2B] rounded-xl p-8 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-purple-600/10 rounded-lg">
-              <MessageSquare className="h-6 w-6 text-purple-400" />
+        <div className="bg-[#151B2B] rounded-xl p-4 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-purple-600/10 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-purple-400" />
             </div>
             <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+8%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">{data.convosCount}</h3>
-          <p className="text-base text-slate-400">Conversations</p>
+          <h3 className="text-xl font-bold text-white mb-1">{data.convosCount}</h3>
+          <p className="text-sm text-slate-400">Conversations</p>
         </div>
 
-        <div className="bg-[#151B2B] rounded-xl p-8 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-6">
-            <div className="p-3 bg-amber-600/10 rounded-lg">
-              <ArrowUpRight className="h-6 w-6 text-amber-400" />
+        <div className="bg-[#151B2B] rounded-xl p-4 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <div className="p-2 bg-amber-600/10 rounded-lg">
+              <ArrowUpRight className="h-5 w-5 text-amber-400" />
             </div>
             <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+18%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">${data.servicesCount > 0 ? '$4,250' : '$0'}</h3>
-          <p className="text-base text-slate-400">Monthly Revenue</p>
+          <h3 className="text-xl font-bold text-white mb-1">${data.servicesCount > 0 ? '$4,250' : '$0'}</h3>
+          <p className="text-sm text-slate-400">Monthly Revenue</p>
         </div>
       </div>
 
