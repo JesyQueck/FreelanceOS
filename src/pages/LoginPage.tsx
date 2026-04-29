@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { signIn } from "../utils/supabase";
 
 const initialState = {
   message: "",
@@ -20,16 +21,22 @@ export default function LoginPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Simulate authentication (replace with actual auth logic)
-    setTimeout(() => {
-      if (email && password) {
+    try {
+      const { data, error } = await signIn(email, password);
+      
+      if (error) {
+        setState({ message: error.message, success: false });
+      } else if (data.user) {
         setState({ message: "Login successful", success: true });
         navigate('/dashboard');
       } else {
-        setState({ message: "Invalid credentials", success: false });
+        setState({ message: "Login failed", success: false });
       }
+    } catch (err) {
+      setState({ message: "An unexpected error occurred", success: false });
+    } finally {
       setIsPending(false);
-    }, 1000);
+    }
   };
 
   return (

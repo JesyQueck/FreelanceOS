@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Mail, Lock, Briefcase, Zap } from "lucide-react";
+import { signUp } from "../utils/supabase";
 
 const initialState = {
   message: "",
@@ -19,15 +20,19 @@ export default function SignupPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    // Simulate signup (replace with actual auth logic)
-    setTimeout(() => {
-      if (email && password) {
-        setState({ message: "Account created successfully! Please check your email.", success: true });
+    try {
+      const { data: _data, error } = await signUp(email, password);
+      
+      if (error) {
+        setState({ message: error.message, success: false });
       } else {
-        setState({ message: "Please fill in all fields", success: false });
+        setState({ message: "Account created successfully! Please check your email to verify your account.", success: true });
       }
+    } catch (err) {
+      setState({ message: "An unexpected error occurred", success: false });
+    } finally {
       setIsPending(false);
-    }, 1000);
+    }
   };
 
   return (
