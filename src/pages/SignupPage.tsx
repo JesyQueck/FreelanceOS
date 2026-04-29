@@ -21,27 +21,55 @@ export default function SignupPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
+    // Validate display name
+    if (!displayName || displayName.trim().length < 2) {
+      setState({ message: "Display name must be at least 2 characters long.", success: false });
+      setIsPending(false);
+      return;
+    }
+
     try {
-      const { data: _data, error } = await signUp(email, password);
+      console.log('Starting signup process for:', { email, displayName });
       
-      if (error) {
-        setState({ message: error.message, success: false });
-      } else if (_data.user) {
-        // Create user profile in database
-        try {
-          console.log('Creating user profile with:', { userId: _data.user.id, email, displayName });
-          const profileResult = await createOrUpdateUserProfile(_data.user.id, email, displayName);
-          console.log('Profile creation result:', profileResult);
-          setState({ message: "Account created successfully! You can now log in.", success: true });
-        } catch (profileError) {
-          console.error('Error creating user profile:', profileError);
+      // Step 1: Create user account
+      const { data: authData, error: authError } = await signUp(email, password);
+      
+      if (authError) {
+        console.error('Auth error:', authError);
+        setState({ message: authError.message, success: false });
+        setIsPending(false);
+        return;
+      }
+      
+      if (!authData.user) {
+        console.error('No user data returned from auth');
+        setState({ message: "Account creation failed. Please try again.", success: false });
+        setIsPending(false);
+        return;
+      }
+      
+      console.log('User created successfully:', authData.user.id);
+      
+      // Step 2: Create user profile
+      try {
+        console.log('Creating user profile with:', { userId: authData.user.id, email, displayName });
+        const profileResult = await createOrUpdateUserProfile(authData.user.id, email, displayName.trim());
+        console.log('Profile creation result:', profileResult);
+        
+        if (profileResult.error) {
+          console.error('Profile creation error:', profileResult.error);
           setState({ message: "Account created but profile setup failed. Please contact support.", success: false });
+        } else {
+          console.log('Profile created successfully');
+          setState({ message: "Account created successfully! You can now log in.", success: true });
         }
-      } else {
-        setState({ message: "Account creation failed", success: false });
+      } catch (profileError) {
+        console.error('Profile creation exception:', profileError);
+        setState({ message: "Account created but profile setup failed. Please contact support.", success: false });
       }
     } catch (err) {
-      setState({ message: "An unexpected error occurred", success: false });
+      console.error('Signup process error:', err);
+      setState({ message: "An unexpected error occurred. Please try again.", success: false });
     } finally {
       setIsPending(false);
     }

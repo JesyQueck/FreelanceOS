@@ -71,16 +71,24 @@ export const getConversationsCount = async (userId: string) => {
 }
 
 export const createOrUpdateUserProfile = async (userId: string, email: string, name?: string) => {
+  console.log('createOrUpdateUserProfile called with:', { userId, email, name });
+  
+  const profileData = {
+    id: userId,
+    email: email,
+    name: name || email.split('@')[0],
+    updated_at: new Date().toISOString()
+  };
+  
+  console.log('Profile data to upsert:', profileData);
+  
   const { data, error } = await supabase
     .from('users')
-    .upsert({
-      id: userId,
-      email: email,
-      name: name || email.split('@')[0],
-      updated_at: new Date().toISOString()
-    })
+    .upsert(profileData)
     .select()
     .single()
+  
+  console.log('Upsert result:', { data, error });
   
   return { data, error }
 }

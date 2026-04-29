@@ -8,6 +8,7 @@ import SignupPage from './pages/SignupPage'
 import DashboardLayout from './pages/dashboard/DashboardLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import ProfilePage from './pages/profile/ProfilePage'
+import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import MessagesPage from './pages/messages/MessagesPage'
 
@@ -27,6 +28,7 @@ function App() {
             }>
               <Route index element={<DashboardPage />} />
               <Route path="profile" element={<ProfilePage />} />
+              <Route path="profile/edit" element={<EditProfilePage />} />
               <Route path="services" element={<ServicesPage />} />
               <Route path="messages" element={<MessagesPage />} />
             </Route>
