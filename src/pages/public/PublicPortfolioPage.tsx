@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, Search, MoreVertical, Paperclip } from "lucide-react";
+import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, MoreVertical, Paperclip } from "lucide-react";
 import { getUserProfile, getPortfolioItems, getServices, UserProfile, PortfolioItem, Service, createConversation, createMessage, supabase } from "../../utils/supabase";
 
 export default function PublicPortfolioPage() {
@@ -14,7 +14,6 @@ export default function PublicPortfolioPage() {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [sending, setSending] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
 
