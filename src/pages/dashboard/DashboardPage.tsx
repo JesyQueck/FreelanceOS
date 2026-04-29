@@ -1,0 +1,143 @@
+import { MessageSquare, Target, Eye, ArrowUpRight, Plus, ExternalLink, Sparkles } from "lucide-react";
+
+export default function DashboardPage() {
+  // Mock data - replace with actual data from your API
+  const displayName = "Alex";
+  const servicesCount = 3;
+  const portfoliosCount = 2;
+  const convosCount = 5;
+  const stepsCompleted = 3;
+  const progressPercent = (stepsCompleted / 5) * 100;
+
+  return (
+    <>
+      {/* Header & Welcome */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
+            Good afternoon, {displayName}
+          </h1>
+          <p className="text-slate-400">
+            Here's what is happening with your freelance business today.
+          </p>
+        </div>
+        <button className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white transition-all bg-indigo-600 rounded-full hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 gap-2">
+          <Plus className="h-4 w-4" /> Add Service
+        </button>
+      </div>
+
+      {/* Profile Completion Indicator */}
+      <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              <h3 className="font-semibold text-lg text-white">Profile is {progressPercent}% complete</h3>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-2 mb-3">
+              <div 
+                className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-sm text-slate-400">
+              Complete your profile to attract more clients and appear in search results.
+            </p>
+          </div>
+          <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">
+            Complete Profile
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-indigo-600/10 rounded-lg">
+              <Target className="h-5 w-5 text-indigo-400" />
+            </div>
+            <span className="text-xs text-slate-500 font-medium">+12%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">{servicesCount}</h3>
+          <p className="text-sm text-slate-400">Active Services</p>
+        </div>
+
+        <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-green-600/10 rounded-lg">
+              <Eye className="h-5 w-5 text-green-400" />
+            </div>
+            <span className="text-xs text-slate-500 font-medium">+25%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">{portfoliosCount}</h3>
+          <p className="text-sm text-slate-400">Portfolio Items</p>
+        </div>
+
+        <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-purple-600/10 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-purple-400" />
+            </div>
+            <span className="text-xs text-slate-500 font-medium">+8%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">{convosCount}</h3>
+          <p className="text-sm text-slate-400">Conversations</p>
+        </div>
+
+        <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-amber-600/10 rounded-lg">
+              <ArrowUpRight className="h-5 w-5 text-amber-400" />
+            </div>
+            <span className="text-xs text-slate-500 font-medium">+18%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">$4,250</h3>
+          <p className="text-sm text-slate-400">Monthly Revenue</p>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
+        <div className="bg-[#151B2B] rounded-2xl border border-slate-800/60 shadow-sm overflow-hidden">
+          <div className="divide-y divide-slate-800/60">
+            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div>
+                  <p className="text-sm font-medium text-white">New message from Sarah</p>
+                  <p className="text-xs text-slate-400">2 minutes ago</p>
+                </div>
+              </div>
+              <ExternalLink className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+            </div>
+            
+            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div>
+                  <p className="text-sm font-medium text-white">Service "Logo Design" viewed</p>
+                  <p className="text-xs text-slate-400">1 hour ago</p>
+                </div>
+              </div>
+              <Eye className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+            </div>
+            
+            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                <div>
+                  <p className="text-sm font-medium text-white">Profile updated</p>
+                  <p className="text-xs text-slate-400">3 hours ago</p>
+                </div>
+              </div>
+              <Target className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

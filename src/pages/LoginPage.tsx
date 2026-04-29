@@ -1,10 +1,6 @@
-"use client";
-
-import { useActionState, useEffect } from "react";
-import Link from "next/link";
-import { loginAction } from "./actions";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 const initialState = {
   message: "",
@@ -12,15 +8,29 @@ const initialState = {
 };
 
 export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(loginAction, initialState);
-  const router = useRouter();
+  const [state, setState] = useState(initialState);
+  const [isPending, setIsPending] = useState(false);
+  const navigate = useNavigate();
 
-  // HARD REDIRECT: If the server action succeeded but navigation is stuck.
-  useEffect(() => {
-    if (state?.success) {
-      window.location.href = "/dashboard";
-    }
-  }, [state?.success]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    // Simulate authentication (replace with actual auth logic)
+    setTimeout(() => {
+      if (email && password) {
+        setState({ message: "Login successful", success: true });
+        navigate('/dashboard');
+      } else {
+        setState({ message: "Invalid credentials", success: false });
+      }
+      setIsPending(false);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center p-4 font-sans antialiased selection:bg-indigo-500/30">
@@ -40,7 +50,7 @@ export default function LoginPage() {
         <div className="bg-[#151B2B] p-10 rounded-[2.5rem] border border-slate-800/60 shadow-[0_30px_70px_rgba(0,0,0,0.7)] relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/5 blur-[80px] rounded-full" />
           
-          <form action={formAction} className="space-y-6 relative z-10">
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Email Address</label>
@@ -56,15 +66,12 @@ export default function LoginPage() {
                     className="w-full bg-[#0B0F19] border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 hover:border-slate-700 transition-all text-sm"
                   />
                 </div>
-                {state?.errors?.email && (
-                   <p className="mt-2 text-xs text-red-500/80 ml-1 font-medium italic">{state.errors.email[0]}</p>
-                )}
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-2.5 ml-1">
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Password</label>
-                  <Link href="#" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 transition-colors uppercase tracking-widest">Reset?</Link>
+                  <Link to="#" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 transition-colors uppercase tracking-widest">Reset?</Link>
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-600 group-focus-within:text-indigo-400 transition-colors">
@@ -78,9 +85,6 @@ export default function LoginPage() {
                     className="w-full bg-[#0B0F19] border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 hover:border-slate-700 transition-all text-sm"
                   />
                 </div>
-                {state?.errors?.password && (
-                   <p className="mt-2 text-xs text-red-500/80 ml-1 font-medium italic">{state.errors.password[0]}</p>
-                )}
               </div>
             </div>
 
@@ -108,7 +112,7 @@ export default function LoginPage() {
 
           <p className="text-center mt-10 text-slate-600 text-xs font-medium">
             Not a member? {" "}
-            <Link href="/signup" className="text-slate-300 font-bold hover:text-indigo-400 transition-colors underline-offset-4 hover:underline">
+            <Link to="/signup" className="text-slate-300 font-bold hover:text-indigo-400 transition-colors underline-offset-4 hover:underline">
               Request Access
             </Link>
           </p>

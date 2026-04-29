@@ -1,39 +1,57 @@
-"use client";
-
-import { useActionState } from "react";
-import Link from "next/link";
-import { signupAction } from "./actions";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Loader2, Mail, Lock, Briefcase, Zap } from "lucide-react";
 
 const initialState = {
   message: "",
+  success: false,
 };
 
 export default function SignupPage() {
-  const [state, formAction, isPending] = useActionState(signupAction, initialState);
+  const [state, setState] = useState(initialState);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsPending(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    // Simulate signup (replace with actual auth logic)
+    setTimeout(() => {
+      if (email && password) {
+        setState({ message: "Account created successfully! Please check your email.", success: true });
+      } else {
+        setState({ message: "Please fill in all fields", success: false });
+      }
+      setIsPending(false);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center p-4 font-sans antialiased selection:bg-indigo-500/30">
       <div className="w-full max-w-md">
         {/* Unified Branding Logo */}
         <div className="flex flex-col items-center mb-10 group animate-in fade-in zoom-in duration-700">
-           <div className="flex items-center gap-3 mb-6">
-              <div className="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
-                <Briefcase className="text-white h-6 w-6" />
-              </div>
-              <span className="text-white font-black text-2xl tracking-tighter group-hover:text-indigo-400 transition-colors duration-500">Freelance<span className="text-indigo-500">OS</span></span>
-           </div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)] group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
+              <Briefcase className="text-white h-6 w-6" />
+            </div>
+            <span className="text-white font-black text-2xl tracking-tighter group-hover:text-indigo-400 transition-colors duration-500">Freelance<span className="text-indigo-500">OS</span></span>
+          </div>
           <h1 className="text-3xl font-bold text-white tracking-tight text-center px-4">Begin Your Tenure</h1>
           <p className="text-slate-500 mt-2 text-sm font-medium flex items-center gap-2">
-             <Zap className="h-4 w-4 text-indigo-500 animate-pulse" /> Join the professional network
+            <Zap className="h-4 w-4 text-indigo-500 animate-pulse" /> Join the professional network
           </p>
         </div>
 
         <div className="bg-[#151B2B] p-10 rounded-[2.5rem] border border-slate-800/60 shadow-[0_30px_70px_rgba(0,0,0,0.7)] relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
-           {/* Subtle Gradient Glow */}
-           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-600/5 blur-[80px] rounded-full" />
+          {/* Subtle Gradient Glow */}
+          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-600/5 blur-[80px] rounded-full" />
 
-          <form action={formAction} className="space-y-6 relative z-10">
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Work Email</label>
@@ -49,9 +67,6 @@ export default function SignupPage() {
                     className="w-full bg-[#0B0F19] border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 hover:border-slate-700 transition-all text-sm"
                   />
                 </div>
-                {state?.errors?.email && (
-                   <p className="mt-2 text-xs text-red-500/80 ml-1 font-medium italic">{state.errors.email[0]}</p>
-                )}
               </div>
 
               <div>
@@ -68,9 +83,6 @@ export default function SignupPage() {
                     className="w-full bg-[#0B0F19] border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 hover:border-slate-700 transition-all text-sm"
                   />
                 </div>
-                {state?.errors?.password && (
-                   <p className="mt-2 text-xs text-red-500/80 ml-1 font-medium italic">{state.errors.password[0]}</p>
-                )}
               </div>
             </div>
 
@@ -95,7 +107,7 @@ export default function SignupPage() {
 
           <div className="text-center mt-10">
             <span className="text-slate-600 text-xs font-medium">Existing user?</span>{" "}
-            <Link href="/login" className="text-slate-300 font-bold hover:text-indigo-400 transition-colors text-xs underline-offset-4 hover:underline">
+            <Link to="/login" className="text-slate-300 font-bold hover:text-indigo-400 transition-colors text-xs underline-offset-4 hover:underline">
               Enter Platform
             </Link>
           </div>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { ArrowRight, Briefcase, FileText, Share2, MessageCircle, BarChart3, Star, CheckCircle2 } from "lucide-react";
 
 export default function LandingPage() {
@@ -17,14 +17,14 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
-            <Link href="#how-it-works" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">How it works</Link>
-            <Link href="#features" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</Link>
+            <Link to="#how-it-works" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">How it works</Link>
+            <Link to="#features" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center">
+            <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center">
               Log in
             </Link>
-            <Link href="/login" className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm flex items-center">
+            <Link to="/login" className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm flex items-center">
               Get Started
             </Link>
           </div>
@@ -56,13 +56,13 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6">
             <Link
-              href="/login"
+              to="/login"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm hover:shadow-md gap-2"
             >
               Get Started <ArrowRight className="h-4 w-4 shrink-0 transition-transform hover:translate-x-1" />
             </Link>
             <Link
-              href="#demo"
+              to="#demo"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-slate-200 transition-all bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-800/80 shadow-sm gap-2"
             >
               View Demo Profile
@@ -252,7 +252,7 @@ export default function LandingPage() {
                 Join our private beta today and get early access to the most powerful tool built specifically for independent professionals.
               </p>
               <Link
-                href="/login"
+                to="/login"
                 className="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-indigo-500 transition-colors shadow-xl shadow-indigo-600/20"
               >
                 Create your Free Account
@@ -271,9 +271,9 @@ export default function LandingPage() {
           </div>
           <p>© 2026 FreelanceOS. Designed for world-class talent.</p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Twitter</Link>
-            <Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Dribbble</Link>
-            <Link href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms</Link>
+            <Link to="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Twitter</Link>
+            <Link to="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Dribbble</Link>
+            <Link to="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms</Link>
           </div>
         </div>
       </footer>

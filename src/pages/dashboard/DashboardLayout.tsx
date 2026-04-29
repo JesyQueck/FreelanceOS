@@ -1,0 +1,118 @@
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell } from "lucide-react";
+
+export default function DashboardLayout() {
+  const navigate = useNavigate();
+  const displayName = "Alex"; // Mock data - replace with actual user data
+  const initial = displayName.charAt(0).toUpperCase();
+
+  const handleLogout = () => {
+    // Handle logout logic here
+    navigate('/login');
+  };
+
+  return (
+    <div className="flex h-screen bg-[#0B0F19] text-slate-50 overflow-hidden font-sans">
+      
+      {/* SIDEBAR */}
+      <aside className="w-64 border-r border-slate-800/60 bg-[#0F1523]/50 backdrop-blur-xl flex-shrink-0 flex flex-col z-20">
+        <div className="h-20 flex items-center px-6 border-b border-transparent">
+          <Link className="flex items-center gap-2.5 group" to="/dashboard">
+            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
+              <Briefcase className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
+          </Link>
+        </div>
+        
+        <div className="px-4 py-4">
+          <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            Overview
+          </p>
+          <nav className="space-y-1">
+            <Link to="/dashboard" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+              <div className="flex items-center gap-3">
+                <LayoutDashboard className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium">Dashboard</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+            
+            <Link to="/dashboard/profile" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+              <div className="flex items-center gap-3">
+                <UserCircle className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium">Profile</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+            
+            <Link to="/dashboard/services" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+              <div className="flex items-center gap-3">
+                <Target className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium">Services</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+            
+            <Link to="/dashboard/messages" className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+              <div className="flex items-center gap-3">
+                <MessageSquare className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium">Messages</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
+          </nav>
+          
+          <div className="mt-8">
+            <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Settings
+            </p>
+            <nav className="space-y-1">
+              <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group">
+                <div className="flex items-center gap-3">
+                  <Settings className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium">Settings</span>
+                </div>
+                <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+              
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-medium">Log out</span>
+                </div>
+                <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            </nav>
+          </div>
+        </div>
+        
+        {/* User Profile Section */}
+        <div className="mt-auto p-4 border-t border-slate-800/60">
+          <div className="flex items-center gap-3 px-3 py-2">
+            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+              {initial}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">{displayName}</p>
+              <p className="text-xs text-slate-400 truncate">alex@freelance.os</p>
+            </div>
+            <button className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
+              <Bell className="h-4 w-4 text-slate-400" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6">
+          <Outlet />
+        </div>
+      </main>
+    </div>
+  );
+}
