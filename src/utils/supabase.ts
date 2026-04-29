@@ -70,12 +70,34 @@ export const getConversationsCount = async (userId: string) => {
   return count || 0
 }
 
+export const createOrUpdateUserProfile = async (userId: string, email: string, name?: string) => {
+  const { data, error } = await supabase
+    .from('users')
+    .upsert({
+      id: userId,
+      email: email,
+      name: name || email.split('@')[0],
+      updated_at: new Date().toISOString()
+    })
+    .select()
+    .single()
+  
+  return { data, error }
+}
+
 export const getUserProfile = async (userId: string) => {
-  const { data } = await supabase
+  console.log('Getting user profile for ID:', userId);
+  const { data, error } = await supabase
     .from('users')
     .select('name')
     .eq('id', userId)
     .single()
+  
+  if (error) {
+    console.error('Error fetching user profile:', error);
+  }
+  
+  console.log('User profile data:', data);
   return data
 }
 

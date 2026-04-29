@@ -1,14 +1,49 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { getUserProfile } from "../../utils/supabase";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
-  const displayName = "Alex"; // Mock data - replace with actual user data
-  const initial = displayName.charAt(0).toUpperCase();
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<{ name?: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    navigate('/login');
+  useEffect(() => {
+    if (user) {
+      console.log('Fetching profile for user:', user.id);
+      getUserProfile(user.id)
+        .then((profile) => {
+          console.log('User profile fetched:', profile);
+          setUserProfile(profile);
+        })
+        .catch((error) => {
+          console.error('Error fetching user profile:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const displayName = userProfile?.name || user?.email?.split('@')[0] || 'User';
+  const userEmail = user?.email || '';
+  const initial = displayName.charAt(0).toUpperCase();
+  
+  console.log('Dashboard display data:', { displayName, userEmail, userProfile });
+
+  const handleLogout = async () => {
+    try {
+      const { signOut } = await import("../../utils/supabase");
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      navigate('/login');
+    }
   };
 
   return (
@@ -94,11 +129,19 @@ export default function DashboardLayout() {
         <div className="mt-auto p-4 border-t border-slate-800/60">
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
-              {initial}
+              {loading ? (
+                <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+              ) : (
+                initial
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{displayName}</p>
-              <p className="text-xs text-slate-400 truncate">alex@freelance.os</p>
+              <p className="text-sm font-medium text-white truncate">
+                {loading ? 'Loading...' : displayName}
+              </p>
+              <p className="text-xs text-slate-400 truncate">
+                {loading ? 'Loading...' : userEmail}
+              </p>
             </div>
             <button className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
               <Bell className="h-4 w-4 text-slate-400" />

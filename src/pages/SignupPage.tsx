@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Mail, Lock, Briefcase, Zap } from "lucide-react";
-import { signUp } from "../utils/supabase";
+import { signUp, createOrUpdateUserProfile } from "../utils/supabase";
 
 const initialState = {
   message: "",
@@ -17,6 +17,7 @@ export default function SignupPage() {
     setIsPending(true);
     
     const formData = new FormData(e.currentTarget);
+    const displayName = formData.get('displayName') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
@@ -25,8 +26,19 @@ export default function SignupPage() {
       
       if (error) {
         setState({ message: error.message, success: false });
+      } else if (_data.user) {
+        // Create user profile in database
+        try {
+          console.log('Creating user profile with:', { userId: _data.user.id, email, displayName });
+          const profileResult = await createOrUpdateUserProfile(_data.user.id, email, displayName);
+          console.log('Profile creation result:', profileResult);
+          setState({ message: "Account created successfully! You can now log in.", success: true });
+        } catch (profileError) {
+          console.error('Error creating user profile:', profileError);
+          setState({ message: "Account created but profile setup failed. Please contact support.", success: false });
+        }
       } else {
-        setState({ message: "Account created successfully! Please check your email to verify your account.", success: true });
+        setState({ message: "Account creation failed", success: false });
       }
     } catch (err) {
       setState({ message: "An unexpected error occurred", success: false });
@@ -58,6 +70,22 @@ export default function SignupPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             <div className="space-y-5">
+              <div>
+                <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Display Name</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-600 group-focus-within:text-indigo-400 transition-colors">
+                    <Briefcase className="h-4 w-4" />
+                  </div>
+                  <input
+                    name="displayName"
+                    type="text"
+                    placeholder="John Doe"
+                    required
+                    className="w-full bg-[#0B0F19] border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 hover:border-slate-700 transition-all text-sm"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2.5 ml-1">Work Email</label>
                 <div className="relative group">
