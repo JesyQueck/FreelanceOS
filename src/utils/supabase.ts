@@ -70,6 +70,19 @@ export interface PortfolioItem {
   created_at?: string;
 }
 
+// TypeScript interface for services
+export interface Service {
+  id?: string;
+  user_id?: string;
+  title: string;
+  description?: string;
+  price?: string;
+  timeline?: string;
+  status?: 'active' | 'draft';
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const getServicesCount = async (userId: string) => {
   const { count } = await supabase
     .from('services')
@@ -259,6 +272,119 @@ export const deletePortfolioItem = async (id: string): Promise<{ error: any }> =
     return { error };
   } catch (err) {
     console.error('Unexpected error in deletePortfolioItem:', err);
+    return { error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+// Services CRUD functions
+export const getServices = async (userId: string): Promise<Service[]> => {
+  console.log('Getting services for user:', userId);
+  const { data, error } = await supabase
+    .from('services')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching services:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'created_at' | 'updated_at'>, userId: string): Promise<{ data: Service | null; error: any }> => {
+  console.log('Creating service:', { ...service, userId });
+  
+  const serviceData = {
+    ...service,
+    user_id: userId,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .insert(serviceData)
+      .select()
+      .single();
+    
+    console.log('Service creation result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createService:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const updateService = async (id: string, service: Partial<Service>): Promise<{ data: Service | null; error: any }> => {
+  console.log('Updating service:', { id, ...service });
+  
+  const updateData = {
+    ...service,
+    updated_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    console.log('Service update result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in updateService:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const deleteService = async (id: string): Promise<{ error: any }> => {
+  console.log('Deleting service:', id);
+  
+  try {
+    const { error } = await supabase
+      .from('services')
+      .delete()
+      .eq('id', id);
+    
+    console.log('Service deletion result:', { error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { error };
+  } catch (err) {
+    console.error('Unexpected error in deleteService:', err);
     return { error: { message: 'Unexpected error occurred' } };
   }
 };

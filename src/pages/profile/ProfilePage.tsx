@@ -279,7 +279,7 @@ export default function ProfilePage() {
                 ) : (
                   <>
                     <h2 className="text-xl font-bold text-white">
-                      {profile?.name || profile?.display_name || 'User'}
+                      {profile?.display_name || profile?.name || 'User'}
                     </h2>
                     <button
                       onClick={() => startEditing('name', profile?.name || '')}
@@ -292,7 +292,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <p className="text-slate-400">
-                {profile?.bio || 'Professional freelancer'}
+                Freelancer
               </p>
               <div className="flex items-center justify-center gap-1 mt-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -514,107 +514,117 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-white">Portfolio</h3>
           <button 
-            onClick={() => setShowAddPortfolio(!showAddPortfolio)}
+            onClick={() => setShowAddPortfolio(true)}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors shadow-sm"
           >
-            {showAddPortfolio ? (
-              <>
-                <X className="h-4 w-4" />
-                Cancel
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" />
-                Add Project
-              </>
-            )}
+            <Plus className="h-4 w-4" />
+            Add Project
           </button>
         </div>
         
+        {/* Modal Overlay */}
         {showAddPortfolio && (
-          <div className="mb-6 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50 backdrop-blur-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
-                <Plus className="h-5 w-5 text-indigo-400" />
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
+                    <Plus className="h-5 w-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-semibold">Add New Project</h4>
+                    <p className="text-slate-400 text-sm">Showcase your best work</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAddPortfolio(false);
+                    setNewPortfolio({
+                      title: '',
+                      description: '',
+                      image_url: '',
+                      external_link: ''
+                    });
+                  }}
+                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  <X className="h-5 w-5 text-slate-400" />
+                </button>
               </div>
-              <div>
-                <h4 className="text-white font-semibold">Add New Project</h4>
-                <p className="text-slate-400 text-sm">Showcase your best work</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Project Title *</label>
+                  <input
+                    type="text"
+                    value={newPortfolio.title}
+                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="Enter project title"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                  <textarea
+                    value={newPortfolio.description}
+                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none transition-all"
+                    placeholder="Describe your project, what you built, and your role"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Project Image URL</label>
+                  <input
+                    type="url"
+                    value={newPortfolio.image_url}
+                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
+                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">External Link</label>
+                  <input
+                    type="url"
+                    value={newPortfolio.external_link}
+                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
+                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="https://www.project.com"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-300 mb-2">Project Title *</label>
-                <input
-                  type="text"
-                  value={newPortfolio.title}
-                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="Enter project title"
-                />
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowAddPortfolio(false);
+                    setNewPortfolio({
+                      title: '',
+                      description: '',
+                      image_url: '',
+                      external_link: ''
+                    });
+                  }}
+                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddPortfolio}
+                  disabled={isSaving || !newPortfolio.title?.trim()}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4" />
+                      Add Project
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
-                <textarea
-                  value={newPortfolio.description}
-                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none transition-all"
-                  placeholder="Describe your project, what you built, and your role"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Project Image URL</label>
-                <input
-                  type="url"
-                  value={newPortfolio.image_url}
-                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">External Link</label>
-                <input
-                  type="url"
-                  value={newPortfolio.external_link}
-                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder="https://github.com/username/project"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => {
-                  setShowAddPortfolio(false);
-                  setNewPortfolio({
-                    title: '',
-                    description: '',
-                    image_url: '',
-                    external_link: ''
-                  });
-                }}
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddPortfolio}
-                disabled={isSaving || !newPortfolio.title?.trim()}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
-              >
-                {isSaving ? (
-                  <>
-                    <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4" />
-                    Add Project
-                  </>
-                )}
-              </button>
             </div>
           </div>
         )}
@@ -674,13 +684,6 @@ export default function ProfilePage() {
                 <p className="text-slate-400 mb-6 max-w-md mx-auto">
                   Start building your portfolio by adding your first project. Showcase your best work and impress potential clients.
                 </p>
-                <button
-                  onClick={() => setShowAddPortfolio(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-sm"
-                >
-                  <Plus className="h-5 w-5" />
-                  Add Your First Project
-                </button>
               </div>
             </div>
           )}
