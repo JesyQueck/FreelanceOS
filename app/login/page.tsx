@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { Briefcase } from "lucide-react";
-import { login, signup } from "./actions";
+import { login } from "./actions";
 
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: { error: string };
+export default async function LoginPage(props: {
+  searchParams: Promise<{ error: string; message: string }>;
 }) {
+  const searchParams = await props.searchParams;
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md pt-32 pb-12 mx-auto min-h-screen relative">
       <Link
@@ -85,6 +84,12 @@ export default function LoginPage({
             </Link>
           </div>
         </div>
+
+        {searchParams?.message && (
+          <p className="mt-4 p-4 bg-indigo-900/20 text-indigo-400 text-center text-xs rounded-lg border border-indigo-900/50">
+            {searchParams.message}
+          </p>
+        )}
 
         {searchParams?.error && (
           <p className="mt-4 p-4 bg-red-900/20 text-red-400 text-center text-xs rounded-lg border border-red-900/50">

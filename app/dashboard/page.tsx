@@ -11,37 +11,37 @@ export default async function DashboardPage() {
       {/* Header & Welcome */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
             Good afternoon, {user?.email?.split('@')[0] || 'User'}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-slate-400">
             Here's what is happening with your freelance business today.
           </p>
         </div>
-        <button className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white transition-all bg-slate-900 dark:bg-white dark:text-slate-900 rounded-full hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm gap-2">
+        <button className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white transition-all bg-indigo-600 rounded-full hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 gap-2">
           <Plus className="h-4 w-4" /> Add Service
         </button>
       </div>
 
       {/* Profile Completion Indicator */}
-      <div className="bg-white dark:bg-[#151B2B] rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800/60 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+      <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-amber-500" />
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Profile is 60% complete</h3>
+              <h3 className="font-semibold text-lg text-white">Profile is 60% complete</h3>
             </div>
-            <p className="text-slate-500 text-sm mb-4">
+            <p className="text-slate-400 text-sm mb-4">
               Add a professional bio and at least 3 services to unlock your public portfolio link.
             </p>
             
-            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 mb-2 overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
-              <div className="bg-gradient-to-r from-amber-400 to-amber-500 h-2.5 rounded-full w-[60%]" />
+            <div className="w-full bg-slate-800 rounded-full h-2.5 mb-2 overflow-hidden border border-slate-700/50">
+              <div className="bg-amber-500 h-2.5 rounded-full w-[60%] shadow-[0_0_10px_rgba(245,158,11,0.3)]" />
             </div>
-            <p className="text-xs text-slate-400 font-medium text-right">3 of 5 steps completed</p>
+            <p className="text-xs text-slate-500 font-medium text-right">3 of 5 steps completed</p>
           </div>
-          <button className="flex-shrink-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+          <button className="flex-shrink-0 bg-slate-800 border border-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
             Complete Profile
           </button>
         </div>
@@ -50,44 +50,44 @@ export default async function DashboardPage() {
       {/* Value Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card 1 */}
-        <div className="bg-white dark:bg-[#151B2B] p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+        <div className="bg-[#151B2B] p-6 rounded-2xl border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-2.5 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl text-primary-600 dark:text-primary-400">
+            <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-400">
               <MessageSquare className="h-5 w-5" />
             </div>
-            <span className="flex items-center text-xs font-medium text-green-600 bg-green-50 dark:bg-green-500/10 px-2 py-1 rounded-lg">
+            <span className="flex items-center text-xs font-medium text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">
               <ArrowUpRight className="h-3 w-3 mr-1" />
               12%
             </span>
           </div>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Active Conversations</p>
-          <h4 className="text-3xl font-bold text-slate-900 dark:text-white">3</h4>
+          <p className="text-sm font-medium text-slate-400 mb-1">Active Conversations</p>
+          <h4 className="text-3xl font-bold text-white">3</h4>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white dark:bg-[#151B2B] p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+        <div className="bg-[#151B2B] p-6 rounded-2xl border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-2.5 bg-purple-50 dark:bg-purple-500/10 rounded-xl text-purple-600 dark:text-purple-400">
+            <div className="p-2.5 bg-purple-500/10 rounded-xl text-purple-400">
               <Target className="h-5 w-5" />
             </div>
           </div>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Services</p>
-          <h4 className="text-3xl font-bold text-slate-900 dark:text-white">0</h4>
+          <p className="text-sm font-medium text-slate-400 mb-1">Total Services</p>
+          <h4 className="text-3xl font-bold text-white">0</h4>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-white dark:bg-[#151B2B] p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+        <div className="bg-[#151B2B] p-6 rounded-2xl border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 rounded-xl text-blue-600 dark:text-blue-400">
+            <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400">
               <Eye className="h-5 w-5" />
             </div>
-            <span className="flex items-center text-xs font-medium text-green-600 bg-green-50 dark:bg-green-500/10 px-2 py-1 rounded-lg">
+            <span className="flex items-center text-xs font-medium text-green-400 bg-green-500/10 px-2 py-1 rounded-lg">
               <ArrowUpRight className="h-3 w-3 mr-1" />
               48%
             </span>
           </div>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Profile Views</p>
-          <h4 className="text-3xl font-bold text-slate-900 dark:text-white">428</h4>
+          <p className="text-sm font-medium text-slate-400 mb-1">Profile Views</p>
+          <h4 className="text-3xl font-bold text-white">428</h4>
         </div>
       </div>
 
@@ -95,19 +95,19 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Recent Messages Area */}
-        <div className="lg:col-span-2 bg-white dark:bg-[#151B2B] border border-slate-200/60 dark:border-slate-800/60 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[400px]">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center bg-white dark:bg-[#151B2B]">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Messages</h2>
-            <Link href="/dashboard/messages" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">
+        <div className="lg:col-span-2 bg-[#151B2B] border border-slate-800/60 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[400px]">
+          <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-[#151B2B]">
+            <h2 className="text-lg font-semibold text-white">Recent Messages</h2>
+            <Link href="/dashboard/messages" className="text-sm font-medium text-indigo-400 hover:underline">
               View Inbox
             </Link>
           </div>
-          <div className="flex-1 p-8 text-center flex flex-col items-center justify-center bg-slate-50/50 dark:bg-[#0B0F19]/50">
-            <div className="h-16 w-16 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl flex items-center justify-center mb-4">
+          <div className="flex-1 p-8 text-center flex flex-col items-center justify-center bg-[#0B0F19]/50">
+            <div className="h-16 w-16 bg-slate-800 border border-slate-700 shadow-sm rounded-2xl flex items-center justify-center mb-4">
               <MessageSquare className="h-6 w-6 text-slate-400" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">Inbox zero</h3>
-            <p className="text-slate-500 text-sm max-w-[250px]">
+            <h3 className="text-lg font-medium text-white mb-2">Inbox zero</h3>
+            <p className="text-slate-400 text-sm max-w-[250px]">
               You don't have any active threads right now. Share your profile to get started.
             </p>
           </div>

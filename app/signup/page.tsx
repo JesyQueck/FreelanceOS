@@ -2,11 +2,10 @@ import Link from "next/link";
 import { Briefcase } from "lucide-react";
 import { signup } from "./actions";
 
-export default function SignupPage({
-  searchParams,
-}: {
-  searchParams: { error: string };
+export default async function SignupPage(props: {
+  searchParams: Promise<{ error: string }>;
 }) {
+  const searchParams = await props.searchParams;
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md pt-32 pb-12 mx-auto min-h-screen relative">
       <Link

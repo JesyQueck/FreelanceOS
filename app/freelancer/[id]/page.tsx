@@ -4,7 +4,8 @@ import { createClient } from "@/utils/supabase/server";
 import { initiateDealRoom } from "./actions";
 import { notFound } from "next/navigation";
 
-export default async function FreelancerPublicProfile({ params }: { params: { id: string } }) {
+export default async function FreelancerPublicProfile(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
   
   // NOTE: In production, `params.id` would be the UUID or a custom string slug.
@@ -49,10 +50,10 @@ export default async function FreelancerPublicProfile({ params }: { params: { id
   const initials = profile.name?.substring(0, 2).toUpperCase() || "FR";
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-50 selection:bg-indigo-500/30 font-sans">
+    <div className="min-h-screen bg-[#0B0F19] text-slate-50 selection:bg-indigo-500/30 font-sans">
       
       {/* PUBLIC NAVBAR */}
-      <nav className="w-full bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/80 h-[72px] flex items-center px-6 sticky top-0 z-50">
+      <nav className="w-full bg-[#0B0F19]/80 backdrop-blur-xl border-b border-slate-800/80 h-[72px] flex items-center px-6 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto w-full flex justify-between items-center">
           <Link href="/" className="font-bold tracking-tight text-lg text-slate-900 dark:text-white">FreelanceOS</Link>
           <div className="flex gap-5 items-center">
@@ -212,8 +213,8 @@ export default async function FreelancerPublicProfile({ params }: { params: { id
       </section>
 
       {/* FOOTER */}
-      <footer className="w-full py-16 text-center text-slate-500 text-sm border-t border-slate-200/50 dark:border-slate-800 bg-[#FAFAFA] dark:bg-[#0B0F19]">
-        <p>Built with <Link href="/" className="font-bold text-slate-900 dark:text-white hover:text-primary-600 transition-colors">FreelanceOS</Link>. Professional software for independents.</p>
+      <footer className="w-full py-16 text-center text-slate-500 text-sm border-t border-slate-800 bg-[#0B0F19]">
+        <p>Built with <Link href="/" className="font-bold text-white hover:text-indigo-400 transition-colors">FreelanceOS</Link>. Professional software for independents.</p>
       </footer>
     </div>
   );
