@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageSquare, Target, Eye, ArrowUpRight, Plus, Sparkles } from "lucide-react";
 import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getUserProfile, getRecentActivity, ActivityItem } from "../../utils/supabase";
 
@@ -13,6 +14,7 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DashboardData>({
@@ -152,7 +154,10 @@ export default function DashboardPage() {
               Complete your profile to attract more clients and appear in search results.
             </p>
           </div>
-          <button className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors">
+          <button 
+            onClick={() => navigate('/dashboard/profile')}
+            className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
+          >
             Complete Profile
           </button>
         </div>
