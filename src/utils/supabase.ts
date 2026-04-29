@@ -542,10 +542,6 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
       freelancer_user:users!freelancer_id(
         username,
         display_name
-      ),
-      client_user:users!client_id(
-        username,
-        display_name
       )
     `)
     .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
@@ -556,7 +552,30 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
     return [];
   }
   
-  return data || [];
+  // For client conversations, we need to get client info separately
+  const conversationsWithClientInfo = await Promise.all(
+    (data || []).map(async (conv) => {
+      if (conv.client_id && conv.client_id.startsWith('client-')) {
+        // This is a client conversation, get client info from client_info table
+        const { data: clientData } = await supabase
+          .from('client_info')
+          .select('name, email')
+          .eq('id', conv.client_id)
+          .single();
+        
+        return {
+          ...conv,
+          client_user: clientData ? [{
+            username: clientData.name.replace(/\s+/g, '-').toLowerCase(),
+            display_name: clientData.name
+          }] : []
+        };
+      }
+      return conv;
+    })
+  );
+  
+  return conversationsWithClientInfo;
 };
 
 export const getMessages = async (conversationId: string): Promise<Message[]> => {

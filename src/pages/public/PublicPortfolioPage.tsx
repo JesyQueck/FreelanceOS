@@ -60,10 +60,15 @@ export default function PublicPortfolioPage() {
 
   // Real-time messaging subscription
   useEffect(() => {
-    if (!currentConversation) return;
+    if (!currentConversation || !clientId) {
+      console.log('Real-time subscription not set up - missing conversation or client ID', { currentConversation, clientId });
+      return;
+    }
 
+    console.log('🔧 Setting up real-time subscription for conversation:', currentConversation.id, 'Client ID:', clientId);
+    
     const subscription = supabase
-      .channel(`messages:${currentConversation.id}`)
+      .channel(`client-chat-${currentConversation.id}`)
       .on('postgres_changes', 
         { 
           event: 'INSERT', 
@@ -72,11 +77,28 @@ export default function PublicPortfolioPage() {
           filter: `conversation_id=eq.${currentConversation.id}`
         },
         (payload) => {
-          console.log('New message received:', payload.new);
+          console.log('✅ Real-time message received:', payload.new);
+          const messageContent = payload.new.content;
+          
+          // Check if this is from the current client
+          const isFromClient = payload.new.sender_id === clientId;
+          console.log('👤 Message from:', isFromClient ? 'Client' : 'Freelancer');
+          
+          // Format message for display
+          let displayContent = messageContent;
+          if (!isFromClient) {
+            // This is from freelancer, remove any client info prefix if present
+            displayContent = messageContent.replace(/^(📧|👤)[^:]+: /, '');
+            console.log('🔄 Formatted freelancer message:', displayContent);
+          }
+          
           const newMessage = {
             ...payload.new,
-            is_client: payload.new.sender_id === clientId
+            content: displayContent,
+            is_client: isFromClient
           };
+          
+          console.log('📝 Adding message to chat:', newMessage);
           setMessages(prev => [...prev, newMessage]);
           
           // Scroll to bottom for new messages
@@ -85,36 +107,78 @@ export default function PublicPortfolioPage() {
           }, 100);
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('📡 Subscription status:', status);
+        if (err) {
+          console.error('❌ Subscription error:', err);
+        } else if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to real-time updates');
+        }
+      });
 
     return () => {
+      console.log('🧹 Cleaning up real-time subscription');
       supabase.removeChannel(subscription);
     };
   }, [currentConversation, clientId]);
 
   // Load existing conversation and messages when modal opens
+  // Check URL for client conversation parameters
+  useEffect(() => {
+    if (!profile?.id) return;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientConversationId = urlParams.get('client');
+    const clientName = urlParams.get('name');
+    const clientEmail = urlParams.get('email');
+    const conversationId = urlParams.get('conversation');
+    
+    if (clientConversationId && clientName) {
+      // Client is returning via URL link
+      setClientId(clientConversationId);
+      setClientInfo({ name: clientName, email: clientEmail || '' });
+      setShowClientForm(false);
+      
+      // If conversation ID is in URL, set it directly
+      if (conversationId) {
+        setCurrentConversation({ id: conversationId });
+        console.log('Conversation loaded from URL:', { conversationId });
+      }
+      
+      console.log('Client identified via URL:', { clientConversationId, clientName, clientEmail, conversationId });
+    }
+  }, [profile?.id]);
+
   useEffect(() => {
     if (!showMessageModal || !profile?.id || !clientId) return;
 
     const loadExistingConversation = async () => {
       try {
         // Check for existing conversation
-        const { data: existingConv } = await supabase
+        const { data: existingConv, error: convError } = await supabase
           .from('conversations')
           .select('*')
           .eq('freelancer_id', profile.id)
           .eq('client_id', clientId)
-          .single();
+          .maybeSingle(); // Use maybeSingle() instead of single()
+
+        if (convError) {
+          console.log('Conversation lookup error:', convError);
+        }
 
         if (existingConv) {
           setCurrentConversation(existingConv);
           
           // Load existing messages
-          const { data: existingMessages } = await supabase
+          const { data: existingMessages, error: msgError } = await supabase
             .from('messages')
             .select('*')
             .eq('conversation_id', existingConv.id)
             .order('created_at', { ascending: true });
+
+          if (msgError) {
+            console.log('Messages lookup error:', msgError);
+          }
 
           if (existingMessages) {
             const formattedMessages = existingMessages.map(msg => ({
@@ -124,9 +188,11 @@ export default function PublicPortfolioPage() {
             }));
             setMessages(formattedMessages);
           }
+        } else {
+          console.log('No existing conversation found, will create new one');
         }
       } catch (error) {
-        console.log('No existing conversation found');
+        console.log('Error in loadExistingConversation:', error);
       }
     };
 
@@ -143,19 +209,23 @@ export default function PublicPortfolioPage() {
       if (!conversation) {
         // Try to find existing conversation first
         try {
-          const { data: existingConv } = await supabase
+          const { data: existingConv, error: convError } = await supabase
             .from('conversations')
             .select('*')
             .eq('freelancer_id', profile.id)
             .eq('client_id', clientId)
-            .single();
+            .maybeSingle(); // Use maybeSingle() instead of single()
+          
+          if (convError) {
+            console.log('Conversation lookup error in send message:', convError);
+          }
           
           if (existingConv) {
             conversation = existingConv;
             setCurrentConversation(conversation);
           }
         } catch (error) {
-          // No existing conversation, create new one
+          console.log('Error checking existing conversation:', error);
         }
         
         if (!conversation) {
@@ -226,7 +296,33 @@ export default function PublicPortfolioPage() {
         });
         
         if (clientResult.data) {
-          setClientId(clientResult.data.id);
+          const clientId = clientResult.data.id;
+          setClientId(clientId);
+          
+          // Create conversation immediately when form is submitted
+          if (profile?.id) {
+            const conversationResult = await createConversation({
+              freelancer_id: profile.id,
+              client_id: clientId
+            });
+            
+            if (conversationResult.data) {
+              setCurrentConversation(conversationResult.data);
+              console.log('✅ Conversation created immediately:', conversationResult.data);
+              
+              // Generate shareable URL with conversation ID
+              const currentUrl = window.location.pathname; // e.g., /freelancer-slug
+              const clientUrl = `${currentUrl}?client=${clientId}&name=${encodeURIComponent(clientInfo.name)}${clientInfo.email ? `&email=${encodeURIComponent(clientInfo.email)}` : ''}&conversation=${conversationResult.data.id}`;
+              
+              console.log('🔗 Client shareable URL with conversation:', clientUrl);
+              
+              // Update URL without page reload
+              window.history.pushState({}, '', clientUrl);
+            } else {
+              console.error('Error creating conversation:', conversationResult.error);
+            }
+          }
+          
           setShowClientForm(false);
         } else {
           console.error('Error creating client:', clientResult.error);
@@ -474,7 +570,7 @@ export default function PublicPortfolioPage() {
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
-                      {profile?.display_name?.charAt(0).toUpperCase() || profile?.username?.charAt(0).toUpperCase() || 'U'}
+                      {profile?.display_name?.substring(0, 2).toUpperCase() || profile?.name?.substring(0, 2).toUpperCase() || 'FR'}
                     </div>
                   )}
                   <div>
@@ -483,9 +579,22 @@ export default function PublicPortfolioPage() {
                   </div>
                 </div>
               </div>
-              <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                <MoreVertical className="h-4 w-4 text-slate-400" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const shareUrl = window.location.href;
+                    navigator.clipboard.writeText(shareUrl);
+                    alert('Conversation link copied! You can return to this chat anytime using this link.');
+                  }}
+                  className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                  title="Copy conversation link"
+                >
+                  <ExternalLink className="h-4 w-4 text-slate-400" />
+                </button>
+                <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                  <MoreVertical className="h-4 w-4 text-slate-400" />
+                </button>
+              </div>
             </div>
 
             {/* Messages Area */}
