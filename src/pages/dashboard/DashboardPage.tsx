@@ -43,8 +43,42 @@ export default function DashboardPage() {
         ]);
 
         const recentActivity = await getRecentActivity(user.id);
-        const stepsCompleted = servicesCount > 0 ? 3 : 2;
-        const progressPercent = (stepsCompleted / 5) * 100;
+        
+        // Calculate real profile completion percentage
+        const calculateProfileCompletion = (profile: any) => {
+          let completedFields = 0;
+          const totalFields = 5;
+          
+          // Check display_name (set during signup)
+          if (profile?.display_name && profile.display_name.trim().length > 0) {
+            completedFields++;
+          }
+          
+          // Check name (professional name)
+          if (profile?.name && profile.name.trim().length > 0) {
+            completedFields++;
+          }
+          
+          // Check bio
+          if (profile?.bio && profile.bio.trim().length > 0) {
+            completedFields++;
+          }
+          
+          // Check profile_image
+          if (profile?.profile_image && profile.profile_image.trim().length > 0) {
+            completedFields++;
+          }
+          
+          // Check skills array
+          if (profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0) {
+            completedFields++;
+          }
+          
+          return Math.round((completedFields / totalFields) * 100);
+        };
+        
+        const progressPercent = calculateProfileCompletion(profile);
+        const stepsCompleted = Math.floor((progressPercent / 100) * 5);
 
         setData({
           displayName: profile?.display_name || (user.email && user.email.split('@')[0]) || 'User',
