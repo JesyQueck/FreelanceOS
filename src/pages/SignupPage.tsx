@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signIn } from "../utils/supabase";
 import { Link } from "react-router-dom";
 import { Loader2, Mail, Lock, Briefcase, Zap } from "lucide-react";
 import { signUp, createOrUpdateUserProfile } from "../utils/supabase";
@@ -9,6 +11,7 @@ const initialState = {
 };
 
 export default function SignupPage() {
+  const navigate = useNavigate();
   const [state, setState] = useState(initialState);
   const [isPending, setIsPending] = useState(false);
 
@@ -61,7 +64,23 @@ export default function SignupPage() {
           setState({ message: "Account created but profile setup failed. Please contact support.", success: false });
         } else {
           console.log('Profile created successfully');
-          setState({ message: "Account created successfully! You can now log in.", success: true });
+          
+          // Step 3: Automatically sign in the user
+          try {
+            const { error: signInError } = await signIn(email, password);
+            if (signInError) {
+              console.error('Auto sign-in error:', signInError);
+              setState({ message: "Account created! Please log in manually.", success: true });
+            } else {
+              console.log('Auto sign-in successful');
+              setState({ message: "Account created successfully! Redirecting to dashboard...", success: true });
+              // Redirect to dashboard after a short delay
+              setTimeout(() => navigate('/dashboard'), 1500);
+            }
+          } catch (signInException) {
+            console.error('Auto sign-in exception:', signInException);
+            setState({ message: "Account created! Please log in manually.", success: true });
+          }
         }
       } catch (profileError) {
         console.error('Profile creation exception:', profileError);
