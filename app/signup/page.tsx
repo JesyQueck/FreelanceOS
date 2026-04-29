@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Briefcase } from "lucide-react";
-import { login, signup } from "./actions";
+import { signup } from "./actions";
 
-export default function LoginPage({
+export default function SignupPage({
   searchParams,
 }: {
   searchParams: { error: string };
@@ -34,8 +34,8 @@ export default function LoginPage({
         <div className="bg-indigo-600/20 border border-indigo-500/30 p-3 rounded-2xl mb-4 shadow-lg shadow-indigo-900/20">
           <Briefcase className="h-6 w-6 text-indigo-400" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
-        <p className="text-xs text-slate-400 mt-1.5">Enter your email and password to sign in</p>
+        <h1 className="text-2xl font-bold tracking-tight text-white">Create an account</h1>
+        <p className="text-xs text-slate-400 mt-1.5">Enter your email and password to get started</p>
       </div>
 
       <form className="flex-1 flex flex-col w-full justify-center gap-4 text-foreground">
@@ -63,26 +63,27 @@ export default function LoginPage({
               name="password"
               placeholder="••••••••"
               required
+              minLength={6}
             />
           </div>
         </div>
         
         <div className="flex flex-col gap-4 mt-6">
           <button
-            formAction={login}
+            formAction={signup}
             className="w-full bg-indigo-600 text-white rounded-xl px-4 py-3 text-sm font-semibold hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20"
           >
-            Sign In
+            Create Account
           </button>
           
           <div className="text-center mt-2">
-            <span className="text-xs text-slate-400">Don't have an account? </span>
-            <button
-              formAction={signup}
+            <span className="text-xs text-slate-400">Already have an account? </span>
+            <Link
+              href="/login"
               className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
             >
-              Sign Up Now
-            </button>
+              Sign In
+            </Link>
           </div>
         </div>
 
