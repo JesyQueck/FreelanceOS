@@ -7,7 +7,7 @@ export default function LandingPage() {
       
       {/* 1. NAVIGATION BAR */}
       <nav className="fixed w-full z-50 top-0 border-b border-slate-800/50 bg-[#0B0F19]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-sm flex items-center justify-center">
               <Briefcase className="w-4 h-4" />
@@ -34,7 +34,7 @@ export default function LandingPage() {
       <main className="flex-1 w-full flex flex-col pt-20">
         
         {/* 2. HERO SECTION */}
-        <section className="relative overflow-hidden w-full pt-28 pb-16 lg:pt-36 lg:pb-24 flex flex-col items-center text-center px-4">
+        <section className="relative overflow-hidden w-full pt-28 pb-16 lg:pt-36 lg:pb-24 flex flex-col items-center text-center px-8">
           {/* Background Glows Refined */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary-500/10 dark:bg-primary-500/5 blur-[80px] rounded-full point-events-none -z-10" />
           
@@ -54,7 +54,7 @@ export default function LandingPage() {
             Stop relying on marketplaces. Build a breathtaking portfolio, package your services, and manage client communications in your own branded workspace.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-8">
             <Link
               to="/login"
               className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm hover:shadow-md gap-2"
@@ -71,7 +71,7 @@ export default function LandingPage() {
         </section>
 
         {/* 3. PROFILE PREVIEW SECTION */}
-        <section id="demo" className="w-full px-6 py-12 flex justify-center -mt-8 relative z-10">
+        <section id="demo" className="w-full px-8 py-12 flex justify-center -mt-8 relative z-10">
           <div className="w-full max-w-6xl rounded-[2rem] border border-slate-700/50 bg-slate-900/50 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl">
             <div className="rounded-[1.5rem] overflow-hidden border border-slate-800 bg-[#0F1523] shadow-inner">
               {/* Fake Browser Window Header */}
@@ -172,8 +172,8 @@ export default function LandingPage() {
 
         {/* 5. FEATURES SECTION */}
         <section id="features" className="w-full py-24 bg-[#0B0F19]">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="max-w-7xl mx-auto px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               <div>
                 <h2 className="text-2xl md:text-4xl font-bold mb-6 leading-tight text-white">Everything you need to <br/>run a solo agency.</h2>
                 <div className="space-y-8 mt-10">
@@ -209,7 +209,7 @@ export default function LandingPage() {
               
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 rounded-[3rem] transform rotate-3" />
-                <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 shadow-xl relative backdrop-blur-sm">
+                <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-10 shadow-xl relative backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-8">
                     <div>
                       <p className="text-sm text-slate-400 font-medium">New Message</p>
@@ -240,20 +240,20 @@ export default function LandingPage() {
         </section>
 
         {/* 6. FINAL CTA */}
-        <section className="w-full py-32 px-6">
+        <section className="w-full py-32 px-8">
           <div className="max-w-5xl mx-auto rounded-[3rem] bg-slate-900 dark:bg-slate-800 text-white overflow-hidden relative shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 mix-blend-overlay" />
             <div className="absolute top-0 right-0 p-32 bg-primary-500/20 blur-[100px] rounded-full" />
             <div className="absolute bottom-0 left-0 p-32 bg-purple-500/20 blur-[100px] rounded-full" />
             
             <div className="relative z-10 px-8 py-20 text-center flex flex-col items-center">
-              <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white">Ready to upgrade your<br/>freelance career?</h2>
-              <p className="text-slate-300 text-base md:text-lg max-w-xl mb-10">
+              <h2 className="text-2xl md:text-4xl font-bold mb-6 tracking-tight text-white">Ready to upgrade your<br/>freelance career?</h2>
+              <p className="text-slate-300 text-sm md:text-base max-w-xl mb-10">
                 Join our private beta today and get early access to the most powerful tool built specifically for independent professionals.
               </p>
               <Link
                 to="/login"
-                className="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-indigo-500 transition-colors shadow-xl shadow-indigo-600/20"
+                className="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold text-sm hover:bg-indigo-500 transition-colors shadow-xl shadow-indigo-600/20"
               >
                 Create your Free Account
               </Link>
@@ -263,7 +263,7 @@ export default function LandingPage() {
         
       </main>
 
-      <footer className="w-full py-12 px-6 border-t border-slate-200/50 dark:border-slate-800/50 text-center text-sm text-slate-500 mt-auto">
+      <footer className="w-full py-12 px-8 border-t border-slate-200/50 dark:border-slate-800/50 text-center text-sm text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-slate-400" />
