@@ -9,10 +9,6 @@ const initialState = {
   message: "",
 };
 
-import { cookies } from "next/headers";
-
-export const dynamic = "force-dynamic";
-
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
 

@@ -9,8 +9,6 @@ const initialState = {
   message: "",
 };
 
-export const dynamic = "force-dynamic";
-
 export default function SignupPage() {
   const [state, formAction, isPending] = useActionState(signupAction, initialState);
 
