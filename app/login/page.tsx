@@ -1,16 +1,26 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import { loginAction } from "./actions";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const initialState = {
   message: "",
+  success: false,
 };
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const router = useRouter();
+
+  // HARD REDIRECT: If the server action succeeded but navigation is stuck.
+  useEffect(() => {
+    if (state?.success) {
+      window.location.href = "/dashboard";
+    }
+  }, [state?.success]);
 
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center p-4 font-sans antialiased selection:bg-indigo-500/30">
@@ -28,7 +38,6 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-[#151B2B] p-10 rounded-[2.5rem] border border-slate-800/60 shadow-[0_30px_70px_rgba(0,0,0,0.7)] relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          {/* Subtle Gradient Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-600/5 blur-[80px] rounded-full" />
           
           <form action={formAction} className="space-y-6 relative z-10">

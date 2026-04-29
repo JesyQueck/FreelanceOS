@@ -47,11 +47,9 @@ export async function loginAction(prevState: any, formData: FormData): Promise<A
     return { message: "Login successful but session was not created. Please try again." };
   }
 
-  // FORCE REVALIDATION
-  revalidatePath("/", "layout");
-  
-  // NEXT.JS 15 REDIRECT
-  redirect("/dashboard");
+  // 3. Success - First attempt server-side redirect
+  // We ALSO return success: true so the client can force a redirect if this hangs
+  return { success: true };
 }
 
 export async function signout() {
