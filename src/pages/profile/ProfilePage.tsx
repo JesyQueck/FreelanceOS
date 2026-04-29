@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save } from "lucide-react";
+import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save, Plus, ExternalLink, Trash2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile, UserProfile } from "../../utils/supabase";
+import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem } from "../../utils/supabase";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -10,6 +10,16 @@ export default function ProfilePage() {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Portfolio state
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [showAddPortfolio, setShowAddPortfolio] = useState(false);
+  const [newPortfolio, setNewPortfolio] = useState<Partial<PortfolioItem>>({
+    title: '',
+    description: '',
+    image_url: '',
+    external_link: ''
+  });
 
   // Helper function to get relative time
   const getRelativeTime = (dateString: string) => {
@@ -38,20 +48,24 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       if (user) {
         try {
-          const profileData = await getUserProfile(user.id);
+          const [profileData, portfolioData] = await Promise.all([
+            getUserProfile(user.id),
+            getPortfolioItems(user.id)
+          ]);
           setProfile(profileData);
+          setPortfolioItems(portfolioData);
         } catch (error) {
-          console.error('Error fetching profile:', error);
+          console.error('Error fetching profile data:', error);
         } finally {
           setLoading(false);
         }
       }
     };
 
-    fetchProfile();
+    fetchProfileData();
   }, [user]);
 
   const startEditing = (field: string, value: string) => {
@@ -62,6 +76,80 @@ export default function ProfilePage() {
   const cancelEditing = () => {
     setEditingField(null);
     setEditingValue('');
+  };
+
+  const removeSkill = async (skillToRemove: string) => {
+    if (!user || !profile?.skills) return;
+    
+    setIsSaving(true);
+    try {
+      const updatedSkills = profile.skills.filter((skill: string) => skill !== skillToRemove);
+      
+      const result = await createOrUpdateUserProfile(
+        user.id,
+        user.email || '',
+        profile?.display_name || '',
+        profile?.name,
+        profile?.bio,
+        updatedSkills
+      );
+      
+      if (result.error) {
+        console.error('Error removing skill:', result.error);
+      } else {
+        setProfile(result.data);
+      }
+    } catch (error) {
+      console.error('Error removing skill:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Portfolio functions
+  const handleAddPortfolio = async () => {
+    if (!user || !newPortfolio.title?.trim()) return;
+    
+    setIsSaving(true);
+    try {
+      const result = await createPortfolioItem(newPortfolio as Omit<PortfolioItem, 'id' | 'user_id' | 'created_at'>, user.id);
+      
+      if (result.error) {
+        console.error('Error creating portfolio item:', result.error);
+      } else if (result.data) {
+        setPortfolioItems(prev => [result.data!, ...prev]);
+        setNewPortfolio({
+          title: '',
+          description: '',
+          image_url: '',
+          external_link: ''
+        });
+        setShowAddPortfolio(false);
+      }
+    } catch (error) {
+      console.error('Error creating portfolio item:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeletePortfolio = async (id: string) => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    try {
+      const result = await deletePortfolioItem(id);
+      
+      if (result.error) {
+        console.error('Error deleting portfolio item:', result.error);
+      } else {
+        setPortfolioItems(prev => prev.filter(item => item.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting portfolio item:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const saveField = async () => {
@@ -93,11 +181,11 @@ export default function ProfilePage() {
       } else if (editingField === 'bio') {
         updateData.bio = editingValue;
       } else if (editingField === 'skills') {
-        const skillsArray = editingValue
-          .split(',')
-          .map((skill: string) => skill.trim())
-          .filter((skill: string) => skill.length > 0);
-        updateData.skills = skillsArray;
+        // Handle individual skill addition
+        const newSkill = editingValue.trim();
+        if (newSkill && !updateData.skills?.includes(newSkill)) {
+          updateData.skills = [...(updateData.skills || []), newSkill];
+        }
       }
       
       const result = await createOrUpdateUserProfile(
@@ -351,7 +439,7 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">Skills</h3>
           <button
-            onClick={() => startEditing('skills', profile?.skills ? profile.skills.join(', ') : '')}
+            onClick={() => startEditing('skills', '')}
             className="p-1 hover:bg-slate-700 rounded transition-colors"
             title="Edit skills"
           >
@@ -360,34 +448,51 @@ export default function ProfilePage() {
         </div>
         {editingField === 'skills' ? (
           <div className="space-y-3">
-            <input
-              type="text"
-              value={editingValue}
-              onChange={(e) => setEditingValue(e.target.value)}
-              className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="e.g. UI Design, React, TypeScript"
-              autoFocus
-            />
             <div className="flex gap-2">
-              <button
-                onClick={cancelEditing}
-                className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
-              >
-                Cancel
-              </button>
+              <input
+                type="text"
+                value={editingValue}
+                onChange={(e) => setEditingValue(e.target.value)}
+                className="flex-1 bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="Enter a skill"
+                autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    saveField();
+                  }
+                }}
+              />
               <button
                 onClick={saveField}
-                disabled={isSaving}
-                className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm disabled:opacity-50 flex items-center gap-1"
+                disabled={isSaving || !editingValue.trim()}
+                className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSaving ? (
-                  <div className="h-3 w-3 border border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <Save className="h-3 w-3" />
+                  <span>Add</span>
                 )}
-                {isSaving ? 'Saving...' : 'Save'}
               </button>
             </div>
+            <div className="flex flex-wrap gap-2">
+              {profile?.skills?.map((skill: string, index: number) => (
+                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm group">
+                  <span>{skill}</span>
+                  <button
+                    onClick={() => removeSkill(skill)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-400"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={cancelEditing}
+              className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
+            >
+              Done
+            </button>
           </div>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -408,18 +513,122 @@ export default function ProfilePage() {
       <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">Portfolio Items</h3>
-          <button className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
-            View All
+          <button 
+            onClick={() => setShowAddPortfolio(true)}
+            className="flex items-center gap-2 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Add Project
           </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-slate-800 rounded-xl p-4 hover:bg-slate-700 transition-colors">
-            <div className="h-32 bg-slate-700 rounded-lg mb-3 flex items-center justify-center">
-              <span className="text-slate-400">No portfolio items yet</span>
+        
+        {showAddPortfolio && (
+          <div className="mb-6 p-4 bg-slate-800 rounded-lg border border-slate-700">
+            <h4 className="text-white font-medium mb-4">Add New Project</h4>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Project Title *</label>
+                <input
+                  type="text"
+                  value={newPortfolio.title}
+                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="Enter project title"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
+                <textarea
+                  value={newPortfolio.description}
+                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-24 resize-none"
+                  placeholder="Describe your project"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1">External Link</label>
+                <input
+                  type="url"
+                  value={newPortfolio.external_link}
+                  onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
+                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-3 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  placeholder="https://example.com"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setShowAddPortfolio(false);
+                    setNewPortfolio({
+                      title: '',
+                      description: '',
+                      image_url: '',
+                      external_link: ''
+                    });
+                  }}
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddPortfolio}
+                  disabled={isSaving || !newPortfolio.title?.trim()}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <span>Add Project</span>
+                  )}
+                </button>
+              </div>
             </div>
-            <h4 className="text-sm font-medium text-white">Add your first project</h4>
-            <p className="text-xs text-slate-400 mt-1">Click Edit Profile to get started</p>
           </div>
+        )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {portfolioItems.length > 0 ? (
+            portfolioItems.map((item) => (
+              <div key={item.id} className="bg-slate-800 rounded-xl p-4 hover:bg-slate-700 transition-colors group">
+                <div className="relative">
+                  <div className="h-32 bg-slate-700 rounded-lg mb-3 flex items-center justify-center">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.title} className="w-full h-full object-cover rounded-lg" />
+                    ) : (
+                      <span className="text-slate-400">No image</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDeletePortfolio(item.id!)}
+                    className="absolute top-2 left-2 p-1 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+                <h4 className="text-sm font-medium text-white mb-2">{item.title}</h4>
+                <p className="text-xs text-slate-400 mb-3 line-clamp-2">{item.description}</p>
+                {item.external_link && (
+                  <a
+                    href={item.external_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    View Project
+                  </a>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <div className="h-32 bg-slate-700 rounded-lg mb-4 flex items-center justify-center mx-auto w-32">
+                <span className="text-slate-400">No projects</span>
+              </div>
+              <h4 className="text-sm font-medium text-white mb-2">No portfolio items yet</h4>
+              <p className="text-xs text-slate-400">Click "Add Project" to showcase your work</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

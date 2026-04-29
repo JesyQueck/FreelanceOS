@@ -46,6 +46,7 @@ export const getUser = async () => {
   return user
 }
 
+// TypeScript interface for user profile
 export interface UserProfile {
   display_name?: string;
   name?: string;
@@ -56,6 +57,17 @@ export interface UserProfile {
   email?: string;
   id?: string;
   updated_at?: string;
+}
+
+// TypeScript interface for portfolio items
+export interface PortfolioItem {
+  id?: string;
+  user_id?: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  external_link?: string;
+  created_at?: string;
 }
 
 export const getServicesCount = async (userId: string) => {
@@ -143,6 +155,113 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   console.log('User profile data:', data);
   return data
 }
+
+// Portfolio items functions
+export const getPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
+  console.log('Getting portfolio items for user:', userId);
+  const { data, error } = await supabase
+    .from('portfolios')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching portfolio items:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const createPortfolioItem = async (item: Omit<PortfolioItem, 'id' | 'user_id' | 'created_at'>, userId: string): Promise<{ data: PortfolioItem | null; error: any }> => {
+  console.log('Creating portfolio item:', { ...item, userId });
+  
+  const portfolioData = {
+    ...item,
+    user_id: userId,
+    created_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .insert(portfolioData)
+      .select()
+      .single();
+    
+    console.log('Portfolio item creation result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createPortfolioItem:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const updatePortfolioItem = async (id: string, item: Partial<PortfolioItem>): Promise<{ data: PortfolioItem | null; error: any }> => {
+  console.log('Updating portfolio item:', { id, ...item });
+  
+  try {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .update(item)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    console.log('Portfolio item update result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in updatePortfolioItem:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const deletePortfolioItem = async (id: string): Promise<{ error: any }> => {
+  console.log('Deleting portfolio item:', id);
+  
+  try {
+    const { error } = await supabase
+      .from('portfolios')
+      .delete()
+      .eq('id', id);
+    
+    console.log('Portfolio item deletion result:', { error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { error };
+  } catch (err) {
+    console.error('Unexpected error in deletePortfolioItem:', err);
+    return { error: { message: 'Unexpected error occurred' } };
+  }
+};
 
 export const getRecentActivity = async (userId: string) => {
   const { data } = await supabase
