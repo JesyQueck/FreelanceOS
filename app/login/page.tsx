@@ -77,12 +77,12 @@ export default function LoginPage({
           
           <div className="text-center mt-2">
             <span className="text-xs text-slate-400">Don't have an account? </span>
-            <button
-              formAction={signup}
+            <Link
+              href="/signup"
               className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
             >
               Sign Up Now
-            </button>
+            </Link>
           </div>
         </div>
 
