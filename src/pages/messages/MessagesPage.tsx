@@ -4,9 +4,13 @@ import { Search, Send, Paperclip, MoreVertical, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
 import { supabase } from "../../utils/supabase";
+import NotificationDropdown from "../../components/NotificationDropdown";
+import ToastContainer from "../../components/ToastContainer";
+import { useNotifications } from "../../contexts/NotificationContext";
 
 export default function MessagesPage() {
   const { user } = useAuth();
+  const { addToastNotification } = useNotifications();
   const [searchParams] = useSearchParams();
   const conversationIdParam = searchParams.get('conversation');
   
@@ -18,40 +22,55 @@ export default function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const subscriptionRef = useRef<any>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Real-time message subscription
+  // Real-time message subscription for all conversations
   useEffect(() => {
-    if (!selectedConversation) return;
+    if (!user) return;
 
     const channel = supabase
-      .channel(`messages:${selectedConversation.id}`)
+      .channel(`messages:${user.id}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `conversation_id=eq.${selectedConversation.id}`
+          filter: `sender_id=neq.${user.id}` // Only messages from other users
         },
         (payload) => {
-          console.log('New message received:', payload);
-          setMessages(prev => [...prev, payload.new as Message]);
+          const newMessage = payload.new as Message;
+          console.log('New message received:', newMessage);
+          
+          // If this message is from the current conversation, add it to messages
+          if (selectedConversation && newMessage.conversation_id === selectedConversation.id) {
+            setMessages(prev => [...prev, newMessage]);
+          } else {
+            // If this message is from a different conversation, show toast notification
+            const conversation = conversations.find(c => c.id === newMessage.conversation_id);
+            if (conversation) {
+              const displayName = getDisplayName(conversation);
+              addToastNotification({
+                type: 'message',
+                title: `New message from ${displayName}`,
+                message: newMessage.content.substring(0, 100) + (newMessage.content.length > 100 ? '...' : ''),
+                conversationId: newMessage.conversation_id,
+                senderId: newMessage.sender_id,
+              });
+            }
+          }
         }
       )
       .subscribe();
 
-    subscriptionRef.current = channel;
-
     return () => {
       channel.unsubscribe();
     };
-  }, [selectedConversation]);
+  }, [user, selectedConversation, conversations, addToastNotification]);
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -183,13 +202,16 @@ export default function MessagesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-white">Messages</h1>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search conversations..."
-            className="pl-10 pr-4 py-2 bg-[#151B2B] border border-slate-800/60 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 w-full sm:w-auto"
-          />
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              className="pl-10 pr-4 py-2 bg-[#151B2B] border border-slate-800/60 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 w-full sm:w-auto"
+            />
+          </div>
+          <NotificationDropdown />
         </div>
       </div>
 
@@ -321,6 +343,9 @@ export default function MessagesPage() {
           )}
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   );
 }

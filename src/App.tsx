@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './styles/globals.css'
 import { AuthProvider } from './contexts/AuthContext'
+import { NotificationProvider } from './contexts/NotificationContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -17,25 +18,27 @@ function App() {
   return (
     <div className="antialiased bg-[#0B0F19] text-slate-50 min-h-screen flex flex-col">
       <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/portfolio/:slug" element={<PublicPortfolioPage />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<DashboardPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="profile/edit" element={<EditProfilePage />} />
-              <Route path="services" element={<ServicesPage />} />
-              <Route path="messages" element={<MessagesPage />} />
-            </Route>
-          </Routes>
-        </Router>
+        <NotificationProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/portfolio/:slug" element={<PublicPortfolioPage />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<DashboardPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="profile/edit" element={<EditProfilePage />} />
+                <Route path="services" element={<ServicesPage />} />
+                <Route path="messages" element={<MessagesPage />} />
+              </Route>
+            </Routes>
+          </Router>
+        </NotificationProvider>
       </AuthProvider>
     </div>
   )

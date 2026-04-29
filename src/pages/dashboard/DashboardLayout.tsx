@@ -1,8 +1,21 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
-import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell, Menu, X } from "lucide-react";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import { 
+  Briefcase, 
+  LayoutDashboard, 
+  UserCircle, 
+  Target, 
+  MessageSquare, 
+  Settings, 
+  LogOut, 
+  ChevronRight, 
+  Bell, 
+  Menu, 
+  X 
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../../utils/supabase";
+import NotificationDropdown from "../../components/NotificationDropdown";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -83,12 +96,15 @@ export default function DashboardLayout() {
             <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
           </Link>
           
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg bg-[#151B2B]/50 hover:bg-[#151B2B] transition-colors"
-          >
-            {sidebarOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationDropdown />
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg bg-[#151B2B]/50 hover:bg-[#151B2B] transition-colors"
+            >
+              {sidebarOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
+            </button>
+          </div>
         </div>
       </header>
 
