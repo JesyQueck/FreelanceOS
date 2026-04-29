@@ -20,6 +20,7 @@ CREATE TABLE public.portfolios (
   title TEXT NOT NULL,
   description TEXT,
   image_url TEXT,
+  external_link TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 

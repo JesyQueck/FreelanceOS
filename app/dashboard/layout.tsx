@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { Briefcase, LayoutDashboard, UserCircle, Target, MessageSquare, Settings, LogOut, ChevronRight, Bell } from "lucide-react";
 import { signout } from "@/app/login/actions";
@@ -12,6 +13,16 @@ export default async function DashboardLayout({
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch name for sidebar
+  const { data: profile } = await supabase
+    .from("users")
+    .select("name")
+    .eq("id", user?.id)
+    .single();
+
+  const displayName = profile?.name || user?.email?.split('@')[0] || 'User';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="flex h-screen bg-[#0B0F19] text-slate-50 overflow-hidden font-sans">
@@ -70,13 +81,13 @@ export default async function DashboardLayout({
         <div className="p-4 border-t border-slate-200/60 dark:border-slate-800/60">
           <div className="flex items-center gap-3 px-2 py-2 mb-2">
             <div className="h-9 w-9 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-semibold text-white shadow-sm ring-2 ring-slate-900">
-              {user?.email?.charAt(0).toUpperCase() || 'U'}
+              {initial}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {user?.email || 'user@example.com'}
+                {displayName}
               </p>
-              <p className="text-xs text-slate-500 truncate">Free Plan</p>
+              <p className="text-xs text-slate-500 truncate">{user?.email}</p>
             </div>
           </div>
           <form action={signout}>

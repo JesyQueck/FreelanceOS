@@ -6,13 +6,30 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Fetch counts and profile from DB
+  const [
+    { data: profile },
+    { count: servicesCount },
+    { count: portfoliosCount },
+    { count: convosCount }
+  ] = await Promise.all([
+    supabase.from("users").select("name").eq("id", user?.id).single(),
+    supabase.from("services").select("*", { count: 'exact', head: true }).eq("user_id", user?.id),
+    supabase.from("portfolios").select("*", { count: 'exact', head: true }).eq("user_id", user?.id),
+    supabase.from("conversations").select("*", { count: 'exact', head: true }).or(`freelancer_id.eq.${user?.id},client_id.eq.${user?.id}`)
+  ]);
+
+  const displayName = profile?.name || user?.email?.split('@')[0] || 'User';
+  const stepsCompleted = (servicesCount || 0) > 0 ? 3 : 2; 
+  const progressPercent = (stepsCompleted / 5) * 100;
+
   return (
     <>
       {/* Header & Welcome */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
-            Good afternoon, {user?.email?.split('@')[0] || 'User'}
+            Good afternoon, {displayName}
           </h1>
           <p className="text-slate-400">
             Here's what is happening with your freelance business today.
@@ -30,20 +47,23 @@ export default async function DashboardPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-amber-500" />
-              <h3 className="font-semibold text-lg text-white">Profile is 60% complete</h3>
+              <h3 className="font-semibold text-lg text-white">Profile is {progressPercent}% complete</h3>
             </div>
             <p className="text-slate-400 text-sm mb-4">
               Add a professional bio and at least 3 services to unlock your public portfolio link.
             </p>
             
             <div className="w-full bg-slate-800 rounded-full h-2.5 mb-2 overflow-hidden border border-slate-700/50">
-              <div className="bg-amber-500 h-2.5 rounded-full w-[60%] shadow-[0_0_10px_rgba(245,158,11,0.3)]" />
+              <div 
+                className="bg-amber-500 h-2.5 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(245,158,11,0.3)]" 
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
-            <p className="text-xs text-slate-500 font-medium text-right">3 of 5 steps completed</p>
+            <p className="text-xs text-slate-500 font-medium text-right">{stepsCompleted} of 5 steps completed</p>
           </div>
-          <button className="flex-shrink-0 bg-slate-800 border border-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
+          <Link href="/dashboard/profile" className="flex-shrink-0 bg-slate-800 border border-slate-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-700 transition-colors shadow-sm">
             Complete Profile
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -61,7 +81,7 @@ export default async function DashboardPage() {
             </span>
           </div>
           <p className="text-sm font-medium text-slate-400 mb-1">Active Conversations</p>
-          <h4 className="text-3xl font-bold text-white">3</h4>
+          <h4 className="text-3xl font-bold text-white">{convosCount || 0}</h4>
         </div>
 
         {/* Card 2 */}
@@ -72,7 +92,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <p className="text-sm font-medium text-slate-400 mb-1">Total Services</p>
-          <h4 className="text-3xl font-bold text-white">0</h4>
+          <h4 className="text-3xl font-bold text-white">{servicesCount || 0}</h4>
         </div>
 
         {/* Card 3 */}
