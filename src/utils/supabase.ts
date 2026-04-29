@@ -70,34 +70,48 @@ export const getConversationsCount = async (userId: string) => {
   return count || 0
 }
 
-export const createOrUpdateUserProfile = async (userId: string, email: string, name?: string) => {
-  console.log('createOrUpdateUserProfile called with:', { userId, email, name });
+export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string) => {
+  console.log('createOrUpdateUserProfile called with:', { userId, email, displayName });
   
   const profileData = {
     id: userId,
     email: email,
-    name: name || email.split('@')[0],
+    display_name: displayName || email.split('@')[0],
     updated_at: new Date().toISOString()
   };
   
   console.log('Profile data to upsert:', profileData);
   
-  const { data, error } = await supabase
-    .from('users')
-    .upsert(profileData)
-    .select()
-    .single()
-  
-  console.log('Upsert result:', { data, error });
-  
-  return { data, error }
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .upsert(profileData)
+      .select()
+      .single();
+    
+    console.log('Upsert result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createOrUpdateUserProfile:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
 }
 
 export const getUserProfile = async (userId: string) => {
   console.log('Getting user profile for ID:', userId);
   const { data, error } = await supabase
     .from('users')
-    .select('name')
+    .select('display_name, name')
     .eq('id', userId)
     .single()
   

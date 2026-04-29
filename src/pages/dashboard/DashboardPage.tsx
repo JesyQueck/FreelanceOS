@@ -47,7 +47,7 @@ export default function DashboardPage() {
         const progressPercent = (stepsCompleted / 5) * 100;
 
         setData({
-          displayName: profile?.name || (user.email && user.email.split('@')[0]) || 'User',
+          displayName: profile?.display_name || (user.email && user.email.split('@')[0]) || 'User',
           servicesCount,
           portfoliosCount,
           convosCount,

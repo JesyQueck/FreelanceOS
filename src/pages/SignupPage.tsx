@@ -20,9 +20,11 @@ export default function SignupPage() {
     setIsPending(true);
     
     const formData = new FormData(e.currentTarget);
-    const displayName = formData.get('displayName') as string;
+    const displayName = formData.get('display_name') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+
+    console.log('Form data extracted:', { displayName, email, password: '***' });
 
     // Validate display name
     if (!displayName || displayName.trim().length < 2) {
@@ -56,12 +58,15 @@ export default function SignupPage() {
       // Step 2: Create user profile
       try {
         console.log('Creating user profile with:', { userId: authData.user.id, email, displayName });
+        console.log('Display name type and value:', typeof displayName, JSON.stringify(displayName));
+        console.log('Trimmed display name:', displayName.trim());
         const profileResult = await createOrUpdateUserProfile(authData.user.id, email, displayName.trim());
         console.log('Profile creation result:', profileResult);
         
         if (profileResult.error) {
-          console.error('Profile creation error:', profileResult.error);
-          setState({ message: "Account created but profile setup failed. Please contact support.", success: false });
+          console.error('Profile creation error details:', profileResult.error);
+          console.error('Full error object:', JSON.stringify(profileResult.error, null, 2));
+          setState({ message: `Profile setup failed: ${profileResult.error.message || 'Unknown error'}`, success: false });
         } else {
           console.log('Profile created successfully');
           
@@ -124,7 +129,7 @@ export default function SignupPage() {
                     <Briefcase className="h-4 w-4" />
                   </div>
                   <input
-                    name="displayName"
+                    name="display_name"
                     type="text"
                     placeholder="John Doe"
                     required

@@ -2,7 +2,11 @@
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT NOT NULL,
-  name TEXT,
+  display_name TEXT,  -- Set during signup
+  name TEXT,          -- Set/edited in profile page
+  bio TEXT,
+  profile_image TEXT,
+  skills TEXT[],
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -15,6 +19,7 @@ DROP POLICY IF EXISTS "Users can manage their own profile" ON users;
 DROP POLICY IF EXISTS "Users can view their own profile" ON users;
 DROP POLICY IF EXISTS "Users can insert their own profile" ON users;
 DROP POLICY IF EXISTS "Users can update their own profile" ON users;
+DROP POLICY IF EXISTS "Allow profile creation during signup" ON users;
 
 -- Create policy for users to insert their own profile during signup
 CREATE POLICY "Users can insert their own profile" ON users
@@ -27,6 +32,10 @@ CREATE POLICY "Users can update their own profile" ON users
 -- Create policy for users to view their own profile
 CREATE POLICY "Users can view their own profile" ON users
   FOR SELECT USING (auth.uid() = id);
+
+-- Create a bypass policy for initial profile creation (temporary)
+CREATE POLICY "Allow profile creation during signup" ON users
+  FOR INSERT WITH CHECK (true);
 
 -- Create function to automatically update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()

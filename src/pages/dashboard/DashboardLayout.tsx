@@ -7,7 +7,7 @@ import { getUserProfile } from "../../utils/supabase";
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [userProfile, setUserProfile] = useState<{ name?: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ display_name?: string; name?: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,9 +29,20 @@ export default function DashboardLayout() {
     }
   }, [user]);
 
-  const displayName = userProfile?.name || user?.email?.split('@')[0] || 'User';
+  const displayName = userProfile?.display_name || user?.email?.split('@')[0] || 'User';
   const userEmail = user?.email || '';
   const initial = displayName.charAt(0).toUpperCase();
+  
+  // Show loading state while profile is being fetched
+  if (loading) {
+    return (
+      <div className="flex h-screen bg-[#0B0F19] text-slate-50 overflow-hidden font-sans">
+        <div className="flex items-center justify-center w-full">
+          <div className="text-slate-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
   
   console.log('Dashboard display data:', { displayName, userEmail, userProfile });
 
