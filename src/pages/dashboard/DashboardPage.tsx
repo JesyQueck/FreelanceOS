@@ -1,21 +1,94 @@
-import { MessageSquare, Target, Eye, ArrowUpRight, Plus, ExternalLink, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageSquare, Target, Eye, ArrowUpRight, Plus, Sparkles } from "lucide-react";
+import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getUserProfile, getRecentActivity, ActivityItem } from "../../utils/supabase";
+
+interface DashboardData {
+  displayName: string;
+  servicesCount: number;
+  portfoliosCount: number;
+  convosCount: number;
+  stepsCompleted: number;
+  progressPercent: number;
+  recentActivity: ActivityItem[];
+}
 
 export default function DashboardPage() {
-  // Mock data - replace with actual data from your API
-  const displayName = "Alex";
-  const servicesCount = 3;
-  const portfoliosCount = 2;
-  const convosCount = 5;
-  const stepsCompleted = 3;
-  const progressPercent = (stepsCompleted / 5) * 100;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<DashboardData>({
+    displayName: '',
+    servicesCount: 0,
+    portfoliosCount: 0,
+    convosCount: 0,
+    stepsCompleted: 0,
+    progressPercent: 0,
+    recentActivity: []
+  });
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const user = await getUser();
+        if (!user) {
+          setError('User not authenticated');
+          setLoading(false);
+          return;
+        }
+
+        const [profile, servicesCount, portfoliosCount, convosCount] = await Promise.all([
+          getUserProfile(user.id),
+          getServicesCount(user.id),
+          getPortfoliosCount(user.id),
+          getConversationsCount(user.id)
+        ]);
+
+        const recentActivity = await getRecentActivity(user.id);
+        const stepsCompleted = servicesCount > 0 ? 3 : 2;
+        const progressPercent = (stepsCompleted / 5) * 100;
+
+        setData({
+          displayName: profile?.name || (user.email && user.email.split('@')[0]) || 'User',
+          servicesCount,
+          portfoliosCount,
+          convosCount,
+          stepsCompleted,
+          progressPercent,
+          recentActivity
+        });
+      } catch (err) {
+        setError('Failed to load dashboard data');
+        console.error('Dashboard error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-red-500 text-center">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <>
       {/* Header & Welcome */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-1">
-            Good afternoon, {displayName}
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">
+            Good afternoon, {data.displayName}
           </h1>
           <p className="text-slate-400">
             Here's what is happening with your freelance business today.
@@ -33,12 +106,12 @@ export default function DashboardPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-amber-500" />
-              <h3 className="font-semibold text-lg text-white">Profile is {progressPercent}% complete</h3>
+              <h3 className="font-semibold text-lg text-white">Profile is {data.progressPercent}% complete</h3>
             </div>
             <div className="w-full bg-slate-800 rounded-full h-2 mb-3">
               <div 
                 className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
+                style={{ width: `${data.progressPercent}%` }}
               />
             </div>
             <p className="text-sm text-slate-400">
@@ -58,9 +131,9 @@ export default function DashboardPage() {
             <div className="p-2 bg-indigo-600/10 rounded-lg">
               <Target className="h-5 w-5 text-indigo-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">+12%</span>
+            <span className="text-xs text-slate-500 font-medium">{data.servicesCount > 0 ? '+12%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-1">{servicesCount}</h3>
+          <h3 className="text-2xl font-bold text-white mb-1">{data.servicesCount}</h3>
           <p className="text-sm text-slate-400">Active Services</p>
         </div>
 
@@ -69,9 +142,9 @@ export default function DashboardPage() {
             <div className="p-2 bg-green-600/10 rounded-lg">
               <Eye className="h-5 w-5 text-green-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">+25%</span>
+            <span className="text-xs text-slate-500 font-medium">{data.portfoliosCount > 0 ? '+25%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-1">{portfoliosCount}</h3>
+          <h3 className="text-2xl font-bold text-white mb-1">{data.portfoliosCount}</h3>
           <p className="text-sm text-slate-400">Portfolio Items</p>
         </div>
 
@@ -80,9 +153,9 @@ export default function DashboardPage() {
             <div className="p-2 bg-purple-600/10 rounded-lg">
               <MessageSquare className="h-5 w-5 text-purple-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">+8%</span>
+            <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+8%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-1">{convosCount}</h3>
+          <h3 className="text-2xl font-bold text-white mb-1">{data.convosCount}</h3>
           <p className="text-sm text-slate-400">Conversations</p>
         </div>
 
@@ -91,9 +164,9 @@ export default function DashboardPage() {
             <div className="p-2 bg-amber-600/10 rounded-lg">
               <ArrowUpRight className="h-5 w-5 text-amber-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">+18%</span>
+            <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+18%' : '0%'}</span>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-1">$4,250</h3>
+          <h3 className="text-2xl font-bold text-white mb-1">${data.servicesCount > 0 ? '$4,250' : '$0'}</h3>
           <p className="text-sm text-slate-400">Monthly Revenue</p>
         </div>
       </div>
@@ -103,38 +176,27 @@ export default function DashboardPage() {
         <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
         <div className="bg-[#151B2B] rounded-2xl border border-slate-800/60 shadow-sm overflow-hidden">
           <div className="divide-y divide-slate-800/60">
-            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-medium text-white">New message from Sarah</p>
-                  <p className="text-xs text-slate-400">2 minutes ago</p>
+            {data.recentActivity.map((activity: ActivityItem) => (
+              <div key={activity.id} className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${
+                    activity.type === 'message' ? 'bg-green-500' :
+                    activity.type === 'system' ? 'bg-blue-500' : 'bg-amber-500'
+                  }`}></div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{activity.name}</p>
+                    <p className="text-xs text-slate-400">{activity.time}</p>
+                  </div>
                 </div>
+                {activity.type === 'message' ? (
+                  <MessageSquare className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+                ) : activity.type === 'system' ? (
+                  <Eye className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+                ) : (
+                  <Target className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
+                )}
               </div>
-              <ExternalLink className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
-            </div>
-            
-            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-medium text-white">Service "Logo Design" viewed</p>
-                  <p className="text-xs text-slate-400">1 hour ago</p>
-                </div>
-              </div>
-              <Eye className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
-            </div>
-            
-            <div className="p-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-medium text-white">Profile updated</p>
-                  <p className="text-xs text-slate-400">3 hours ago</p>
-                </div>
-              </div>
-              <Target className="h-4 w-4 text-slate-400 hover:text-white transition-colors" />
-            </div>
+            ))}
           </div>
         </div>
       </div>
