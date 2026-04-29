@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "../utils/supabase";
 
 export default function NotificationBell() {
   const supabase = createClient();
@@ -24,7 +24,7 @@ export default function NotificationBell() {
       
       // Setup realtime listener for notifications table
       supabase.channel('user-notifications')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => {
           setUnreadCount((prev) => prev + 1);
         })
         .subscribe();

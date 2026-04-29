@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, DollarSign } from "lucide-react";
+import { Clock, DollarSign } from "lucide-react";
 
 interface ServiceCardProps {
   title: string;
