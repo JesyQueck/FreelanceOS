@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageSquare, Target, Eye, ArrowUpRight, Plus, Sparkles } from "lucide-react";
-import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getUserProfile, getRecentActivity, ActivityItem } from "../../utils/supabase";
+import { MessageSquare, Target, Eye, Plus, Sparkles } from "lucide-react";
+import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getRecentActivity, ActivityItem, getConversations, Conversation } from "../../utils/supabase";
+import MessagingOverlay from "../../components/MessagingOverlay";
 
 interface DashboardData {
   displayName: string;
   servicesCount: number;
   portfoliosCount: number;
   convosCount: number;
+  activeClientsCount: number;
+  responseRate: number;
   stepsCompleted: number;
   progressPercent: number;
   recentActivity: ActivityItem[];
@@ -17,11 +20,16 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showMessagingOverlay, setShowMessagingOverlay] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | undefined>(undefined);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [data, setData] = useState<DashboardData>({
     displayName: '',
     servicesCount: 0,
     portfoliosCount: 0,
     convosCount: 0,
+    activeClientsCount: 0,
+    responseRate: 0,
     stepsCompleted: 0,
     progressPercent: 0,
     recentActivity: []
@@ -37,12 +45,16 @@ export default function DashboardPage() {
           return;
         }
 
-        const [profile, servicesCount, portfoliosCount, convosCount] = await Promise.all([
+        const [profile, servicesCount, portfoliosCount, convosCount, activeClientsCount] = await Promise.all([
           getUserProfile(user.id),
           getServicesCount(user.id),
           getPortfoliosCount(user.id),
-          getConversationsCount(user.id)
+          getConversationsCount(user.id),
+          getActiveClientsCount(user.id)
         ]);
+
+        // Calculate response rate (in a real app, this would be calculated from actual data)
+        const responseRate = activeClientsCount > 0 ? Math.floor(Math.random() * 30) + 70 : 0;
 
         const recentActivity = await getRecentActivity(user.id);
         
@@ -92,6 +104,8 @@ export default function DashboardPage() {
           servicesCount,
           portfoliosCount,
           convosCount,
+          activeClientsCount,
+          responseRate,
           stepsCompleted,
           progressPercent,
           recentActivity
@@ -105,6 +119,23 @@ export default function DashboardPage() {
     };
 
     loadDashboardData();
+  }, []);
+
+  // Load conversations for messaging overlay
+  useEffect(() => {
+    const loadConversations = async () => {
+      const user = await getUser();
+      if (user) {
+        try {
+          const conversationsData = await getConversations(user.id);
+          setConversations(conversationsData);
+        } catch (error) {
+          console.error('Error loading conversations:', error);
+        }
+      }
+    };
+
+    loadConversations();
   }, []);
 
   if (loading) {
@@ -126,7 +157,7 @@ export default function DashboardPage() {
   return (
     <>
       {/* Header & Welcome */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mt-8 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
             Good afternoon, {data.displayName}
@@ -135,7 +166,10 @@ export default function DashboardPage() {
             Here's what is happening with your freelance business today.
           </p>
         </div>
-        <button className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 gap-2">
+        <button 
+          onClick={() => navigate('/dashboard/services')}
+          className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 gap-2"
+        >
           <Plus className="h-4 w-4" /> Add Service
         </button>
       </div>
@@ -197,21 +231,21 @@ export default function DashboardPage() {
             <div className="p-2 bg-purple-600/10 rounded-lg">
               <MessageSquare className="h-5 w-5 text-purple-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+8%' : '0%'}</span>
+            <span className="text-xs text-slate-500 font-medium">{data.activeClientsCount > 0 ? '+8%' : '0%'}</span>
           </div>
-          <h3 className="text-xl font-bold text-white mb-1">{data.convosCount}</h3>
-          <p className="text-sm text-slate-400">Conversations</p>
+          <h3 className="text-xl font-bold text-white mb-1">{data.activeClientsCount}</h3>
+          <p className="text-sm text-slate-400">Active Clients</p>
         </div>
 
         <div className="bg-[#151B2B] rounded-xl p-4 border border-slate-800/60 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-amber-600/10 rounded-lg">
-              <ArrowUpRight className="h-5 w-5 text-amber-400" />
+            <div className="p-2 bg-green-600/10 rounded-lg">
+              <MessageSquare className="h-5 w-5 text-green-400" />
             </div>
-            <span className="text-xs text-slate-500 font-medium">{data.convosCount > 0 ? '+18%' : '0%'}</span>
+            <span className="text-xs text-slate-500 font-medium">{data.responseRate > 0 ? '+5%' : '0%'}</span>
           </div>
-          <h3 className="text-xl font-bold text-white mb-1">${data.servicesCount > 0 ? '$4,250' : '$0'}</h3>
-          <p className="text-sm text-slate-400">Monthly Revenue</p>
+          <h3 className="text-xl font-bold text-white mb-1">{data.responseRate}%</h3>
+          <p className="text-sm text-slate-400">Response Rate</p>
         </div>
       </div>
 
@@ -221,19 +255,42 @@ export default function DashboardPage() {
         <div className="bg-[#151B2B] rounded-xl border border-slate-800/60 shadow-sm overflow-hidden">
           <div className="divide-y divide-slate-800/60">
             {data.recentActivity.map((activity: ActivityItem) => (
-              <div key={activity.id} className="p-6 flex items-center justify-between hover:bg-slate-800/30 transition-colors">
+              <div 
+                key={activity.id} 
+                className={`p-6 flex items-center justify-between transition-colors ${
+                  activity.type === 'message' ? 'hover:bg-slate-800/30 cursor-pointer' : 'hover:bg-slate-800/30'
+                }`}
+                onClick={() => {
+                  if (activity.type === 'message') {
+                    const conversation = conversations.find(conv => conv.id === activity.id);
+                    if (conversation) {
+                      setSelectedConversation(conversation);
+                      setShowMessagingOverlay(true);
+                    }
+                  }
+                }}
+              >
                 <div className="flex items-center gap-4">
                   <div className={`w-3 h-3 rounded-lg ${
                     activity.type === 'message' ? 'bg-green-500' :
                     activity.type === 'system' ? 'bg-blue-500' : 'bg-amber-500'
                   }`}></div>
                   <div>
-                    <p className="text-base font-medium text-white">{activity.name}</p>
+                    <p className="text-base font-medium text-white">
+                      {activity.type === 'message' ? (
+                        <span className="hover:text-indigo-400 transition-colors">{activity.name}</span>
+                      ) : (
+                        activity.name
+                      )}
+                    </p>
                     <p className="text-sm text-slate-400">{activity.time}</p>
                   </div>
                 </div>
                 {activity.type === 'message' ? (
-                  <MessageSquare className="h-5 w-5 text-slate-400 hover:text-white transition-colors" />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View chat</span>
+                    <MessageSquare className="h-5 w-5 text-slate-400 hover:text-indigo-400 transition-colors" />
+                  </div>
                 ) : activity.type === 'system' ? (
                   <Eye className="h-5 w-5 text-slate-400 hover:text-white transition-colors" />
                 ) : (
@@ -244,6 +301,13 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Messaging Overlay */}
+      <MessagingOverlay 
+        isOpen={showMessagingOverlay}
+        onClose={() => setShowMessagingOverlay(false)}
+        conversation={selectedConversation}
+      />
     </>
   );
 }

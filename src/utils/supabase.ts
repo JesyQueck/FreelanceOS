@@ -118,13 +118,29 @@ export interface Message {
   created_at?: string;
 }
 
-export const getServicesCount = async (userId: string) => {
+export const getServices = async (userId: string): Promise<Service[]> => {
+  console.log('Getting services for user:', userId);
+  const { data, error } = await supabase
+    .from('services')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching services:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const getServicesCount = async (userId: string): Promise<number> => {
   const { count } = await supabase
     .from('services')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
   return count || 0
-}
+};
 
 export const getPortfoliosCount = async (userId: string) => {
   const { count } = await supabase
@@ -134,13 +150,6 @@ export const getPortfoliosCount = async (userId: string) => {
   return count || 0
 }
 
-export const getConversationsCount = async (userId: string) => {
-  const { count } = await supabase
-    .from('conversations')
-    .select('*', { count: 'exact', head: true })
-    .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
-  return count || 0
-}
 
 export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string, name?: string, bio?: string, skills?: string[]) => {
   console.log('createOrUpdateUserProfile called with:', { userId, email, displayName, name, bio, skills });
@@ -416,25 +425,44 @@ export const deletePortfolioItem = async (id: string): Promise<{ error: any }> =
 };
 
 // Services CRUD functions
-export const getServices = async (userId: string): Promise<Service[]> => {
-  console.log('Getting services for user:', userId);
+export const getConversationsCount = async (userId: string): Promise<number> => {
+  console.log('Getting conversations count for user:', userId);
   const { data, error } = await supabase
-    .from('services')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-  
+    .from('conversations')
+    .select('id', { count: 'exact', head: true })
+    .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`);
+      
   if (error) {
-    console.error('Error fetching services:', error);
-    return [];
+    console.error('Error fetching conversations count:', error);
+    return 0;
   }
-  
-  return data || [];
+      
+  return data?.length || 0;
+};
+
+export const getActiveClientsCount = async (freelancerId: string): Promise<number> => {
+  console.log('Getting active clients count for freelancer:', freelancerId);
+      
+  // Get conversations with messages in the last 7 days (considered active)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('id, last_message_at')
+    .eq('freelancer_id', freelancerId)
+    .gte('last_message_at', sevenDaysAgo);
+      
+  if (error) {
+    console.error('Error fetching active clients count:', error);
+    return 0;
+  }
+      
+  return data?.length || 0;
 };
 
 export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'created_at' | 'updated_at'>, userId: string): Promise<{ data: Service | null; error: any }> => {
   console.log('Creating service:', { ...service, userId });
-  
+      
   const serviceData = {
     ...service,
     user_id: userId,

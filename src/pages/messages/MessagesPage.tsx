@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, Send, Paperclip, MoreVertical } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Search, Send, Paperclip, MoreVertical, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
 import { supabase } from "../../utils/supabase";
 
 export default function MessagesPage() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const conversationIdParam = searchParams.get('conversation');
+  
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [messageInput, setMessageInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const subscriptionRef = useRef<any>(null);
 
@@ -55,9 +60,17 @@ export default function MessagesPage() {
           const conversationsData = await getConversations(user.id);
           setConversations(conversationsData);
           if (conversationsData.length > 0) {
-            setSelectedConversation(conversationsData[0]);
-            const messagesData = await getMessages(conversationsData[0].id!);
-            setMessages(messagesData);
+            // Check if there's a specific conversation ID in URL
+            if (conversationIdParam) {
+              const targetConversation = conversationsData.find(conv => conv.id === conversationIdParam);
+              if (targetConversation) {
+                setSelectedConversation(targetConversation);
+                setShowChat(true);
+                const messagesData = await getMessages(targetConversation.id!);
+                setMessages(messagesData);
+              }
+            }
+            // Don't auto-select any conversation - wait for user to click
           }
         } catch (error) {
           console.error('Error fetching conversations:', error);
@@ -97,14 +110,22 @@ export default function MessagesPage() {
     }
   };
 
-  const handleSelectConversation = async (conversation: Conversation) => {
+  const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
-    try {
-      const messagesData = await getMessages(conversation.id!);
-      setMessages(messagesData);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
+    setShowChat(true);
+    const loadMessages = async () => {
+      try {
+        const messagesData = await getMessages(conversation.id!);
+        setMessages(messagesData);
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      }
+    };
+    loadMessages();
+  };
+
+  const handleBackToList = () => {
+    setShowChat(false);
   };
 
   const formatTime = (dateString?: string) => {
@@ -159,6 +180,7 @@ export default function MessagesPage() {
 
   return (
     <div className="h-full flex flex-col bg-[#0B0F19]">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-white">Messages</h1>
         <div className="relative">
@@ -171,9 +193,11 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
-        {/* Conversations List */}
-        <div className="w-full lg:w-80 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col">
+      <div className="flex-1 flex bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden relative">
+        {/* Conversations List - Always visible */}
+        <div className={`w-full sm:w-80 bg-[#151B2B] flex flex-col transition-transform duration-300 ${
+          showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
+        } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
           <div className="p-4 border-b border-slate-800/60">
             <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">All Conversations</h2>
           </div>
@@ -210,13 +234,21 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        {/* Chat Area */}
-        <div className="flex-1 bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden flex flex-col min-w-0">
+        {/* Chat Area - Slides in from right */}
+        <div className={`flex-1 bg-[#151B2B] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
+          showChat ? 'translate-x-0' : 'translate-x-full'
+        } ${showChat ? 'absolute inset-0 z-20 sm:relative sm:z-0' : 'absolute inset-0'}`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
               <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
                 <div className="flex items-center gap-3">
+                  <button 
+                    onClick={handleBackToList}
+                    className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                  >
+                    <ArrowLeft className="h-5 w-5 text-white" />
+                  </button>
                   <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
                     {getInitials(selectedConversation)}
                   </div>
