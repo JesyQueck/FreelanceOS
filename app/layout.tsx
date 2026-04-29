@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`antialiased bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-50 min-h-screen flex flex-col`} suppressHydrationWarning>
+      <body className={`antialiased bg-[#0B0F19] text-slate-50 min-h-screen flex flex-col`} suppressHydrationWarning>
         {children}
       </body>
     </html>

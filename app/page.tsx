@@ -3,16 +3,16 @@ import { ArrowRight, Briefcase, FileText, Share2, MessageCircle, BarChart3, Star
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0B0F19] selection:bg-primary-500/30">
+    <div className="flex flex-col min-h-screen bg-[#0B0F19] text-white selection:bg-indigo-500/30">
       
       {/* 1. NAVIGATION BAR */}
-      <nav className="fixed w-full z-50 top-0 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/80 dark:bg-[#0B0F19]/80 backdrop-blur-xl">
+      <nav className="fixed w-full z-50 top-0 border-b border-slate-800/50 bg-[#0B0F19]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-sm flex items-center justify-center">
               <Briefcase className="w-4 h-4" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+            <span className="font-bold text-base tracking-tight text-white">
               FreelanceOS
             </span>
           </div>
@@ -21,7 +21,7 @@ export default function LandingPage() {
             <Link href="#features" className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Features</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center">
+            <Link href="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center">
               Log in
             </Link>
             <Link href="/login" className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition-all shadow-sm flex items-center">
@@ -38,19 +38,19 @@ export default function LandingPage() {
           {/* Background Glows Refined */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary-500/10 dark:bg-primary-500/5 blur-[80px] rounded-full point-events-none -z-10" />
           
-          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-400 mb-8 border border-indigo-100 dark:border-indigo-500/20">
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-500/10 px-4 py-1.5 text-xs font-semibold text-indigo-400 mb-8 border border-indigo-500/20">
             <span className="flex h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
             Join 10,000+ top independent professionals
           </div>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl leading-tight mb-5">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-white max-w-3xl leading-tight mb-5">
             Turn Your Freelance Work Into a {" "}
-            <span className="text-indigo-600 dark:text-indigo-400">
+            <span className="text-indigo-400">
               Professional Experience
             </span>
           </h1>
           
-          <p className="mx-auto max-w-[600px] text-base md:text-lg text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
+          <p className="mx-auto max-w-[500px] text-sm md:text-base text-slate-400 mb-8 leading-relaxed">
             Stop relying on marketplaces. Build a breathtaking portfolio, package your services, and manage client communications in your own branded workspace.
           </p>
           
@@ -63,7 +63,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="#demo"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-all bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/80 shadow-sm gap-2"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-slate-200 transition-all bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-800/80 shadow-sm gap-2"
             >
               View Demo Profile
             </Link>
@@ -72,16 +72,16 @@ export default function LandingPage() {
 
         {/* 3. PROFILE PREVIEW SECTION */}
         <section id="demo" className="w-full px-6 py-12 flex justify-center -mt-8 relative z-10">
-          <div className="w-full max-w-6xl rounded-[2rem] border border-slate-200/60 dark:border-slate-700/50 bg-white/50 dark:bg-slate-900/50 p-2 shadow-2xl shadow-slate-200/50 dark:shadow-black/50 backdrop-blur-xl">
-            <div className="rounded-[1.5rem] overflow-hidden border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#0F1523] shadow-inner">
+          <div className="w-full max-w-6xl rounded-[2rem] border border-slate-700/50 bg-slate-900/50 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl">
+            <div className="rounded-[1.5rem] overflow-hidden border border-slate-800 bg-[#0F1523] shadow-inner">
               {/* Fake Browser Window Header */}
-              <div className="h-14 bg-slate-50 dark:bg-[#0B0F19] border-b border-slate-100 dark:border-slate-800 flex items-center px-6 gap-2">
+              <div className="h-14 bg-[#0B0F19] border-b border-slate-800 flex items-center px-6 gap-2">
                 <div className="flex gap-1.5">
                   <div className="h-3 w-3 rounded-full bg-red-400" />
                   <div className="h-3 w-3 rounded-full bg-amber-400" />
                   <div className="h-3 w-3 rounded-full bg-green-400" />
                 </div>
-                <div className="mx-auto flex h-8 w-64 items-center justify-center rounded-md bg-white dark:bg-slate-800 text-xs font-medium text-slate-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50 line-clamp-1">
+                <div className="mx-auto flex h-8 w-64 items-center justify-center rounded-md bg-slate-800 text-xs font-medium text-slate-400 shadow-sm border border-slate-700/50 line-clamp-1">
                   freelanceos.com/alex-design
                 </div>
               </div>
@@ -90,18 +90,18 @@ export default function LandingPage() {
               <div className="p-8 md:p-12">
                 <div className="flex flex-col md:flex-row gap-12 items-start">
                   <div className="w-full md:w-1/3 flex flex-col gap-6">
-                    <div className="h-24 w-24 rounded-2xl bg-indigo-50 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-indigo-600">AR</span>
+                    <div className="h-20 w-20 rounded-2xl bg-indigo-50 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center">
+                      <span className="text-xl font-bold text-indigo-600">AR</span>
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Alex Rivera</h2>
+                        <h2 className="text-xl font-bold tracking-tight text-white">Alex Rivera</h2>
                         <CheckCircle2 className="h-4 w-4 text-indigo-500 shrink-0" />
                       </div>
                       <p className="text-slate-500 mb-6 h-16 line-clamp-3 text-sm leading-relaxed">
                         Digital designer specializing in SaaS UI/UX. I help early-stage startups look like enterprise giants.
                       </p>
-                      <button className="w-full py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg text-sm font-semibold shadow-sm hover:bg-slate-800 transition-colors flex items-center justify-center">
+                      <button className="w-full py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold shadow-sm hover:bg-indigo-500 transition-colors flex items-center justify-center">
                         Message Freelancer
                       </button>
                     </div>
@@ -109,19 +109,19 @@ export default function LandingPage() {
                   
                   <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Fake Service Cards */}
-                    <div className="p-6 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-800 transition-colors shadow-sm">
-                      <h3 className="font-semibold text-lg mb-1">Full App Redesign</h3>
-                      <p className="text-slate-500 text-sm mb-5 leading-relaxed">Complete overhaul of your web app user interface.</p>
-                      <div className="flex justify-between items-center text-sm pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                        <span className="font-semibold text-slate-900 dark:text-white">From $4,500</span>
+                    <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800 transition-colors shadow-sm">
+                      <h3 className="font-semibold text-base mb-1 text-white">Full App Redesign</h3>
+                      <p className="text-slate-400 text-xs mb-5 leading-relaxed">Complete overhaul of your web app user interface.</p>
+                      <div className="flex justify-between items-center text-xs pt-4 border-t border-slate-800/80">
+                        <span className="font-semibold text-white">From $4,500</span>
                         <span className="text-slate-400">2-3 weeks</span>
                       </div>
                     </div>
-                    <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F1523] hover:shadow-sm transition-all focus-within:ring-2 focus-within:ring-indigo-500">
-                      <h3 className="font-semibold text-base mb-1.5 text-slate-900 dark:text-white">Brand Identity</h3>
-                      <p className="text-slate-500 text-sm mb-5 leading-relaxed">Logo, color palette, and complete typography system.</p>
-                      <div className="flex justify-between items-center text-sm pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                        <span className="font-semibold text-slate-900 dark:text-white">From $2,000</span>
+                    <div className="p-5 rounded-2xl border border-slate-800 bg-[#0F1523] hover:shadow-sm transition-all focus-within:ring-2 focus-within:ring-indigo-500">
+                      <h3 className="font-semibold text-sm mb-1.5 text-white">Brand Identity</h3>
+                      <p className="text-slate-400 text-xs mb-5 leading-relaxed">Logo, color palette, and complete typography system.</p>
+                      <div className="flex justify-between items-center text-xs pt-4 border-t border-slate-800/80">
+                        <span className="font-semibold text-white">From $2,000</span>
                         <span className="text-slate-400">1 week</span>
                       </div>
                     </div>
@@ -133,104 +133,104 @@ export default function LandingPage() {
         </section>
 
         {/* 4. HOW IT WORKS SECTION */}
-        <section id="how-it-works" className="w-full py-24 bg-white dark:bg-[#0B0F19]">
+        <section id="how-it-works" className="w-full py-24 bg-[#0B0F19]">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Your entire workflow,<br/>simplified.</h2>
-              <p className="text-slate-500 text-lg">No job boards, no bidding, no commissions taken from your earnings.</p>
+              <h2 className="text-2xl md:text-4xl font-bold tracking-tight mb-4 text-white">Your entire workflow,<br/>simplified.</h2>
+              <p className="text-slate-400 text-base">No job boards, no bidding, no commissions taken from your earnings.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-              <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent -z-10" />
+              <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-transparent via-slate-800 to-transparent -z-10" />
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
-                  <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">1</span>
+                <div className="w-10 h-10 rounded-full bg-indigo-900/20 border border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
+                  <span className="text-base font-bold text-indigo-400">1</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">Create your profile</h3>
-                <p className="text-slate-500 text-sm leading-relaxed max-w-sm">Launch a beautiful portfolio that showcases your best work and packages your services simply.</p>
+                <h3 className="text-base font-bold mb-2 text-white">Create your profile</h3>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-sm">Launch a beautiful portfolio that showcases your best work and packages your services simply.</p>
               </div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
-                  <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">2</span>
+                <div className="w-10 h-10 rounded-full bg-indigo-900/20 border border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
+                  <span className="text-base font-bold text-indigo-400">2</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">Share with clients</h3>
-                <p className="text-slate-500 text-sm leading-relaxed max-w-sm">Send your custom link to leads. They can view your offerings and hire you directly in one click.</p>
+                <h3 className="text-base font-bold mb-2 text-white">Share with clients</h3>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-sm">Send your custom link to leads. They can view your offerings and hire you directly in one click.</p>
               </div>
               
               <div className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
-                  <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">3</span>
+                <div className="w-10 h-10 rounded-full bg-indigo-900/20 border border-indigo-800/50 flex items-center justify-center mb-5 shrink-0">
+                  <span className="text-base font-bold text-indigo-400">3</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white">Manage conversations</h3>
-                <p className="text-slate-500 text-sm leading-relaxed max-w-sm">Streamline project chat, file sharing, and updates in a dedicated portal that impresses clients.</p>
+                <h3 className="text-base font-bold mb-2 text-white">Manage conversations</h3>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-sm">Streamline project chat, file sharing, and updates in a dedicated portal that impresses clients.</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* 5. FEATURES SECTION */}
-        <section id="features" className="w-full py-24 bg-slate-50/50 dark:bg-[#0B0F19]">
+        <section id="features" className="w-full py-24 bg-[#0B0F19]">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">Everything you need to <br/>run a solo agency.</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-6 leading-tight text-white">Everything you need to <br/>run a solo agency.</h2>
                 <div className="space-y-8 mt-10">
                   <div className="flex gap-4 items-start">
-                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <FileText className="h-5 w-5 text-indigo-600" />
+                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-800 rounded-lg border border-slate-700">
+                      <FileText className="h-5 w-5 text-indigo-400" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold mb-1">Notion-like Portfolio</h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">Rich text, dynamic embeds, and incredibly fast editing. Your past work has never looked better.</p>
+                      <h4 className="text-base font-bold mb-1">Notion-like Portfolio</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed max-w-sm">Rich text, dynamic embeds, and incredibly fast editing. Your past work has never looked better.</p>
                     </div>
                   </div>
                   <div className="flex gap-4 items-start">
-                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <BarChart3 className="h-5 w-5 text-indigo-600" />
+                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-800 rounded-lg border border-slate-700">
+                      <BarChart3 className="h-5 w-5 text-indigo-400" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold mb-1">Service Menus</h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">Sell your skills like products. Define prices, timelines, and deliverables so expectations are perfectly set.</p>
+                      <h4 className="text-base font-bold mb-1">Service Menus</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed max-w-sm">Sell your skills like products. Define prices, timelines, and deliverables so expectations are perfectly set.</p>
                     </div>
                   </div>
                   <div className="flex gap-4 items-start">
-                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <MessageCircle className="h-5 w-5 text-indigo-600" />
+                    <div className="flex items-center justify-center w-10 h-10 shrink-0 bg-slate-800 rounded-lg border border-slate-700">
+                      <MessageCircle className="h-5 w-5 text-indigo-400" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-bold mb-1">Real-time Messaging</h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">Integrated client portals mean you can stop losing track of requirements in messy email chains.</p>
+                      <h4 className="text-base font-bold mb-1">Real-time Messaging</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed max-w-sm">Integrated client portals mean you can stop losing track of requirements in messy email chains.</p>
                     </div>
                   </div>
                 </div>
               </div>
               
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary-600/10 to-purple-600/10 rounded-[3rem] transform rotate-3" />
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 shadow-xl relative backdrop-blur-sm">
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 rounded-[3rem] transform rotate-3" />
+                <div className="bg-slate-900 border border-slate-800 rounded-[2.5rem] p-8 shadow-xl relative backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-8">
                     <div>
-                      <p className="text-sm text-slate-500 font-medium">New Message</p>
-                      <h5 className="text-lg font-semibold">Client: Sarah Jenkins</h5>
+                      <p className="text-sm text-slate-400 font-medium">New Message</p>
+                      <h5 className="text-lg font-semibold text-white">Client: Sarah Jenkins</h5>
                     </div>
-                    <div className="h-10 w-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                    <div className="h-10 w-10 bg-slate-800 rounded-full flex items-center justify-center">
                       <Star className="h-5 w-5 text-amber-500" />
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl rounded-tr-sm border border-slate-100 dark:border-slate-700 w-4/5 ml-auto text-sm text-slate-700 dark:text-slate-300">
+                    <div className="bg-slate-800/50 p-4 rounded-2xl rounded-tr-sm border border-slate-700 w-4/5 ml-auto text-sm text-slate-300">
                       Hi Sarah! Reviewing the wireframes. Looks great.
                     </div>
-                    <div className="bg-primary-50 dark:bg-primary-900/20 p-4 rounded-2xl rounded-tl-sm border border-primary-100 dark:border-primary-800 w-4/5 text-sm text-slate-700 dark:text-slate-300">
+                    <div className="bg-indigo-900/20 p-4 rounded-2xl rounded-tl-sm border border-indigo-800 w-4/5 text-sm text-slate-300">
                       Thanks! Can we move forward with the high-fidelity designs for the dashboard? Let's proceed.
                     </div>
                   </div>
-                  <div className="mt-8 border-t border-slate-100 dark:border-slate-800 pt-6">
+                  <div className="mt-8 border-t border-slate-800 pt-6">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-medium">Project Stage: Approved</span>
+                      <span className="text-sm font-medium text-slate-200">Project Stage: Approved</span>
                     </div>
                   </div>
                 </div>
@@ -247,13 +247,13 @@ export default function LandingPage() {
             <div className="absolute bottom-0 left-0 p-32 bg-purple-500/20 blur-[100px] rounded-full" />
             
             <div className="relative z-10 px-8 py-20 text-center flex flex-col items-center">
-              <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">Ready to upgrade your<br/>freelance career?</h2>
-              <p className="text-slate-300 text-lg md:text-xl max-w-2xl mb-10">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-white">Ready to upgrade your<br/>freelance career?</h2>
+              <p className="text-slate-300 text-base md:text-lg max-w-xl mb-10">
                 Join our private beta today and get early access to the most powerful tool built specifically for independent professionals.
               </p>
               <Link
                 href="/login"
-                className="bg-white text-slate-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-slate-100 transition-colors shadow-xl shadow-white/10"
+                className="bg-indigo-600 text-white px-8 py-3 rounded-full font-semibold text-base hover:bg-indigo-500 transition-colors shadow-xl shadow-indigo-600/20"
               >
                 Create your Free Account
               </Link>
