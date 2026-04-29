@@ -1,35 +1,46 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/**
+ * Sanitize environment variables to remove accidental quotes or spaces
+ */
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/["]+/g, '').trim();
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.replace(/["]+/g, '').trim();
+
 export async function createClient() {
-  const cookieStore = await cookies();
+  let cookieStore;
+  try {
+    cookieStore = await cookies();
+  } catch (e) {
+    // Fallback for static generation where cookies() is not available
+    cookieStore = {
+      getAll: () => [],
+      set: () => {},
+    };
+  }
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error("Missing Supabase Environment Variables");
+  }
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll()
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            )
-          } catch (error) {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            );
+          } catch {
+            // Safe to ignore in Server Components
           }
         },
       },
-      // IMPORTANT FOR LOCAL DEV: Allow insecure cookies on localhost
-      cookieOptions: {
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-      }
     }
   );
 }
