@@ -1,4 +1,4 @@
-import { Search, MessageCircle, Send, Paperclip, MoreVertical, Check, CheckCheck } from "lucide-react";
+import { Search, Send, Paperclip, MoreVertical, Check, CheckCheck } from "lucide-react";
 
 export default function MessagesPage() {
   // Mock conversations data

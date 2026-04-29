@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Briefcase, FileText, Share2, MessageCircle, BarChart3, Star, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Briefcase, FileText, MessageCircle, BarChart3, Star, CheckCircle2 } from "lucide-react";
 
 export default function LandingPage() {
   return (
