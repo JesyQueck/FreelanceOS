@@ -102,6 +102,14 @@ export interface Conversation {
   }[];
 }
 
+export interface ClientInfo {
+  id: string;
+  name: string;
+  email?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Message {
   id?: string;
   conversation_id: string;
@@ -606,6 +614,68 @@ export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>)
     return { data, error };
   } catch (err) {
     console.error('Unexpected error in createMessage:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+// Client information management
+export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | 'created_at' | 'updated_at'>): Promise<{ data: ClientInfo | null; error: any }> => {
+  console.log('Creating or updating client:', clientInfo);
+  
+  // Generate a unique client ID based on email or name + timestamp
+  const clientId = clientInfo.email 
+    ? `client-${clientInfo.email.replace(/[^a-zA-Z0-9]/g, '')}`
+    : `client-${clientInfo.name.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now()}`;
+  
+  const clientData = {
+    id: clientId,
+    ...clientInfo,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  try {
+    const { data, error } = await supabase
+      .from('client_info')
+      .upsert(clientData, { onConflict: 'id' })
+      .select()
+      .single();
+    
+    console.log('Client creation/update result:', { data, error });
+    
+    if (error) {
+      console.error('Supabase error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in createOrUpdateClient:', err);
+    return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const getClientInfo = async (clientId: string): Promise<{ data: ClientInfo | null; error: any }> => {
+  console.log('Getting client info:', clientId);
+  
+  try {
+    const { data, error } = await supabase
+      .from('client_info')
+      .select('*')
+      .eq('id', clientId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching client info:', error);
+    }
+    
+    return { data, error };
+  } catch (err) {
+    console.error('Unexpected error in getClientInfo:', err);
     return { data: null, error: { message: 'Unexpected error occurred' } };
   }
 };

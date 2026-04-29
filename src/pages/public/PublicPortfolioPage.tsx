@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, MoreVertical, Paperclip } from "lucide-react";
-import { getUserProfile, getPortfolioItems, getServices, UserProfile, PortfolioItem, Service, createConversation, createMessage, supabase } from "../../utils/supabase";
+import { getUserProfile, getPortfolioItems, getServices, UserProfile, PortfolioItem, Service, createConversation, createMessage, createOrUpdateClient, supabase } from "../../utils/supabase";
 
 export default function PublicPortfolioPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -17,6 +17,7 @@ export default function PublicPortfolioPage() {
   const [currentConversation, setCurrentConversation] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [clientInfo, setClientInfo] = useState({ name: '', email: '' });
+  const [clientId, setClientId] = useState<string>('');
   const [showClientForm, setShowClientForm] = useState(true);
 
   useEffect(() => {
@@ -36,8 +37,8 @@ export default function PublicPortfolioPage() {
           setLoading(false);
           return;
         }
-
-        // Then fetch all profile data
+        
+        // Get user profile and portfolio data
         const [profileData, portfolioData, servicesData] = await Promise.all([
           getUserProfile(userData.id),
           getPortfolioItems(userData.id),
@@ -46,7 +47,7 @@ export default function PublicPortfolioPage() {
         
         setProfile(profileData);
         setPortfolioItems(portfolioData);
-        setServices(servicesData.filter(service => service.status === 'active'));
+        setServices(servicesData);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       } finally {
@@ -57,28 +58,119 @@ export default function PublicPortfolioPage() {
     fetchProfileData();
   }, [slug]);
 
+  // Real-time messaging subscription
+  useEffect(() => {
+    if (!currentConversation) return;
+
+    const subscription = supabase
+      .channel(`messages:${currentConversation.id}`)
+      .on('postgres_changes', 
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'messages',
+          filter: `conversation_id=eq.${currentConversation.id}`
+        },
+        (payload) => {
+          console.log('New message received:', payload.new);
+          const newMessage = {
+            ...payload.new,
+            is_client: payload.new.sender_id === clientId
+          };
+          setMessages(prev => [...prev, newMessage]);
+          
+          // Scroll to bottom for new messages
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [currentConversation, clientId]);
+
+  // Load existing conversation and messages when modal opens
+  useEffect(() => {
+    if (!showMessageModal || !profile?.id || !clientId) return;
+
+    const loadExistingConversation = async () => {
+      try {
+        // Check for existing conversation
+        const { data: existingConv } = await supabase
+          .from('conversations')
+          .select('*')
+          .eq('freelancer_id', profile.id)
+          .eq('client_id', clientId)
+          .single();
+
+        if (existingConv) {
+          setCurrentConversation(existingConv);
+          
+          // Load existing messages
+          const { data: existingMessages } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', existingConv.id)
+            .order('created_at', { ascending: true });
+
+          if (existingMessages) {
+            const formattedMessages = existingMessages.map(msg => ({
+              ...msg,
+              is_client: msg.sender_id === clientId,
+              content: msg.content.replace(/^(📧|👤)[^:]+: /, '') // Remove client info prefix for display
+            }));
+            setMessages(formattedMessages);
+          }
+        }
+      } catch (error) {
+        console.log('No existing conversation found');
+      }
+    };
+
+    loadExistingConversation();
+  }, [showMessageModal, profile?.id, clientId]);
+
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !profile?.id) return;
+    if (!messageText.trim() || !profile?.id || !clientId) return;
     
     setSending(true);
     try {
-      // For demo purposes, create conversation with freelancer as both parties
-      // In production, you'd want to create a proper guest user system
-      const clientId = profile.id + '-guest-' + Date.now();
-      
-      // Create conversation if not exists
+      // Check for existing conversation with this client
       let conversation = currentConversation;
       if (!conversation) {
-        const conversationResult = await createConversation({
-          freelancer_id: profile.id,
-          client_id: clientId
-        });
+        // Try to find existing conversation first
+        try {
+          const { data: existingConv } = await supabase
+            .from('conversations')
+            .select('*')
+            .eq('freelancer_id', profile.id)
+            .eq('client_id', clientId)
+            .single();
+          
+          if (existingConv) {
+            conversation = existingConv;
+            setCurrentConversation(conversation);
+          }
+        } catch (error) {
+          // No existing conversation, create new one
+        }
         
-        if (conversationResult.error) {
-          console.error('Error creating conversation:', conversationResult.error);
-          return;
-        } else if (conversationResult.data) {
-          conversation = conversationResult.data;
+        if (!conversation) {
+          const conversationResult = await createConversation({
+            freelancer_id: profile.id,
+            client_id: clientId
+          });
+          
+          if (conversationResult.error) {
+            console.error('Error creating conversation:', conversationResult.error);
+            return;
+          } else if (conversationResult.data) {
+            conversation = conversationResult.data;
+            setCurrentConversation(conversation);
+          }
         }
       }
       
@@ -86,7 +178,7 @@ export default function PublicPortfolioPage() {
         const messageContent = messageText.trim();
         const clientDisplayName = clientInfo.name || 'Anonymous Client';
         
-        // Format message with client information
+        // Format message with client information for freelancer
         const formattedMessage = clientInfo.email 
           ? `📧 ${clientDisplayName} (${clientInfo.email}): ${messageContent}`
           : `👤 ${clientDisplayName}: ${messageContent}`;
@@ -97,11 +189,10 @@ export default function PublicPortfolioPage() {
           sender_id: clientId,
           content: messageContent,
           created_at: new Date().toISOString(),
-          client_name: clientDisplayName,
-          client_email: clientInfo.email
+          is_client: true
         };
         
-        // Add message to UI immediately
+        // Add message to UI immediately (right-aligned for client)
         setMessages(prev => [...prev, newMessage]);
         setMessageText('');
         
@@ -111,8 +202,6 @@ export default function PublicPortfolioPage() {
           sender_id: clientId,
           content: formattedMessage
         });
-        
-        setCurrentConversation(conversation);
         
         // Scroll to bottom
         setTimeout(() => {
@@ -126,10 +215,25 @@ export default function PublicPortfolioPage() {
     }
   };
 
-  const handleClientInfoSubmit = (e: React.FormEvent) => {
+  const handleClientInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (clientInfo.name.trim()) {
-      setShowClientForm(false);
+      try {
+        // Create or update client information
+        const clientResult = await createOrUpdateClient({
+          name: clientInfo.name,
+          email: clientInfo.email
+        });
+        
+        if (clientResult.data) {
+          setClientId(clientResult.data.id);
+          setShowClientForm(false);
+        } else {
+          console.error('Error creating client:', clientResult.error);
+        }
+      } catch (error) {
+        console.error('Error in handleClientInfoSubmit:', error);
+      }
     }
   };
 
@@ -440,10 +544,16 @@ export default function PublicPortfolioPage() {
                     </div>
                   ) : (
                     messages.map((message) => (
-                      <div key={message.id} className="flex justify-end">
-                        <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl bg-indigo-600 text-white rounded-br-sm">
+                      <div key={message.id} className={`flex ${message.is_client ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                          message.is_client 
+                            ? 'bg-indigo-600 text-white rounded-br-sm' 
+                            : 'bg-slate-700 text-slate-100 rounded-bl-sm'
+                        }`}>
                           <p className="text-sm">{message.content}</p>
-                          <div className="flex items-center gap-1 mt-1 text-xs text-indigo-200">
+                          <div className={`flex items-center gap-1 mt-1 text-xs ${
+                            message.is_client ? 'text-indigo-200' : 'text-slate-400'
+                          }`}>
                             <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                         </div>

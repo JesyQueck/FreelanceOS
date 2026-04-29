@@ -136,12 +136,25 @@ export default function MessagesPage() {
 
   const getDisplayName = (conversation: Conversation) => {
     const otherUser = getOtherUser(conversation);
-    return otherUser.display_name || otherUser.username || 'Unknown User';
+    
+    // If we have user data from the relationship, use it
+    if (otherUser.display_name || otherUser.username) {
+      return otherUser.display_name || otherUser.username;
+    }
+    
+    // For client IDs (starting with 'client-'), extract name from the client_id
+    if (conversation.client_id?.startsWith('client-')) {
+      // Extract name from client_id (e.g., "client-john-doe" -> "John Doe")
+      const namePart = conversation.client_id.replace('client-', '').replace(/-/g, ' ');
+      return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+    }
+    
+    return 'Unknown User';
   };
 
   const getInitials = (conversation: Conversation) => {
     const name = getDisplayName(conversation);
-    return name.substring(0, 2).toUpperCase();
+    return name?.substring(0, 2).toUpperCase() || 'UN';
   };
 
   return (
