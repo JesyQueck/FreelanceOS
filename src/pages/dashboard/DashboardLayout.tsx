@@ -179,6 +179,18 @@ export default function DashboardLayout() {
               </div>
               <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
+            
+            <Link 
+              to="/dashboard/settings" 
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors group"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <div className="flex items-center gap-3">
+                <Settings className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium">Settings</span>
+              </div>
+              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Link>
           </nav>
           
           <div className="mt-8">

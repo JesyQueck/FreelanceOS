@@ -12,6 +12,7 @@ import ProfilePage from './pages/profile/ProfilePage'
 import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import MessagesPage from './pages/messages/MessagesPage'
+import SettingsPage from './pages/dashboard/SettingsPage'
 import PublicPortfolioPage from './pages/public/PublicPortfolioPage'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
                 <Route path="profile/edit" element={<EditProfilePage />} />
                 <Route path="services" element={<ServicesPage />} />
                 <Route path="messages" element={<MessagesPage />} />
+                <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Routes>
           </Router>

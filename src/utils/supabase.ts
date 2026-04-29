@@ -59,6 +59,7 @@ export interface UserProfile {
   updated_at?: string;
   username?: string;
   slug?: string;
+  preferences?: any;
 }
 
 // TypeScript interface for portfolio items
