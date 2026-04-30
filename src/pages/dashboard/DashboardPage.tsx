@@ -36,7 +36,7 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadDashboardData = async (retryCount = 0) => {
       try {
         const user = await getUser();
         if (!user) {
@@ -110,9 +110,23 @@ export default function DashboardPage() {
           progressPercent,
           recentActivity
         });
+        setError(null); // Clear any previous errors
       } catch (err) {
-        setError('Failed to load dashboard data');
         console.error('Dashboard error:', err);
+        
+        // Retry logic for network errors
+        if (retryCount < 2 && (
+          err instanceof Error && 
+          (err.message.includes('fetch') || 
+           err.message.includes('network') || 
+           err.message.includes('timeout'))
+        )) {
+          console.log(`Retrying dashboard load... Attempt ${retryCount + 1}`);
+          setTimeout(() => loadDashboardData(retryCount + 1), 1000 * (retryCount + 1));
+          return;
+        }
+        
+        setError('Failed to load dashboard data. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
@@ -149,7 +163,15 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-red-500 text-center">{error}</div>
+        <div className="text-center">
+          <div className="text-red-500 mb-4">{error}</div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
