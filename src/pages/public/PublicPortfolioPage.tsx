@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, MoreVertical, Paperclip } from "lucide-react";
+import { Mail, UserCircle, Briefcase, Target, Clock, DollarSign, MessageCircle, ExternalLink, Send, ArrowLeft, MoreVertical, Paperclip, X } from "lucide-react";
 import { getUserProfile, getPortfolioItems, getServices, UserProfile, PortfolioItem, Service, createConversation, createMessage, createOrUpdateClient, supabase } from "../../utils/supabase";
 
 export default function PublicPortfolioPage() {
@@ -139,10 +139,13 @@ export default function PublicPortfolioPage() {
       setClientInfo({ name: clientName, email: clientEmail || '' });
       setShowClientForm(false);
       
-      // If conversation ID is in URL, set it directly
+      // If conversation ID is in URL, set it directly and load messages
       if (conversationId) {
         setCurrentConversation({ id: conversationId });
         console.log('Conversation loaded from URL:', { conversationId });
+        
+        // Auto-open message modal when returning client is detected
+        setShowMessageModal(true);
       }
       
       console.log('Client identified via URL:', { clientConversationId, clientName, clientEmail, conversationId });
@@ -154,6 +157,33 @@ export default function PublicPortfolioPage() {
 
     const loadExistingConversation = async () => {
       try {
+        // If we already have a conversation ID from URL, use it directly
+        if (currentConversation?.id) {
+          console.log('Loading messages for existing conversation:', currentConversation.id);
+          
+          // Load existing messages
+          const { data: existingMessages, error: msgError } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', currentConversation.id)
+            .order('created_at', { ascending: true });
+
+          if (msgError) {
+            console.log('Messages lookup error:', msgError);
+          }
+
+          if (existingMessages) {
+            const formattedMessages = existingMessages.map(msg => ({
+              ...msg,
+              is_client: msg.sender_id === clientId,
+              content: msg.content.replace(/^(?:\ud83d\udce7|\ud83d\udc64)[^:]+: /, '') // Remove client info prefix for display
+            }));
+            setMessages(formattedMessages);
+            console.log('Loaded', formattedMessages.length, 'messages');
+          }
+          return;
+        }
+
         // Check for existing conversation
         const { data: existingConv, error: convError } = await supabase
           .from('conversations')
@@ -184,9 +214,10 @@ export default function PublicPortfolioPage() {
             const formattedMessages = existingMessages.map(msg => ({
               ...msg,
               is_client: msg.sender_id === clientId,
-              content: msg.content.replace(/^(📧|👤)[^:]+: /, '') // Remove client info prefix for display
+              content: msg.content.replace(/^(?:\ud83d\udce7|\ud83d\udc64)[^:]+: /, '') // Remove client info prefix for display
             }));
             setMessages(formattedMessages);
+            console.log('Loaded', formattedMessages.length, 'messages from existing conversation');
           }
         } else {
           console.log('No existing conversation found, will create new one');
@@ -197,7 +228,7 @@ export default function PublicPortfolioPage() {
     };
 
     loadExistingConversation();
-  }, [showMessageModal, profile?.id, clientId]);
+  }, [showMessageModal, profile?.id, clientId, currentConversation?.id]);
 
   const handleSendMessage = async () => {
     if (!messageText.trim() || !profile?.id || !clientId) return;
@@ -363,19 +394,7 @@ export default function PublicPortfolioPage() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19]">
-      {/* Header */}
-      <div className="bg-[#151B2B] border-b border-slate-800/60">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <button 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </button>
-        </div>
-      </div>
-
+      
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Profile Section */}
         <div className="bg-[#151B2B] rounded-2xl p-8 border border-slate-800/60 shadow-sm mb-8">
@@ -548,35 +567,25 @@ export default function PublicPortfolioPage() {
         )}
       </div>
 
-      {/* WhatsApp-style Chat Modal */}
+      {/* Chat Modal - MessagingOverlay Style */}
       {showMessageModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0B0F19] rounded-2xl border border-slate-800/60 shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-            {/* Chat Header */}
-            <div className="bg-[#151B2B] p-4 border-b border-slate-800/60 flex items-center justify-between rounded-t-2xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center sm:items-center sm:justify-center">
+          <div className="bg-[#151B2B] w-full sm:w-full sm:max-w-md sm:h-[600px] h-[70vh] sm:h-auto rounded-t-2xl sm:rounded-2xl border border-slate-800/60 shadow-2xl flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-800/60">
               <div className="flex items-center gap-3">
-                <button
+                <button 
                   onClick={() => setShowMessageModal(false)}
-                  className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                  className="sm:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
                 >
-                  <ArrowLeft className="h-5 w-5 text-slate-400" />
+                  <ArrowLeft className="h-5 w-5 text-white" />
                 </button>
-                <div className="flex items-center gap-3">
-                  {profile?.profile_image ? (
-                    <img 
-                      src={profile.profile_image} 
-                      alt="Profile" 
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
-                      {profile?.display_name?.substring(0, 2).toUpperCase() || profile?.name?.substring(0, 2).toUpperCase() || 'FR'}
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="text-sm font-medium text-white">{profile?.display_name || profile?.name || profile?.username || 'Freelancer'}</h3>
-                    <p className="text-xs text-green-400">Active now</p>
-                  </div>
+                <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+                  {profile?.display_name?.charAt(0).toUpperCase() || profile?.name?.charAt(0).toUpperCase() || 'F'}
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-white">{profile?.display_name || profile?.name || profile?.username || 'Freelancer'}</h3>
+                  <p className="text-xs text-green-400">Active now</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -586,121 +595,126 @@ export default function PublicPortfolioPage() {
                     navigator.clipboard.writeText(shareUrl);
                     alert('Conversation link copied! You can return to this chat anytime using this link.');
                   }}
-                  className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                  className="hidden sm:block p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
                   title="Copy conversation link"
                 >
                   <ExternalLink className="h-4 w-4 text-slate-400" />
                 </button>
-                <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                <button className="hidden sm:block p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
                   <MoreVertical className="h-4 w-4 text-slate-400" />
+                </button>
+                <button 
+                  onClick={() => setShowMessageModal(false)}
+                  className="hidden sm:block p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                >
+                  <X className="h-4 w-4 text-slate-400" />
                 </button>
               </div>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#0B0F19] min-h-0">
-              {showClientForm ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="w-full max-w-md">
-                    <div className="text-center mb-6">
-                      <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <MessageCircle className="h-8 w-8 text-indigo-400" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-white mb-2">Introduce Yourself</h3>
-                      <p className="text-slate-400 text-sm">Please provide your name so {profile?.display_name || profile?.name || 'the freelancer'} can identify you</p>
-                    </div>
-                    <form onSubmit={handleClientInfoSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
-                        <input
-                          type="text"
-                          value={clientInfo.name}
-                          onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
-                          className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          placeholder="John Doe"
-                          required
-                          autoFocus
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Email (Optional)</label>
-                        <input
-                          type="email"
-                          value={clientInfo.email}
-                          onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
-                          className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          placeholder="john@example.com"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
-                      >
-                        Start Conversation
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {messages.length === 0 ? (
-                    <div className="text-center text-slate-400 py-8">
-                      <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <MessageCircle className="h-8 w-8 text-slate-400" />
-                      </div>
-                      <p className="text-sm">Start the conversation!</p>
-                      <p className="text-xs text-slate-500 mt-2">Introduce yourself and let them know about your project</p>
-                    </div>
-                  ) : (
-                    messages.map((message) => (
-                      <div key={message.id} className={`flex ${message.is_client ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                          message.is_client 
-                            ? 'bg-indigo-600 text-white rounded-br-sm' 
-                            : 'bg-slate-700 text-slate-100 rounded-bl-sm'
-                        }`}>
-                          <p className="text-sm">{message.content}</p>
-                          <div className={`flex items-center gap-1 mt-1 text-xs ${
-                            message.is_client ? 'text-indigo-200' : 'text-slate-400'
-                          }`}>
-                            <span>{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  <div ref={messagesEndRef} />
-                </>
-              )}
-            </div>
-
-            {/* Message Input - Only show after client form is completed */}
-            {!showClientForm && (
-              <div className="bg-[#151B2B] p-4 border-t border-slate-800/60 rounded-b-2xl">
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <Paperclip className="h-4 w-4 text-slate-400" />
-                  </button>
+            {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {showClientForm ? (
+            <div className="text-center text-slate-400 py-8">
+              <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-indigo-400" />
+              </div>
+              <p className="text-sm mb-4">Please introduce yourself to start the conversation</p>
+              <form onSubmit={handleClientInfoSubmit} className="space-y-4 max-w-sm mx-auto">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
                   <input
                     type="text"
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                    placeholder="Type a message..."
-                    disabled={sending}
-                    className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
+                    value={clientInfo.name}
+                    onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50"
+                    placeholder="John Doe"
+                    required
                     autoFocus
                   />
-                  <button 
-                    onClick={handleSendMessage}
-                    disabled={sending || !messageText.trim()}
-                    className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Send className="h-4 w-4 text-white" />
-                  </button>
                 </div>
-              </div>
-            )}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Email (Optional)</label>
+                  <input
+                    type="email"
+                    value={clientInfo.email}
+                    onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
+                >
+                  Start Conversation
+                </button>
+              </form>
+            </div>
+          ) : (
+            <>
+              {messages.length === 0 ? (
+                <div className="text-center text-slate-400 py-8">
+                  <p className="text-sm">No messages yet</p>
+                  <p className="text-xs mt-2">Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((message) => (
+                  <div 
+                    key={message.id} 
+                    className={`flex ${message.is_client ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-xs sm:max-w-md px-4 py-2 rounded-2xl ${
+                      message.is_client 
+                        ? 'bg-indigo-600 text-white rounded-br-sm' 
+                        : 'bg-slate-800 text-slate-200 rounded-tl-sm'
+                    }`}>
+                      <p className="text-sm">{message.content}</p>
+                      <div className={`flex items-center gap-1 mt-1 text-xs ${
+                        message.is_client ? 'text-indigo-200' : 'text-slate-500'
+                      }`}>
+                        <span>{new Date(message.created_at).toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit',
+                          hour12: true 
+                        })}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </div>
+
+            {/* Message Input */}
+        {!showClientForm && (
+          <div className="p-4 border-t border-slate-800/60">
+            <div className="flex items-center gap-2">
+              <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
+                <Paperclip className="h-4 w-4 text-slate-400" />
+              </button>
+              <input
+                type="text"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                placeholder="Type a message..."
+                disabled={sending}
+                className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
+                autoFocus
+              />
+              <button 
+                onClick={handleSendMessage}
+                disabled={sending || !messageText.trim()}
+                className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="h-4 w-4 text-white" />
+              </button>
+            </div>
+          </div>
+        )}
           </div>
         </div>
       )}
