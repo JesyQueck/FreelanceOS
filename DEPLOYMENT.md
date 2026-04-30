@@ -54,7 +54,12 @@ npm run build:cloudflare
    npm run deploy:cloudflare
    ```
 
-### Option B: Using Cloudflare Dashboard
+   **Alternative direct command**:
+   ```bash
+   npx wrangler pages deploy dist --project-name=freelance-os
+   ```
+
+### Option B: Using Cloudflare Dashboard (Recommended)
 
 1. **Go to Cloudflare Dashboard** > Pages
 2. **Connect to Git** (GitHub, GitLab, etc.)
@@ -70,6 +75,8 @@ npm run build:cloudflare
    - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon key
 
 6. **Deploy**: Click "Save and Deploy"
+
+**Important**: Don't use the custom deploy command in the Cloudflare Pages build settings. Use the standard build command and let Cloudflare Pages handle the deployment automatically.
 
 ## Step 4: Configure Custom Domain (Optional)
 
