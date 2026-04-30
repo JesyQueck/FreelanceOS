@@ -179,7 +179,7 @@ export default function DashboardPage() {
   return (
     <>
       {/* Header & Welcome */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mt-8 mb-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
             Good afternoon, {data.displayName}
@@ -272,7 +272,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="mt-8">
+      <div className="mb-8">
         <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
         <div className="bg-[#151B2B] rounded-xl border border-slate-800/60 shadow-sm overflow-hidden">
           <div className="divide-y divide-slate-800/60">
