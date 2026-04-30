@@ -120,7 +120,6 @@ export interface Message {
 }
 
 export const getServices = async (userId: string): Promise<Service[]> => {
-  console.log('Getting services for user:', userId);
   const { data, error } = await supabase
     .from('services')
     .select('*')
@@ -153,7 +152,6 @@ export const getPortfoliosCount = async (userId: string) => {
 
 
 export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string, name?: string, bio?: string, skills?: string[]) => {
-  console.log('createOrUpdateUserProfile called with:', { userId, email, displayName, name, bio, skills });
   
   const profileData: any = {
     id: userId,
@@ -180,7 +178,6 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
     profileData.slug = profileData.username;
   }
   
-  console.log('Profile data to upsert:', profileData);
   
   try {
     const { data, error } = await supabase
@@ -189,7 +186,6 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
       .select()
       .single();
     
-    console.log('Upsert result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -201,7 +197,6 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
     } else {
       // Clear cache for this user after successful update
       userProfileCache.delete(userId);
-      console.log('Cache cleared for user:', userId);
     }
     
     return { data, error };
@@ -254,7 +249,6 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
       // Clear cache
       userProfileCache.delete(userId);
       
-      console.log('Generated username/slug for user:', { userId, username, slug });
       return { data, error: null };
     }
     
@@ -270,17 +264,14 @@ const userProfileCache = new Map<string, Promise<UserProfile | null>>();
 const pendingRequests = new Map<string, Promise<UserProfile | null>>();
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
-  console.log('Getting user profile for ID:', userId);
   
   // Check if there's already a pending request for this user
   if (pendingRequests.has(userId)) {
-    console.log('Using pending request for user:', userId);
     return pendingRequests.get(userId)!;
   }
   
   // Check cache first
   if (userProfileCache.has(userId)) {
-    console.log('Using cached profile for user:', userId);
     return userProfileCache.get(userId)!;
   }
   
@@ -297,7 +288,6 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
         console.error('Error fetching user profile:', error);
         return null;
       } else {
-        console.log('User profile data:', data);
         return data;
       }
     } catch (error) {
@@ -320,7 +310,6 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 
 // Portfolio items functions
 export const getPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
-  console.log('Getting portfolio items for user:', userId);
   const { data, error } = await supabase
     .from('portfolios')
     .select('*')
@@ -336,7 +325,6 @@ export const getPortfolioItems = async (userId: string): Promise<PortfolioItem[]
 };
 
 export const createPortfolioItem = async (item: Omit<PortfolioItem, 'id' | 'user_id' | 'created_at'>, userId: string): Promise<{ data: PortfolioItem | null; error: any }> => {
-  console.log('Creating portfolio item:', { ...item, userId });
   
   const portfolioData = {
     ...item,
@@ -351,7 +339,6 @@ export const createPortfolioItem = async (item: Omit<PortfolioItem, 'id' | 'user
       .select()
       .single();
     
-    console.log('Portfolio item creation result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -370,7 +357,6 @@ export const createPortfolioItem = async (item: Omit<PortfolioItem, 'id' | 'user
 };
 
 export const updatePortfolioItem = async (id: string, item: Partial<PortfolioItem>): Promise<{ data: PortfolioItem | null; error: any }> => {
-  console.log('Updating portfolio item:', { id, ...item });
   
   try {
     const { data, error } = await supabase
@@ -380,7 +366,6 @@ export const updatePortfolioItem = async (id: string, item: Partial<PortfolioIte
       .select()
       .single();
     
-    console.log('Portfolio item update result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -399,7 +384,6 @@ export const updatePortfolioItem = async (id: string, item: Partial<PortfolioIte
 };
 
 export const deletePortfolioItem = async (id: string): Promise<{ error: any }> => {
-  console.log('Deleting portfolio item:', id);
   
   try {
     const { error } = await supabase
@@ -407,7 +391,6 @@ export const deletePortfolioItem = async (id: string): Promise<{ error: any }> =
       .delete()
       .eq('id', id);
     
-    console.log('Portfolio item deletion result:', { error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -427,7 +410,6 @@ export const deletePortfolioItem = async (id: string): Promise<{ error: any }> =
 
 // Services CRUD functions
 export const getConversationsCount = async (userId: string): Promise<number> => {
-  console.log('Getting conversations count for user:', userId);
   const { data, error } = await supabase
     .from('conversations')
     .select('id', { count: 'exact', head: true })
@@ -442,7 +424,6 @@ export const getConversationsCount = async (userId: string): Promise<number> => 
 };
 
 export const getActiveClientsCount = async (freelancerId: string): Promise<number> => {
-  console.log('Getting active clients count for freelancer:', freelancerId);
       
   // Get conversations with messages in the last 7 days (considered active)
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -462,7 +443,6 @@ export const getActiveClientsCount = async (freelancerId: string): Promise<numbe
 };
 
 export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'created_at' | 'updated_at'>, userId: string): Promise<{ data: Service | null; error: any }> => {
-  console.log('Creating service:', { ...service, userId });
       
   const serviceData = {
     ...service,
@@ -478,7 +458,6 @@ export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'c
       .select()
       .single();
     
-    console.log('Service creation result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -497,7 +476,6 @@ export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'c
 };
 
 export const updateService = async (id: string, service: Partial<Service>): Promise<{ data: Service | null; error: any }> => {
-  console.log('Updating service:', { id, ...service });
   
   const updateData = {
     ...service,
@@ -512,7 +490,6 @@ export const updateService = async (id: string, service: Partial<Service>): Prom
       .select()
       .single();
     
-    console.log('Service update result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -531,7 +508,6 @@ export const updateService = async (id: string, service: Partial<Service>): Prom
 };
 
 export const deleteService = async (id: string): Promise<{ error: any }> => {
-  console.log('Deleting service:', id);
   
   try {
     const { error } = await supabase
@@ -539,7 +515,6 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
       .delete()
       .eq('id', id);
     
-    console.log('Service deletion result:', { error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -559,7 +534,6 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
 
 // Messaging CRUD functions
 export const getConversations = async (userId: string): Promise<Conversation[]> => {
-  console.log('Getting conversations for user:', userId);
   const { data, error } = await supabase
     .from('conversations')
     .select(`
@@ -608,7 +582,6 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
 };
 
 export const getMessages = async (conversationId: string): Promise<Message[]> => {
-  console.log('Getting messages for conversation:', conversationId);
   const { data, error } = await supabase
     .from('messages')
     .select('*')
@@ -624,7 +597,6 @@ export const getMessages = async (conversationId: string): Promise<Message[]> =>
 };
 
 export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>): Promise<{ data: Message | null; error: any }> => {
-  console.log('Creating message:', message);
   
   const messageData = {
     ...message,
@@ -638,7 +610,6 @@ export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>)
       .select()
       .single();
     
-    console.log('Message creation result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -668,7 +639,6 @@ export const createMessage = async (message: Omit<Message, 'id' | 'created_at'>)
 
 // Client information management
 export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | 'created_at' | 'updated_at'>): Promise<{ data: ClientInfo | null; error: any }> => {
-  console.log('Creating or updating client:', clientInfo);
   
   // Generate a unique client ID based on email or name + timestamp
   const clientId = clientInfo.email 
@@ -689,7 +659,6 @@ export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | '
       .select()
       .single();
     
-    console.log('Client creation/update result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -708,7 +677,6 @@ export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | '
 };
 
 export const getClientInfo = async (clientId: string): Promise<{ data: ClientInfo | null; error: any }> => {
-  console.log('Getting client info:', clientId);
   
   try {
     const { data, error } = await supabase
@@ -729,7 +697,6 @@ export const getClientInfo = async (clientId: string): Promise<{ data: ClientInf
 };
 
 export const createConversation = async (conversation: Omit<Conversation, 'id' | 'created_at'>): Promise<{ data: Conversation | null; error: any }> => {
-  console.log('Creating conversation:', conversation);
   
   const conversationData = {
     ...conversation,
@@ -744,7 +711,6 @@ export const createConversation = async (conversation: Omit<Conversation, 'id' |
       .select()
       .single();
     
-    console.log('Conversation creation result:', { data, error });
     
     if (error) {
       console.error('Supabase error details:', {
@@ -763,7 +729,6 @@ export const createConversation = async (conversation: Omit<Conversation, 'id' |
 };
 
 export const getRecentActivity = async (userId: string): Promise<ActivityItem[]> => {
-  console.log('Getting recent activity for user:', userId);
   const { data, error } = await supabase
     .from('conversations')
     .select(`
