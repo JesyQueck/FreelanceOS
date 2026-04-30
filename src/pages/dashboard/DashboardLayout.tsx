@@ -132,9 +132,6 @@ export default function DashboardLayout() {
           </nav>
 
           <div className="mt-8">
-            <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              Settings
-            </p>
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
@@ -221,9 +218,6 @@ export default function DashboardLayout() {
           </nav>
 
           <div className="mt-8">
-            <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              Settings
-            </p>
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}

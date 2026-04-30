@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Bell, Sun, Shield } from "lucide-react";
+import { Bell, Sun, Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile, supabase } from "../../utils/supabase";
+import { getUserProfile, supabase } from "../../utils/supabase";
 
 interface UserPreferences {
   notifications: {
@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [preferences, setPreferences] = useState<UserPreferences>({
     notifications: {
       email: true,
@@ -66,21 +67,39 @@ export default function SettingsPage() {
     if (!user) return;
     
     setSaving(true);
+    setFeedback(null);
+    
     try {
-      // Get current profile first
-      const profile = await getUserProfile(user.id);
-      await createOrUpdateUserProfile(user.id, user.email || '', profile?.display_name, profile?.name, profile?.bio, profile?.skills);
+      // Update preferences using the correct table name and including all required fields
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          preferences,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
       
-      // Update preferences separately using supabase directly
-      await supabase
-        .from('user_profiles')
-        .update({ preferences })
-        .eq('user_id', user.id);
+      if (error) {
+        throw error;
+      }
       
-      // Show success message
+      setFeedback({
+        type: 'success',
+        message: 'Preferences saved successfully!'
+      });
+      
+      // Clear feedback after 3 seconds
+      setTimeout(() => setFeedback(null), 3000);
+      
     } catch (error) {
       console.error('Error saving preferences:', error);
-      // Show error message
+      setFeedback({
+        type: 'error',
+        message: 'Failed to save preferences. Please try again.'
+      });
+      
+      // Clear feedback after 5 seconds
+      setTimeout(() => setFeedback(null), 5000);
     } finally {
       setSaving(false);
     }
@@ -111,6 +130,22 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
         <p className="text-slate-400">Manage your account preferences and notification settings</p>
       </div>
+
+      {/* Feedback Message */}
+      {feedback && (
+        <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+          feedback.type === 'success' 
+            ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
+            : 'bg-red-500/10 border border-red-500/30 text-red-400'
+        }`}>
+          {feedback.type === 'success' ? (
+            <CheckCircle className="h-5 w-5 flex-shrink-0" />
+          ) : (
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          )}
+          <span className="text-sm font-medium">{feedback.message}</span>
+        </div>
+      )}
 
       {/* Notifications */}
       <div className="bg-[#151B2B] rounded-xl border border-slate-800/60 p-6">
