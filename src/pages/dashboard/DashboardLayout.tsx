@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useEffect } from "react";
-import { getUserProfile } from "../../utils/supabase";
+import { getUserProfile, signOut } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 
 export default function DashboardLayout() {
@@ -62,12 +62,10 @@ export default function DashboardLayout() {
 
   const handleLogout = async () => {
     try {
-      const { signOut } = await import("../../utils/supabase");
       await signOut();
       navigate('/login');
     } catch (error) {
-      console.error('Error during logout:', error);
-      navigate('/login');
+      console.error('Logout error:', error);
     }
   };
 

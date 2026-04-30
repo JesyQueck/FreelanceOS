@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Bell, Sun, Shield } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile } from "../../utils/supabase";
+import { getUserProfile, createOrUpdateUserProfile, supabase } from "../../utils/supabase";
 
 interface UserPreferences {
   notifications: {
@@ -72,7 +72,6 @@ export default function SettingsPage() {
       await createOrUpdateUserProfile(user.id, user.email || '', profile?.display_name, profile?.name, profile?.bio, profile?.skills);
       
       // Update preferences separately using supabase directly
-      const { supabase } = await import("../../utils/supabase");
       await supabase
         .from('user_profiles')
         .update({ preferences })
