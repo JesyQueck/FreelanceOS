@@ -615,41 +615,46 @@ export default function PublicPortfolioPage() {
             {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {showClientForm ? (
-            <div className="text-center text-slate-400 py-8">
-              <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="h-8 w-8 text-indigo-400" />
+            <div className="flex items-center justify-center h-full">
+              <div className="w-full max-w-md">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-indigo-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Introduce Yourself</h3>
+                  <p className="text-slate-400 text-sm">Please provide your name so {profile?.display_name || profile?.name || 'the freelancer'} can identify you</p>
+                </div>
+                <form onSubmit={handleClientInfoSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                    <input
+                      type="text"
+                      value={clientInfo.name}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="John Doe"
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Email (Optional)</label>
+                    <input
+                      type="email"
+                      value={clientInfo.email}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
+                  >
+                    Start Conversation
+                  </button>
+                </form>
               </div>
-              <p className="text-sm mb-4">Please introduce yourself to start the conversation</p>
-              <form onSubmit={handleClientInfoSubmit} className="space-y-4 max-w-sm mx-auto">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
-                  <input
-                    type="text"
-                    value={clientInfo.name}
-                    onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50"
-                    placeholder="John Doe"
-                    required
-                    autoFocus
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Email (Optional)</label>
-                  <input
-                    type="email"
-                    value={clientInfo.email}
-                    onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium"
-                >
-                  Start Conversation
-                </button>
-              </form>
             </div>
           ) : (
             <>
