@@ -163,27 +163,101 @@ export default function ProfilePage() {
   const handleShareProfile = async () => {
     if (!user) return;
     
-    // First ensure user has username and slug
-    const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
-    
-    if (slugResult.error) {
-      alert('Error generating portfolio link. Please try again.');
-      return;
-    }
-    
-    // Refresh profile data to get the new username/slug
-    const updatedProfile = await getUserProfile(user.id);
-    setProfile(updatedProfile);
-    
-    const shareLink = generateShareLink(updatedProfile?.username);
-    if (shareLink) {
-      navigator.clipboard.writeText(shareLink).then(() => {
-        alert('Portfolio link copied to clipboard!\n\n' + shareLink);
-      }).catch(() => {
-        alert('Portfolio link: ' + shareLink);
-      });
-    } else {
-      alert('No portfolio link available. Please complete your profile first.');
+    try {
+      // First ensure user has username and slug
+      const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
+      
+      if (slugResult.error) {
+        // Show error notification
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
+        errorDiv.innerHTML = `
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Error generating portfolio link. Please try again.</span>
+          </div>
+        `;
+        document.body.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 3000);
+        return;
+      }
+      
+      // Refresh profile data to get the new username/slug
+      const updatedProfile = await getUserProfile(user.id);
+      setProfile(updatedProfile);
+      
+      const shareLink = generateShareLink(updatedProfile?.username);
+      console.log('Generated share link:', shareLink); // Debug log
+      console.log('User profile:', updatedProfile); // Debug log
+      if (shareLink) {
+        // Copy to clipboard and show success notification
+        navigator.clipboard.writeText(shareLink).then(() => {
+          // Show success notification
+          const successDiv = document.createElement('div');
+          successDiv.className = 'fixed top-4 right-4 z-50 bg-[#FFD700] text-black px-4 py-3 rounded-lg shadow-lg max-w-sm';
+          successDiv.innerHTML = `
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="font-semibold">Portfolio link copied!</span>
+              </div>
+              <div class="text-xs opacity-80 break-all">${shareLink}</div>
+            </div>
+          `;
+          document.body.appendChild(successDiv);
+          setTimeout(() => successDiv.remove(), 1000);
+        }).catch(() => {
+          // Fallback if clipboard API fails
+          const fallbackDiv = document.createElement('div');
+          fallbackDiv.className = 'fixed top-4 right-4 z-50 bg-[#FFD700] text-black px-4 py-3 rounded-lg shadow-lg max-w-sm';
+          fallbackDiv.innerHTML = `
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                </svg>
+                <span class="font-semibold">Copy this link:</span>
+              </div>
+              <div class="text-xs bg-black/10 px-2 py-1 rounded break-all">${shareLink}</div>
+            </div>
+          `;
+          document.body.appendChild(fallbackDiv);
+          setTimeout(() => fallbackDiv.remove(), 1000);
+        });
+      } else {
+        // Show no link available notification
+        const noLinkDiv = document.createElement('div');
+        noLinkDiv.className = 'fixed top-4 right-4 z-50 bg-[#1A1A1A] text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
+        noLinkDiv.innerHTML = `
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>No portfolio link available. Please complete your profile first.</span>
+          </div>
+        `;
+        document.body.appendChild(noLinkDiv);
+        setTimeout(() => noLinkDiv.remove(), 1000);
+      }
+    } catch (error) {
+      console.error('Share profile error:', error);
+      // Show generic error notification
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
+      errorDiv.innerHTML = `
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Something went wrong. Please try again.</span>
+        </div>
+      `;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 1000);
     }
   };
 
