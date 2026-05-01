@@ -78,9 +78,28 @@ export default function SignupPage() {
               setState({ message: "Account created! Please log in manually.", success: true });
             } else {
               console.log('Auto sign-in successful');
-              setState({ message: "Account created successfully! Redirecting to dashboard...", success: true });
-              // Redirect to dashboard after a short delay
-              setTimeout(() => navigate('/dashboard'), 1500);
+              setState({ message: "Account created successfully! Redirecting...", success: true });
+              
+              // Handle post-login redirect
+              const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+              const intendedAction = sessionStorage.getItem('intendedAction');
+              
+              // Clear the stored redirect info
+              sessionStorage.removeItem('redirectAfterLogin');
+              sessionStorage.removeItem('intendedAction');
+              
+              // Redirect after a short delay
+              setTimeout(() => {
+                if (redirectAfterLogin) {
+                  if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {
+                    navigate(redirectAfterLogin);
+                  } else {
+                    navigate(redirectAfterLogin);
+                  }
+                } else {
+                  navigate('/messages'); // Default to messages
+                }
+              }, 1500);
             }
           } catch (signInException) {
             console.error('Auto sign-in exception:', signInException);

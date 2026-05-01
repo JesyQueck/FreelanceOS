@@ -175,7 +175,7 @@ export default function ProfilePage() {
     const updatedProfile = await getUserProfile(user.id);
     setProfile(updatedProfile);
     
-    const shareLink = generateShareLink(updatedProfile?.username, updatedProfile?.slug);
+    const shareLink = generateShareLink(updatedProfile?.username);
     if (shareLink) {
       navigator.clipboard.writeText(shareLink).then(() => {
         alert('Portfolio link copied to clipboard!\n\n' + shareLink);

@@ -3,17 +3,41 @@ import {
   LayoutDashboard, 
   MessageSquare, 
   Target, 
-  UserCircle 
+  UserCircle,
+  Search,
+  Briefcase 
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function MobileBottomNav() {
   const location = useLocation();
+  const { user } = useAuth();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
-    { name: 'Services', href: '/dashboard/services', icon: Target },
-    { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
+  // Check if user is on freelancer dashboard routes
+  const isFreelancerRoute = location.pathname.startsWith('/dashboard') || 
+                           location.pathname === '/services' || 
+                           location.pathname === '/profile';
+
+  // Navigation items based on user role and current route
+  const navigation = user ? (
+    isFreelancerRoute ? [
+      // Old freelancer navigation
+      { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
+      { name: 'Services', href: '/dashboard/services', icon: Target },
+      { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
+    ] : [
+      // New client navigation (for messages, discover, etc.)
+      { name: 'Messages', href: '/messages', icon: MessageSquare },
+      { name: 'Discover', href: '/discover', icon: Search },
+      { name: 'Services', href: '/dashboard/services', icon: Briefcase },
+      { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
+    ]
+  ) : [
+    // Unauthenticated user navigation
+    { name: 'Messages', href: '/login', icon: MessageSquare },
+    { name: 'Discover', href: '/discover', icon: Search },
+    { name: 'Profile', href: '/login', icon: UserCircle },
   ];
 
   return (

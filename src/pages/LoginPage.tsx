@@ -28,7 +28,27 @@ export default function LoginPage() {
         setState({ message: error.message, success: false });
       } else if (data.user) {
         setState({ message: "Login successful", success: true });
-        navigate('/dashboard');
+        
+        // Handle post-login redirect
+        const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+        const intendedAction = sessionStorage.getItem('intendedAction');
+        
+        if (redirectAfterLogin) {
+          // Clear the stored redirect info
+          sessionStorage.removeItem('redirectAfterLogin');
+          sessionStorage.removeItem('intendedAction');
+          
+          // Navigate to intended destination
+          if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {
+            // Navigate to the freelancer profile to start messaging
+            navigate(redirectAfterLogin);
+          } else {
+            navigate(redirectAfterLogin);
+          }
+        } else {
+          // Default redirect to dashboard
+          navigate('/messages'); // Changed to messages as default
+        }
       } else {
         setState({ message: "Login failed", success: false });
       }

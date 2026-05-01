@@ -206,11 +206,11 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   }
 }
 
-export const generateShareLink = (username?: string, slug?: string) => {
+export const generateShareLink = (username?: string) => {
   const baseUrl = window.location.origin;
-  const identifier = slug || username;
-  return identifier ? `${baseUrl}/portfolio/${identifier}` : null;
-}
+  // Use username for the new client-facing freelancer profile URLs
+  return username ? `${baseUrl}/freelancer/${username}` : null;
+};
 
 // Function to ensure user has username and slug (for existing users)
 export const ensureUserHasSlug = async (userId: string, displayName?: string, email?: string): Promise<{ data: UserProfile | null; error: any }> => {
@@ -776,3 +776,131 @@ const formatTimeAgo = (dateString: string) => {
   if (diffHours < 24) return `${diffHours} hours ago`
   return `${diffDays} days ago`
 }
+
+// Public profile functions for freelancer discovery
+export const getPublicUserProfile = async (username: string): Promise<UserProfile | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+      .eq('username', username)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching public user profile:', error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Unexpected error in getPublicUserProfile:', error);
+    return null;
+  }
+};
+
+export const getPublicPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('portfolios')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching public portfolio items:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Unexpected error in getPublicPortfolioItems:', error);
+    return [];
+  }
+};
+
+export const getPublicServices = async (userId: string): Promise<Service[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching public services:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Unexpected error in getPublicServices:', error);
+    return [];
+  }
+};
+
+export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+      .not('display_name', 'is', null)
+      .not('bio', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    
+    if (error) {
+      console.error('Error fetching public freelancers:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Unexpected error in getAllPublicFreelancers:', error);
+    return [];
+  }
+};
+
+// Conversation logic for client-freelancer messaging
+export const checkOrCreateConversation = async (clientId: string, freelancerId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
+  try {
+    // First check if conversation already exists
+    const { data: existingConversation, error: checkError } = await supabase
+      .from('conversations')
+      .select('id')
+      .or(`(client_id.eq.${clientId},freelancer_id.eq.${freelancerId}),(client_id.eq.${freelancerId},freelancer_id.eq.${clientId})`)
+      .single();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking conversation:', checkError);
+      return { success: false, error: 'Failed to check conversation' };
+    }
+
+    // If conversation exists, return it
+    if (existingConversation) {
+      return { success: true, conversationId: existingConversation.id };
+    }
+
+    // Create new conversation
+    const { data: newConversation, error: createError } = await supabase
+      .from('conversations')
+      .insert({
+        client_id: clientId,
+        freelancer_id: freelancerId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select('id')
+      .single();
+
+    if (createError) {
+      console.error('Error creating conversation:', createError);
+      return { success: false, error: 'Failed to create conversation' };
+    }
+
+    return { success: true, conversationId: newConversation.id };
+  } catch (error) {
+    console.error('Unexpected error in checkOrCreateConversation:', error);
+    return { success: false, error: 'Unexpected error' };
+  }
+};

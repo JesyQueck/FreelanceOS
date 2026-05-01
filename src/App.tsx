@@ -3,6 +3,7 @@ import './styles/globals.css'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import MobileBottomNav from './components/MobileBottomNav'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -13,7 +14,8 @@ import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import MessagesPage from './pages/messages/MessagesPage'
 import SettingsPage from './pages/dashboard/SettingsPage'
-import PublicPortfolioPage from './pages/public/PublicPortfolioPage'
+import PublicFreelancerProfile from './pages/public/PublicFreelancerProfile'
+import DiscoverFreelancers from './pages/public/DiscoverFreelancers'
 
 function App() {
   return (
@@ -25,7 +27,18 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-              <Route path="/portfolio/:slug" element={<PublicPortfolioPage />} />
+              <Route path="/freelancer/:username" element={<PublicFreelancerProfile />} />
+              <Route path="/discover" element={<DiscoverFreelancers />} />
+              <Route path="/messages" element={
+                <ProtectedRoute>
+                  <MessagesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/messages/:conversationId" element={
+                <ProtectedRoute>
+                  <MessagesPage />
+                </ProtectedRoute>
+              } />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <DashboardLayout />
@@ -39,6 +52,7 @@ function App() {
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Routes>
+            <MobileBottomNav />
           </Router>
         </NotificationProvider>
       </AuthProvider>
