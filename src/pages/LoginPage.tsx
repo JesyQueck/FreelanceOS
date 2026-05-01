@@ -46,8 +46,8 @@ export default function LoginPage() {
             navigate(redirectAfterLogin);
           }
         } else {
-          // Default redirect to dashboard
-          navigate('/messages'); // Changed to messages as default
+          // Default redirect to freelancer dashboard
+          navigate('/dashboard');
         }
       } else {
         setState({ message: "Login failed", success: false });

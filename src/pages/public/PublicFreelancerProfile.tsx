@@ -57,10 +57,10 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
-      // Store the intended action and redirect to login
+      // Store the intended action and redirect to client login
       sessionStorage.setItem('redirectAfterLogin', `/freelancer/${username}`);
       sessionStorage.setItem('intendedAction', 'message');
-      navigate('/login');
+      navigate('/client-login');
       return;
     }
 

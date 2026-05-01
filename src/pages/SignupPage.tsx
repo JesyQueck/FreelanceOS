@@ -97,7 +97,7 @@ export default function SignupPage() {
                     navigate(redirectAfterLogin);
                   }
                 } else {
-                  navigate('/messages'); // Default to messages
+                  navigate('/dashboard'); // Default to freelancer dashboard
                 }
               }, 1500);
             }

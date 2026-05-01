@@ -18,9 +18,7 @@ export default function MobileBottomNav() {
                            location.pathname === '/services' || 
                            location.pathname === '/profile';
 
-  // Check if user is a client (simple heuristic - can be improved with proper role field)
-  const isClient = user && !user.email?.includes('freelancer');
-
+  
   // Navigation items based on authentication status and role
   const navigation = user ? (
     isFreelancerRoute ? [
@@ -37,10 +35,10 @@ export default function MobileBottomNav() {
       { name: 'Settings', href: '/client-settings', icon: Briefcase },
     ]
   ) : [
-    // Unauthenticated user navigation - redirect to client login
-    { name: 'Messages', href: '/client-login', icon: MessageSquare },
+    // Unauthenticated user navigation - redirect to main login ( freelancer access)
+    { name: 'Messages', href: '/login', icon: MessageSquare },
     { name: 'Discover', href: '/discover', icon: Search },
-    { name: 'Profile', href: '/client-login', icon: UserCircle },
+    { name: 'Profile', href: '/login', icon: UserCircle },
   ];
 
   // Don't show mobile bottom nav for unauthenticated users or on public freelancer profile pages
