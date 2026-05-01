@@ -198,56 +198,56 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0B0F19]">
+    <div className="h-full flex flex-col bg-black">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-white">Messages</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
             <input
               type="text"
               placeholder="Search conversations..."
-              className="pl-10 pr-4 py-2 bg-[#151B2B] border border-slate-800/60 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 w-full sm:w-auto"
+              className="pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base"
             />
           </div>
           <NotificationDropdown />
         </div>
       </div>
 
-      <div className="flex-1 flex bg-[#151B2B] rounded-2xl border border-slate-800/60 overflow-hidden relative">
+      <div className="flex-1 flex bg-[#0A0A0A] rounded-2xl border border-[#1A1A1A] overflow-hidden relative">
         {/* Conversations List - Always visible */}
-        <div className={`w-full sm:w-80 bg-[#151B2B] flex flex-col transition-transform duration-300 ${
+        <div className={`w-full sm:w-80 bg-[#0A0A0A] flex flex-col transition-transform duration-300 ${
           showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
         } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
-          <div className="p-4 border-b border-slate-800/60">
-            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">All Conversations</h2>
+          <div className="p-4 border-b border-[#1A1A1A]">
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">All Conversations</h2>
           </div>
           
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-center text-slate-400">Loading conversations...</div>
+              <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
             ) : conversations.length === 0 ? (
-              <div className="p-4 text-center text-slate-400">No conversations yet</div>
+              <div className="p-6 text-center text-[#A0A0A0]">No conversations yet</div>
             ) : (
               conversations.map((conversation) => (
                 <div 
                   key={conversation.id} 
                   onClick={() => handleSelectConversation(conversation)}
-                  className={`p-4 hover:bg-slate-800/50 cursor-pointer transition-colors border-b border-slate-800/30 last:border-b-0 ${
-                    selectedConversation?.id === conversation.id ? 'bg-slate-800/50' : ''
+                  className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-colors border-b border-[#1A1A1A]/30 last:border-b-0 ${
+                    selectedConversation?.id === conversation.id ? 'bg-[#FFD700]/10' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
                       {getInitials(conversation)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
-                        <span className="text-xs text-slate-500">{formatTimeAgo(conversation.last_message_at)}</span>
+                        <span className="text-xs text-[#A0A0A0]">{formatTimeAgo(conversation.last_message_at)}</span>
                       </div>
-                      <p className="text-xs text-slate-400 truncate">Click to view messages</p>
+                      <p className="text-xs text-[#A0A0A0] truncate">Click to view messages</p>
                     </div>
                   </div>
                 </div>
@@ -257,21 +257,21 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Area - Slides in from right */}
-        <div className={`flex-1 bg-[#151B2B] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
+        <div className={`flex-1 bg-[#0A0A0A] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
           showChat ? 'translate-x-0' : 'translate-x-full'
         } ${showChat ? 'absolute inset-0 z-20 sm:relative sm:z-0' : 'absolute inset-0'}`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-slate-800/60 flex items-center justify-between">
+              <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={handleBackToList}
-                    className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+                    className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors"
                   >
                     <ArrowLeft className="h-5 w-5 text-white" />
                   </button>
-                  <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
                     {getInitials(selectedConversation)}
                   </div>
                   <div>
@@ -279,27 +279,27 @@ export default function MessagesPage() {
                     <p className="text-xs text-green-400">Active now</p>
                   </div>
                 </div>
-                <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                  <MoreVertical className="h-4 w-4 text-slate-400" />
+                <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
+                  <MoreVertical className="h-4 w-4 text-[#A0A0A0]" />
                 </button>
               </div>
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
-                  <div className="text-center text-slate-400 py-8">No messages yet. Start the conversation!</div>
+                  <div className="text-center text-[#A0A0A0] py-8">No messages yet. Start the conversation!</div>
                 ) : (
                   <>
                     {messages.map((message) => (
                       <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                        <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl ${
                           message.sender_id === user?.id 
-                            ? 'bg-indigo-600 text-white rounded-br-sm' 
-                            : 'bg-slate-800 text-slate-200 rounded-tl-sm'
+                            ? 'bg-[#FFD700] text-black rounded-br-sm' 
+                            : 'bg-[#1A1A1A] text-white rounded-tl-sm'
                         }`}>
-                          <p className="text-sm">{message.content}</p>
-                          <div className={`flex items-center gap-1 mt-1 text-xs ${
-                            message.sender_id === user?.id ? 'text-indigo-200' : 'text-slate-500'
+                          <p className="text-sm leading-relaxed">{message.content}</p>
+                          <div className={`flex items-center gap-1 mt-2 text-xs ${
+                            message.sender_id === user?.id ? 'text-black/70' : 'text-[#A0A0A0]'
                           }`}>
                             <span>{formatTime(message.created_at)}</span>
                           </div>
@@ -312,10 +312,10 @@ export default function MessagesPage() {
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-slate-800/60">
-                <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-                    <Paperclip className="h-4 w-4 text-slate-400" />
+              <div className="p-4 border-t border-[#1A1A1A]">
+                <div className="flex items-center gap-3">
+                  <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
+                    <Paperclip className="h-5 w-5 text-[#A0A0A0]" />
                   </button>
                   <input
                     type="text"
@@ -324,20 +324,20 @@ export default function MessagesPage() {
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Type a message..."
                     disabled={sending}
-                    className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 disabled:opacity-50 text-base"
                   />
                   <button 
                     onClick={handleSendMessage}
                     disabled={sending || !messageInput.trim()}
-                    className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-3 bg-[#FFD700] hover:bg-[#FFC700] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Send className="h-4 w-4 text-white" />
+                    <Send className="h-5 w-5 text-black" />
                   </button>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-slate-400">
+            <div className="flex-1 flex items-center justify-center text-[#A0A0A0]">
               <p>Select a conversation to start messaging</p>
             </div>
           )}

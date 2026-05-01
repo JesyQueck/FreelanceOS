@@ -247,8 +247,13 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">Loading profile...</div>
+      <div className="flex flex-col items-center justify-center h-64">
+        <div className="flex gap-1 mb-4">
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        </div>
+        <div className="text-[#A0A0A0]">Loading profile...</div>
       </div>
     );
   }
@@ -259,7 +264,7 @@ export default function ProfilePage() {
         <h1 className="text-2xl font-bold text-white">Profile</h1>
         <button 
           onClick={handleShareProfile}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm transition-colors shadow-sm"
         >
           <Share2 className="h-4 w-4" />
           Share Portfolio
@@ -267,9 +272,9 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-[#151B2B] rounded-2xl p-8 border border-slate-800/60 shadow-sm">
+      <div className="bg-[#0A0A0A] rounded-2xl p-8 border border-[#1A1A1A] shadow-sm">
         <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col md:items-center">
             <div className="relative">
               {profile?.profile_image ? (
                 <img 
@@ -278,42 +283,46 @@ export default function ProfilePage() {
                   className="w-32 h-32 rounded-2xl object-cover"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-3xl font-bold">
+                <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold">
                   {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
-              <button className="absolute bottom-2 right-2 p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors">
+              <button className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 rounded-b-2xl py-2 transition-colors hover:bg-black/80 z-10">
                 <Camera className="h-4 w-4 text-white" />
               </button>
             </div>
-            <div className="mt-4 text-center">
-              <div className="flex items-center justify-center gap-2">
+            <div className="mt-4 md:text-center">
+              <div className="flex items-center md:justify-center gap-2">
                 {editingField === 'name' ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
-                      className="bg-[#0B0F19] border border-slate-800 rounded-lg px-3 py-1 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter your professional name"
                       autoFocus
                     />
                     <div className="flex gap-1">
                       <button
                         onClick={cancelEditing}
-                        className="p-1 hover:bg-slate-700 rounded transition-colors"
+                        className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                       >
-                        <X className="h-3 w-3 text-slate-400" />
+                        <X className="h-3 w-3 text-[#A0A0A0]" />
                       </button>
                       <button
                         onClick={saveField}
                         disabled={isSaving}
-                        className="p-1 hover:bg-indigo-600 rounded transition-colors disabled:opacity-50"
+                        className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
                       >
                         {isSaving ? (
-                          <div className="h-3 w-3 border border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="flex gap-1">
+                            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                            <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          </div>
                         ) : (
-                          <Save className="h-3 w-3 text-white" />
+                          <Save className="h-3 w-3 text-black" />
                         )}
                       </button>
                     </div>
@@ -325,18 +334,18 @@ export default function ProfilePage() {
                     </h2>
                     <button
                       onClick={() => startEditing('name', profile?.name || '')}
-                      className="p-1 hover:bg-slate-700 rounded transition-colors"
+                      className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                       title="Edit name"
                     >
-                      <Edit className="h-4 w-4 text-slate-400" />
+                      <Edit className="h-4 w-4 text-[#A0A0A0]" />
                     </button>
                   </>
                 )}
               </div>
-              <p className="text-slate-400">
+              <p className="text-[#A0A0A0]">
                 Freelancer
               </p>
-              <div className="flex items-center justify-center gap-1 mt-2">
+              <div className="flex items-center md:justify-center gap-1 mt-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                 <span className="text-sm text-green-500">Verified</span>
               </div>
@@ -349,10 +358,10 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-semibold text-white">About</h3>
                 <button
                   onClick={() => startEditing('bio', profile?.bio || '')}
-                  className="p-1 hover:bg-slate-700 rounded transition-colors"
+                  className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                   title="Edit bio"
                 >
-                  <Edit className="h-4 w-4 text-slate-400" />
+                  <Edit className="h-4 w-4 text-[#A0A0A0]" />
                 </button>
               </div>
               {editingField === 'bio' ? (
@@ -360,24 +369,28 @@ export default function ProfilePage() {
                   <textarea
                     value={editingValue}
                     onChange={(e) => setEditingValue(e.target.value)}
-                    className="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
                     placeholder="Tell us about yourself and your work"
                     autoFocus
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={cancelEditing}
-                      className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
+                      className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={saveField}
                       disabled={isSaving}
-                      className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm disabled:opacity-50 flex items-center gap-1"
+                      className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50 flex items-center gap-1"
                     >
                       {isSaving ? (
-                        <div className="h-3 w-3 border border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
                       ) : (
                         <Save className="h-3 w-3" />
                       )}
@@ -386,7 +399,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-[#A0A0A0] leading-relaxed">
                   {profile?.bio || 'No bio added yet. Click the edit icon to add your professional bio.'}
                 </p>
               )}
@@ -394,23 +407,23 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-slate-400" />
+                <Mail className="h-5 w-5 text-[#FFD700]" />
                 <div>
-                  <p className="text-xs text-slate-500">Email</p>
+                  <p className="text-xs text-[#A0A0A0]">Email</p>
                   <p className="text-sm text-white">{user?.email || 'No email'}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <UserCircle className="h-5 w-5 text-slate-400" />
+                <UserCircle className="h-5 w-5 text-[#FFD700]" />
                 <div>
-                  <p className="text-xs text-slate-500">Display Name</p>
+                  <p className="text-xs text-[#A0A0A0]">Display Name</p>
                   <p className="text-sm text-white">{profile?.display_name || 'Not set'}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <Briefcase className="h-5 w-5 text-slate-400" />
+                <Briefcase className="h-5 w-5 text-[#FFD700]" />
                 <div className="flex-1">
                   <p className="text-xs text-slate-500">Professional Name</p>
                   {editingField === 'professional-name' ? (
@@ -436,7 +449,11 @@ export default function ProfilePage() {
                           className="p-1 hover:bg-indigo-600 rounded transition-colors disabled:opacity-50"
                         >
                           {isSaving ? (
-                            <div className="h-3 w-3 border border-white border-t-transparent rounded-full animate-spin" />
+                            <div className="flex gap-1">
+                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                            </div>
                           ) : (
                             <Save className="h-3 w-3 text-white" />
                           )}
@@ -459,14 +476,14 @@ export default function ProfilePage() {
               </div>
               
               <div className="flex items-center gap-3">
-                <UserCircle className="h-5 w-5 text-slate-400" />
+                <UserCircle className="h-5 w-5 text-[#FFD700]" />
                 <div>
-                  <p className="text-xs text-slate-500">Member Since</p>
+                  <p className="text-xs text-[#A0A0A0]">Member Since</p>
                   <p className="text-sm text-white">
                     {profile?.created_at ? (
                       <span>{getRelativeTime(profile?.created_at)}</span>
                     ) : (
-                      <span className="text-slate-400">Recently joined</span>
+                      <span className="text-[#A0A0A0]">Recently joined</span>
                     )}
                   </p>
                 </div>
@@ -477,15 +494,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Skills Section */}
-      <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm">
+      <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-white">Skills</h3>
           <button
             onClick={() => startEditing('skills', '')}
-            className="p-1 hover:bg-slate-700 rounded transition-colors"
+            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
             title="Edit skills"
           >
-            <Edit className="h-4 w-4 text-slate-400" />
+            <Edit className="h-4 w-4 text-[#A0A0A0]" />
           </button>
         </div>
         {editingField === 'skills' ? (
@@ -495,7 +512,7 @@ export default function ProfilePage() {
                 type="text"
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
-                className="flex-1 bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="flex-1 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                 placeholder="Enter a skill"
                 autoFocus
                 onKeyPress={(e) => {
@@ -507,10 +524,14 @@ export default function ProfilePage() {
               <button
                 onClick={saveField}
                 disabled={isSaving || !editingValue.trim()}
-                className="px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-3 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSaving ? (
-                  <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
                 ) : (
                   <span>Add</span>
                 )}
@@ -518,11 +539,11 @@ export default function ProfilePage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {profile?.skills?.map((skill: string, index: number) => (
-                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm group">
+                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm group">
                   <span>{skill}</span>
                   <button
                     onClick={() => removeSkill(skill)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-400"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-[#A0A0A0] hover:text-red-400"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -531,7 +552,7 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={cancelEditing}
-              className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
+              className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
             >
               Done
             </button>
@@ -540,24 +561,24 @@ export default function ProfilePage() {
           <div className="flex flex-wrap gap-2">
             {profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0 ? (
               profile.skills.map((skill: string, index: number) => (
-                <span key={index} className="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-sm">
+                <span key={index} className="px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm">
                   {skill}
                 </span>
               ))
             ) : (
-              <p className="text-slate-400">No skills added yet. Click the edit icon to add your professional skills.</p>
+              <p className="text-[#A0A0A0]">No skills added yet. Click the edit icon to add your professional skills.</p>
             )}
           </div>
         )}
       </div>
 
       {/* Portfolio Section */}
-      <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-sm">
+      <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-white">Portfolio</h3>
           <button 
             onClick={() => setShowAddPortfolio(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm transition-colors shadow-sm"
           >
             <Plus className="h-4 w-4" />
             Add Project
@@ -567,15 +588,15 @@ export default function ProfilePage() {
         {/* Modal Overlay */}
         {showAddPortfolio && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#151B2B] rounded-2xl p-6 border border-slate-800/60 shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
-                    <Plus className="h-5 w-5 text-indigo-400" />
+                  <div className="w-10 h-10 bg-[#FFD700]/20 rounded-lg flex items-center justify-center">
+                    <Plus className="h-5 w-5 text-[#FFD700]" />
                   </div>
                   <div>
                     <h4 className="text-white font-semibold">Add New Project</h4>
-                    <p className="text-slate-400 text-sm">Showcase your best work</p>
+                    <p className="text-[#A0A0A0] text-sm">Showcase your best work</p>
                   </div>
                 </div>
                 <button
@@ -588,48 +609,48 @@ export default function ProfilePage() {
                       external_link: ''
                     });
                   }}
-                  className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#2A2A2A] rounded-lg transition-colors"
                 >
-                  <X className="h-5 w-5 text-slate-400" />
+                  <X className="h-5 w-5 text-[#A0A0A0]" />
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Project Title *</label>
+                  <label className="block text-sm font-medium text-white mb-2">Project Title *</label>
                   <input
                     type="text"
                     value={newPortfolio.title}
                     onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                     placeholder="Enter project title"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-white mb-2">Description</label>
                   <textarea
                     value={newPortfolio.description}
                     onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
                     placeholder="Describe your project, what you built, and your role"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Project Image URL</label>
+                  <label className="block text-sm font-medium text-white mb-2">Project Image URL</label>
                   <input
                     type="url"
                     value={newPortfolio.image_url}
                     onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">External Link</label>
+                  <label className="block text-sm font-medium text-white mb-2">External Link</label>
                   <input
                     type="url"
                     value={newPortfolio.external_link}
                     onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                     placeholder="https://www.project.com"
                   />
                 </div>
@@ -645,20 +666,21 @@ export default function ProfilePage() {
                       external_link: ''
                     });
                   }}
-                  className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                  className="px-6 py-3 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddPortfolio}
                   disabled={isSaving || !newPortfolio.title?.trim()}
-                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                  className="px-6 py-3 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
                 >
                   {isSaving ? (
-                    <>
-                      <div className="h-4 w-4 border border-white border-t-transparent rounded-full animate-spin" />
-                      Adding...
-                    </>
+                    <div className="flex gap-1">
+                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
                   ) : (
                     <>
                       <Plus className="h-4 w-4" />
@@ -674,8 +696,8 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {portfolioItems.length > 0 ? (
             portfolioItems.map((item) => (
-              <div key={item.id} className="group relative bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700/50 hover:border-slate-600/50 transition-all duration-300">
-                <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
+              <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
+                <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                   {item.image_url ? (
                     <img 
                       src={item.image_url} 
@@ -683,12 +705,12 @@ export default function ProfilePage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-slate-600/50 rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <Briefcase className="h-8 w-8 text-slate-400" />
+                        <div className="w-16 h-16 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                          <Briefcase className="h-8 w-8 text-[#FFD700]" />
                         </div>
-                        <span className="text-slate-400 text-sm">No Image</span>
+                        <span className="text-[#A0A0A0] text-sm">No Image</span>
                       </div>
                     </div>
                   )}
@@ -701,13 +723,13 @@ export default function ProfilePage() {
                 </div>
                 <div className="p-5">
                   <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
-                  <p className="text-slate-400 text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                  <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                   {item.external_link && (
                     <a
                       href={item.external_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                      className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] text-sm transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
                       View Project
@@ -719,11 +741,11 @@ export default function ProfilePage() {
           ) : (
             <div className="col-span-full">
               <div className="text-center py-12 px-6">
-                <div className="w-24 h-24 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-600/50">
-                  <Briefcase className="h-12 w-12 text-slate-400" />
+                <div className="w-24 h-24 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#2A2A2A]/50">
+                  <Briefcase className="h-12 w-12 text-[#FFD700]" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">No Projects Yet</h3>
-                <p className="text-slate-400 mb-6 max-w-md mx-auto">
+                <p className="text-[#A0A0A0] mb-6 max-w-md mx-auto">
                   Start building your portfolio by adding your first project. Showcase your best work and impress potential clients.
                 </p>
               </div>

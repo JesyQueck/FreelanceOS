@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { 
   Briefcase, 
-  Menu, 
-  X, 
   LayoutDashboard, 
   UserCircle, 
   Target, 
@@ -16,6 +14,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { supabase } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
+import MobileBottomNav from "../../components/MobileBottomNav";
 
 export default function DashboardLayout() {
   const { user } = useAuth();
@@ -83,7 +82,7 @@ export default function DashboardLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#0B0F19] text-slate-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
@@ -94,21 +93,21 @@ export default function DashboardLayout() {
       )}
 
       {/* DESKTOP SIDEBAR - Always Visible */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-slate-800/60 lg:bg-[#0F1523]/50 lg:backdrop-blur-xl lg:flex-shrink-0">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[#1A1A1A] lg:bg-[#0A0A0A]/50 lg:backdrop-blur-xl lg:flex-shrink-0">
         <div className="h-20 flex items-center px-6 border-b border-transparent">
           <Link 
             className="flex items-center gap-2.5 group" 
             to="/dashboard"
           >
-            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
-              <Briefcase className="h-5 w-5 text-white" />
+            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
+              <Briefcase className="h-5 w-5 text-black" />
             </div>
             <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
           </Link>
         </div>
         
         <div className="px-4 py-4">
-          <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+          <p className="px-3 text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">
             Overview
           </p>
           <nav className="space-y-1">
@@ -118,8 +117,8 @@ export default function DashboardLayout() {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-indigo-600/20 text-indigo-400'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                    ? 'bg-[#FFD700]/20 text-white'
+                    : 'text-[#A0A0A0] hover:bg-[#0A0A0A]/50 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -135,7 +134,7 @@ export default function DashboardLayout() {
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-400 transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -148,11 +147,15 @@ export default function DashboardLayout() {
         </div>
 
         {/* User Profile Section */}
-        <div className="mt-auto p-4 border-t border-slate-800/60">
+        <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
               {loading ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
               ) : (
                 initial
               )}
@@ -161,12 +164,12 @@ export default function DashboardLayout() {
               <p className="text-sm font-medium text-white truncate">
                 {loading ? 'Loading...' : displayName}
               </p>
-              <p className="text-xs text-slate-400 truncate">
+              <p className="text-xs text-[#A0A0A0] truncate">
                 {loading ? 'Loading...' : userEmail}
               </p>
             </div>
-            <button className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
-              <Bell className="h-4 w-4 text-slate-400" />
+            <button className="p-1.5 rounded-lg hover:bg-[#0A0A0A]/50 transition-colors">
+              <Bell className="h-4 w-4 text-[#A0A0A0]" />
             </button>
           </div>
         </div>
@@ -174,7 +177,7 @@ export default function DashboardLayout() {
 
       {/* MOBILE SIDEBAR - Slide out overlay */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-800/60 bg-[#0F1523]/50 backdrop-blur-xl flex-shrink-0 flex flex-col
+        fixed inset-y-0 left-0 z-40 w-64 border-r border-[#1A1A1A] bg-[#0A0A0A]/50 backdrop-blur-xl flex-shrink-0 flex flex-col
         lg:hidden
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -185,15 +188,15 @@ export default function DashboardLayout() {
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
           >
-            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
-              <Briefcase className="h-5 w-5 text-white" />
+            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
+              <Briefcase className="h-5 w-5 text-black" />
             </div>
             <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
           </Link>
         </div>
         
         <div className="px-4 py-4">
-          <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+          <p className="px-3 text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">
             Overview
           </p>
           <nav className="space-y-1">
@@ -203,8 +206,8 @@ export default function DashboardLayout() {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-indigo-600/20 text-indigo-400'
-                    : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                    ? 'bg-[#FFD700]/20 text-white'
+                    : 'text-[#A0A0A0] hover:bg-[#0A0A0A]/50 hover:text-white'
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -221,7 +224,7 @@ export default function DashboardLayout() {
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-400 transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -234,11 +237,15 @@ export default function DashboardLayout() {
         </div>
 
         {/* User Profile Section */}
-        <div className="mt-auto p-4 border-t border-slate-800/60">
+        <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
               {loading ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
               ) : (
                 initial
               )}
@@ -247,38 +254,44 @@ export default function DashboardLayout() {
               <p className="text-sm font-medium text-white truncate">
                 {loading ? 'Loading...' : displayName}
               </p>
-              <p className="text-xs text-slate-400 truncate">
+              <p className="text-xs text-[#A0A0A0] truncate">
                 {loading ? 'Loading...' : userEmail}
               </p>
             </div>
-            <button className="p-1.5 rounded-lg hover:bg-slate-800/50 transition-colors">
-              <Bell className="h-4 w-4 text-slate-400" />
+            <button className="p-1.5 rounded-lg hover:bg-[#0A0A0A]/50 transition-colors">
+              <Bell className="h-4 w-4 text-[#A0A0A0]" />
             </button>
           </div>
         </div>
       </aside>
 
       {/* MOBILE NAVBAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0F1523]/80 backdrop-blur-xl border-b border-slate-800/60">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
         <div className="flex items-center justify-between px-4 py-3">
           <Link 
             className="flex items-center gap-2.5 group" 
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
           >
-            <div className="bg-indigo-600 p-1.5 rounded-lg shadow-sm shadow-indigo-600/20 group-hover:shadow-indigo-600/40 transition-shadow">
-              <Briefcase className="h-4 w-4 text-white" />
+            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
+              <Briefcase className="h-4 w-4 text-black" />
             </div>
             <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
           </Link>
           
           <div className="flex items-center gap-2">
             <NotificationDropdown />
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg bg-[#151B2B]/50 hover:bg-[#151B2B] transition-colors"
+            <Link
+              to="/dashboard/settings"
+              className="p-2 rounded-lg bg-[#1A1A1A]/50 hover:bg-[#1A1A1A] transition-colors"
             >
-              {sidebarOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
+              <Settings className="h-5 w-5 text-white" />
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg bg-red-500/50 hover:bg-red-500/70 transition-colors"
+            >
+              <LogOut className="h-5 w-5 text-white" />
             </button>
           </div>
         </div>
@@ -286,10 +299,13 @@ export default function DashboardLayout() {
 
       {/* MAIN CONTENT - Takes remaining space after sidebar */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto pt-20 lg:pt-6 p-4 lg:p-6">
+        <div className="flex-1 overflow-y-auto pt-20 lg:pt-6 p-4 lg:p-6 pb-20 lg:pb-6">
           <Outlet />
         </div>
       </main>
+
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <MobileBottomNav />
     </div>
   );
 }

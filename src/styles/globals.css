@@ -17,14 +17,22 @@
   --color-primary-900: #312e81;
   --color-primary-950: #1e1b4b;
   
-  --color-background: #0B0F19;
-  --color-foreground: #f8fafc;
+  --color-background: #000000;
+  --color-foreground: #FFFFFF;
+  --color-muted-foreground: #A0A0A0;
+  --color-card: #0A0A0A;
+  --color-border: #1A1A1A;
+  --color-accent: #FFD700;
 }
 
 @layer base {
   :root {
-    --background: #0B0F19;
-    --foreground: #f8fafc;
+    --background: #000000;
+    --foreground: #FFFFFF;
+    --muted-foreground: #A0A0A0;
+    --card: #0A0A0A;
+    --border: #1A1A1A;
+    --accent: #FFD700;
   }
 
   body {
@@ -33,5 +41,87 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Mobile-specific animations and transitions */
+  @media (max-width: 1024px) {
+    /* Smooth touch feedback */
+    button, a, [role="button"] {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    
+    /* Enhanced mobile transitions */
+    .mobile-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Mobile slide animations */
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    /* Mobile animation classes */
+    .mobile-slide-up {
+      animation: slideUp 0.4s ease-out;
+    }
+    
+    .mobile-fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .mobile-scale-in {
+      animation: scaleIn 0.3s ease-out;
+    }
+    
+    /* Enhanced mobile hover states */
+    .mobile-hover {
+      transition: all 0.2s ease;
+    }
+    
+    .mobile-hover:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+    
+    /* Mobile scroll behavior */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* Safe area handling for mobile devices */
+    .mobile-safe-area {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }

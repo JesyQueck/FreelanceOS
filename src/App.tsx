@@ -17,7 +17,7 @@ import PublicPortfolioPage from './pages/public/PublicPortfolioPage'
 
 function App() {
   return (
-    <div className="antialiased bg-[#0B0F19] text-slate-50 min-h-screen flex flex-col">
+    <div className="antialiased bg-black text-white min-h-screen flex flex-col">
       <AuthProvider>
         <NotificationProvider>
           <Router>
