@@ -18,26 +18,29 @@ export default function MobileBottomNav() {
                            location.pathname === '/services' || 
                            location.pathname === '/profile';
 
-  // Navigation items based on user role and current route
+  // Check if user is a client (simple heuristic - can be improved with proper role field)
+  const isClient = user && !user.email?.includes('freelancer');
+
+  // Navigation items based on authentication status and role
   const navigation = user ? (
     isFreelancerRoute ? [
-      // Old freelancer navigation
+      // Freelancer navigation
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
       { name: 'Messages', href: '/dashboard/messages', icon: MessageSquare },
       { name: 'Services', href: '/dashboard/services', icon: Target },
       { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
     ] : [
-      // New client navigation (for messages, discover, etc.)
+      // Client navigation
       { name: 'Messages', href: '/messages', icon: MessageSquare },
       { name: 'Discover', href: '/discover', icon: Search },
-      { name: 'Services', href: '/dashboard/services', icon: Briefcase },
-      { name: 'Profile', href: '/dashboard/profile', icon: UserCircle },
+      { name: 'Profile', href: '/client-dashboard', icon: UserCircle },
+      { name: 'Settings', href: '/client-settings', icon: Briefcase },
     ]
   ) : [
-    // Unauthenticated user navigation
-    { name: 'Messages', href: '/login', icon: MessageSquare },
+    // Unauthenticated user navigation - redirect to client login
+    { name: 'Messages', href: '/client-login', icon: MessageSquare },
     { name: 'Discover', href: '/discover', icon: Search },
-    { name: 'Profile', href: '/login', icon: UserCircle },
+    { name: 'Profile', href: '/client-login', icon: UserCircle },
   ];
 
   // Don't show mobile bottom nav for unauthenticated users or on public freelancer profile pages

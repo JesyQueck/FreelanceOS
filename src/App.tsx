@@ -7,6 +7,8 @@ import MobileBottomNav from './components/MobileBottomNav'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import ClientLoginPage from './pages/ClientLoginPage'
+import ClientSignupPage from './pages/ClientSignupPage'
 import DashboardLayout from './pages/dashboard/DashboardLayout'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import ProfilePage from './pages/profile/ProfilePage'
@@ -27,6 +29,8 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/client-login" element={<ClientLoginPage />} />
+              <Route path="/client-signup" element={<ClientSignupPage />} />
               <Route path="/freelancer/:username" element={<PublicFreelancerProfile />} />
               <Route path="/discover" element={<DiscoverFreelancers />} />
               <Route path="/messages" element={
