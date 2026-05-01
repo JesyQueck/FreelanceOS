@@ -972,14 +972,41 @@ export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
 // Conversation logic for client-freelancer messaging
 export const checkOrCreateConversation = async (clientId: string, freelancerId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
   try {
-    // First check if conversation already exists
-    const { data: existingConversation, error: checkError } = await supabase
+    // First check if conversation already exists (try both directions)
+    let existingConversation = null;
+    let checkError = null;
+
+    // Try client->freelancer direction
+    const { data: conversation1, error: error1 } = await supabase
       .from('conversations')
       .select('id')
-      .or(`(client_id.eq.${clientId},freelancer_id.eq.${freelancerId}),(client_id.eq.${freelancerId},freelancer_id.eq.${clientId})`)
+      .eq('client_id', clientId)
+      .eq('freelancer_id', freelancerId)
       .single();
 
-    if (checkError && checkError.code !== 'PGRST116') {
+    if (conversation1) {
+      existingConversation = conversation1;
+    } else if (error1 && error1.code !== 'PGRST116') {
+      checkError = error1;
+    }
+
+    // Try freelancer->client direction if not found
+    if (!existingConversation && (!error1 || error1.code === 'PGRST116')) {
+      const { data: conversation2, error: error2 } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('client_id', freelancerId)
+        .eq('freelancer_id', clientId)
+        .single();
+
+      if (conversation2) {
+        existingConversation = conversation2;
+      } else if (error2 && error2.code !== 'PGRST116') {
+        checkError = error2;
+      }
+    }
+
+    if (checkError) {
       console.error('Error checking conversation:', checkError);
       return { success: false, error: 'Failed to check conversation' };
     }
