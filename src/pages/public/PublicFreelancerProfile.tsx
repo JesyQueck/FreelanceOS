@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import ClientAuthModal from '../components/ClientAuthModal';
+import ClientAuthModal from '../../components/ClientAuthModal';
 
 export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
@@ -16,6 +16,7 @@ export default function PublicFreelancerProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [messageLoading, setMessageLoading] = useState(false);
+  const [showClientAuthModal, setShowClientAuthModal] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -58,10 +59,8 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
-      // Store the intended action and redirect to client login
-      sessionStorage.setItem('redirectAfterLogin', `/freelancer/${username}`);
-      sessionStorage.setItem('intendedAction', 'message');
-      navigate('/client-login');
+      // Show client auth modal instead of redirecting
+      setShowClientAuthModal(true);
       return;
     }
 
@@ -332,6 +331,33 @@ export default function PublicFreelancerProfile() {
           </div>
         </div>
       </div>
+
+      {/* Client Auth Modal */}
+      <ClientAuthModal
+        isOpen={showClientAuthModal}
+        onClose={() => setShowClientAuthModal(false)}
+        onAuthSuccess={async () => {
+          setShowClientAuthModal(false)
+          // After successful auth, proceed with conversation
+          if (user && profile) {
+            setMessageLoading(true)
+            try {
+              const result = await checkOrCreateConversation(user.id, profile.id!)
+              if (result.success && result.conversationId) {
+                navigate(`/messages/${result.conversationId}`)
+              } else {
+                setError(result.error || 'Failed to start conversation')
+              }
+            } catch (err) {
+              console.error('Error starting conversation:', err)
+              setError('Failed to start conversation')
+            } finally {
+              setMessageLoading(false)
+            }
+          }
+        }}
+        freelancerUsername={username || ''}
+      />
     </div>
-  );
+  )
 }
