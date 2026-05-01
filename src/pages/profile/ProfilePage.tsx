@@ -499,7 +499,11 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3">
                 <Briefcase className="h-5 w-5 text-[#FFD700]" />
                 <div className="flex-1">
+<<<<<<< HEAD
                   <p className="text-xs text-[#A0A0A0]">Professional Name</p>
+=======
+                  <p className="text-xs text-slate-500">Professional Name</p>
+>>>>>>> origin/main
                   {editingField === 'professional-name' ? (
                     <div className="flex items-center gap-2">
                       <input

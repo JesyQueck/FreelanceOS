@@ -224,6 +224,7 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
       let slug = currentProfile?.slug;
       
       if (!username) {
+<<<<<<< HEAD
         // Generate clean username from display name or email
         const baseName = displayName || email?.split('@')[0] || 'user';
         username = baseName.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -269,6 +270,11 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
         if (attempts >= maxAttempts) {
           username = username + Date.now().toString(36);
         }
+=======
+        // Generate from display name or email
+        const baseName = displayName || email?.split('@')[0] || 'user';
+        username = baseName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 1000);
+>>>>>>> origin/main
       }
       
       if (!slug) {
@@ -292,6 +298,7 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
       userProfileCache.delete(userId);
       
       return { data, error: null };
+<<<<<<< HEAD
     } else if (currentProfile.username && currentProfile.username.match(/\d+$/)) {
       // Clean up existing username with random numbers
       let username = currentProfile?.username;
@@ -358,6 +365,8 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
       userProfileCache.delete(userId);
       
       return { data, error: null };
+=======
+>>>>>>> origin/main
     }
     
     return { data: currentProfile, error: null };
