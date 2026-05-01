@@ -40,6 +40,11 @@ export default function MobileBottomNav() {
     { name: 'Profile', href: '/login', icon: UserCircle },
   ];
 
+  // Don't show mobile bottom nav for unauthenticated users
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-[#1A1A1A]">
       <div className="flex items-center justify-around h-16 px-2">

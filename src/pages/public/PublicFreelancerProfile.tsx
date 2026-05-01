@@ -121,28 +121,20 @@ export default function PublicFreelancerProfile() {
     <div className="min-h-screen bg-black">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link to="/discover" className="p-2 rounded-lg hover:bg-[#2A2A2A] transition-colors">
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </Link>
+        <div className="flex items-center justify-start px-4 py-6">
           <div className="flex items-center gap-2">
             <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
             </div>
             <span className="font-bold text-sm text-white">FreelanceOS</span>
           </div>
-          <div className="w-9"></div> {/* Spacer for balance */}
         </div>
       </div>
 
       {/* Desktop Header */}
       <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/discover" className="inline-flex items-center gap-2 text-[#A0A0A0] hover:text-white transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Discover
-            </Link>
+          <div className="flex items-center justify-start">
             <div className="flex items-center gap-2">
               <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
@@ -154,8 +146,8 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="pt-16 lg:pt-20">
-        <div className="max-w-4xl mx-auto px-4 lg:px-6 py-8">
+      <div className="pt-16 lg:pt-20 min-h-screen flex justify-center">
+        <div className="w-full max-w-4xl px-4 lg:px-6 py-8">
           {/* Profile Header */}
           <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
