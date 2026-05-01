@@ -287,7 +287,7 @@ export default function ProfilePage() {
                   {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
-              <button className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 rounded-b-2xl py-2 transition-colors hover:bg-black/80 z-10">
+              <button className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10">
                 <Camera className="h-4 w-4 text-white" />
               </button>
             </div>
