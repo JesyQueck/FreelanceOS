@@ -47,19 +47,16 @@ export default function ClientSignupPage() {
       if (error) {
         setError(error.message)
       } else if (data.user) {
-        // Create client profile
-        const { error: profileError } = await fetch('/api/create-client-profile', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${data.session?.access_token}`
-          },
-          body: JSON.stringify({
-            fullName: formData.fullName,
+        // Create client profile using Supabase
+        const { supabase } = await import('../utils/supabase')
+        const { error: profileError } = await supabase
+          .from('users')
+          .update({
+            display_name: formData.fullName,
             company: formData.company,
-            userId: data.user.id
+            user_type: 'client'
           })
-        })
+          .eq('id', data.user.id)
 
         if (profileError) {
           console.error('Profile creation error:', profileError)
