@@ -146,8 +146,9 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="pt-16 lg:pt-20 min-h-screen flex justify-center">
-        <div className="w-full max-w-4xl px-4 lg:px-6 py-8">
+      <div className="pt-16 lg:pt-20 min-h-screen flex justify-center items-start">
+        <div className="w-full max-w-4xl px-4 lg:px-6 py-8 flex justify-center">
+          <div className="w-full max-w-4xl">
           {/* Profile Header */}
           <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -327,6 +328,7 @@ export default function PublicFreelancerProfile() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>
