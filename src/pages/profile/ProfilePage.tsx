@@ -347,8 +347,8 @@ export default function ProfilePage() {
 
       {/* Profile Card */}
       <div className="bg-[#0A0A0A] rounded-2xl p-8 border border-[#1A1A1A] shadow-sm">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex flex-col md:items-center">
+        <div className="flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center">
             <div className="relative">
               {profile?.profile_image ? (
                 <img 
@@ -358,15 +358,15 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold">
-                  {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                  {profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
               <button className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10">
                 <Camera className="h-4 w-4 text-white" />
               </button>
             </div>
-            <div className="mt-4 md:text-center">
-              <div className="flex items-center md:justify-center gap-2">
+            <div className="mt-4 text-center">
+              <div className="flex items-center justify-center gap-2">
                 {editingField === 'name' ? (
                   <div className="flex items-center gap-2">
                     <input
@@ -404,7 +404,7 @@ export default function ProfilePage() {
                 ) : (
                   <>
                     <h2 className="text-xl font-bold text-white">
-                      {profile?.display_name || profile?.name || 'User'}
+                      {profile?.name || profile?.display_name || 'User'}
                     </h2>
                     <button
                       onClick={() => startEditing('name', profile?.name || '')}
@@ -419,7 +419,7 @@ export default function ProfilePage() {
               <p className="text-[#A0A0A0]">
                 Freelancer
               </p>
-              <div className="flex items-center md:justify-center gap-1 mt-2">
+              <div className="flex items-center justify-center gap-1 mt-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
                 <span className="text-sm text-green-500">Verified</span>
               </div>

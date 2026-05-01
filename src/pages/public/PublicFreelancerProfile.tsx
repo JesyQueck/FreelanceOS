@@ -152,26 +152,26 @@ export default function PublicFreelancerProfile() {
           {/* Profile Header */}
           <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-              <div className="flex flex-col lg:items-center">
+              <div className="flex flex-col items-center lg:items-center">
                 <div className="relative">
                   {profile?.profile_image ? (
                     <img 
                       src={profile.profile_image} 
-                      alt={profile.display_name || profile.name} 
+                      alt={profile.name || profile.display_name} 
                       className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl object-cover"
                     />
                   ) : (
                     <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-2xl lg:text-3xl font-bold">
-                      {profile?.display_name?.charAt(0).toUpperCase() || 'U'}
+                      {profile?.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                   )}
                 </div>
-                <div className="mt-4 lg:mt-6 lg:text-center">
+                <div className="mt-4 text-center lg:text-center">
                   <h1 className="text-xl lg:text-2xl font-bold text-white mb-2">
-                    {profile.display_name || profile.name}
+                    {profile.name || profile.display_name}
                   </h1>
                   <p className="text-[#A0A0A0] mb-3">Freelancer</p>
-                  <div className="flex items-center lg:justify-center gap-1">
+                  <div className="flex items-center justify-center gap-1">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                     <span className="text-sm text-green-500">Verified</span>
                   </div>
