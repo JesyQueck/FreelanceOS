@@ -40,8 +40,8 @@ export default function MobileBottomNav() {
     { name: 'Profile', href: '/login', icon: UserCircle },
   ];
 
-  // Don't show mobile bottom nav for unauthenticated users
-  if (!user) {
+  // Don't show mobile bottom nav for unauthenticated users or on public freelancer profile pages
+  if (!user || location.pathname.startsWith('/freelancer/')) {
     return null;
   }
 
