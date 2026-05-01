@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import ClientAuthModal from '../components/ClientAuthModal';
 
 export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
