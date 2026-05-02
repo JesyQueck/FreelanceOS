@@ -232,21 +232,92 @@ export default function ProfilePage() {
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `profile-images/${fileName}`;
       
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+      let imageUrl: string = '';
       
-      if (uploadError) {
-        throw uploadError;
+      // Try to create the avatars bucket if it doesn't exist, then upload
+      try {
+        // First try to upload to avatars bucket
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+        
+        if (!uploadError) {
+          // Get public URL from avatars bucket
+          const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+          imageUrl = publicUrl;
+          console.log('Image uploaded to avatars bucket successfully');
+        } else {
+          throw uploadError;
+        }
+      } catch (error) {
+        console.log('Avatars bucket not found, creating it...');
+        
+        // Try to create the bucket (this might fail due to permissions)
+        try {
+          const { error: createError } = await supabase.storage.createBucket('avatars', {
+            public: true,
+            allowedMimeTypes: ['image/*'],
+            fileSizeLimit: 5242880 // 5MB
+          });
+          
+          if (createError && !createError.message?.includes('already exists')) {
+            console.log('Could not create bucket:', createError.message);
+            console.log('Please create the "avatars" bucket manually in Supabase Dashboard > Storage');
+            throw error;
+          }
+          
+          // Now try to upload again
+          const { error: retryUploadError } = await supabase.storage
+            .from('avatars')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+          
+          if (retryUploadError) {
+            throw retryUploadError;
+          }
+          
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(filePath);
+          imageUrl = publicUrl;
+          console.log('Bucket created and image uploaded successfully');
+          
+        } catch (createError) {
+          console.error('Failed to create bucket and upload:', createError);
+          
+          // Final fallback: use general-storage bucket
+          try {
+            const { error: publicUploadError } = await supabase.storage
+              .from('general-storage')
+              .upload(`profile-images/${fileName}`, file, {
+                cacheControl: '3600',
+                upsert: true
+              });
+            
+            if (publicUploadError) {
+              throw publicUploadError;
+            }
+            
+            const { data: { publicUrl } } = supabase.storage
+              .from('general-storage')
+              .getPublicUrl(`profile-images/${fileName}`);
+            imageUrl = publicUrl;
+            console.log('Image uploaded to general-storage bucket as fallback');
+            
+          } catch (fallbackError) {
+            console.error('All upload methods failed:', fallbackError);
+            throw new Error('Unable to upload image. Please check your Supabase storage configuration.');
+          }
+        }
       }
-      
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
       
       // Update profile with new image URL
       const result = await createOrUpdateUserProfile(
@@ -256,7 +327,7 @@ export default function ProfilePage() {
         profile?.name || '',
         profile?.bio || '',
         profile?.skills,
-        publicUrl
+        imageUrl
       );
       
       if (result.error) {
