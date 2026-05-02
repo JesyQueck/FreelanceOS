@@ -60,7 +60,7 @@ export default function ProfilePage() {
           // First fetch profile data directly without cache
           const { data: profileData, error: profileError } = await supabase
             .from('users')
-            .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug, role')
+            .select('display_name, name, bio, profile_image, created_at, id, updated_at, username, slug, role')
             .eq('id', user.id)
             .single() as { data: UserProfile | null; error: any };
           
@@ -98,6 +98,9 @@ export default function ProfilePage() {
         } finally {
           setLoading(false);
         }
+      } else {
+        // No user, set loading to false
+        setLoading(false);
       }
     };
 
@@ -119,12 +122,22 @@ export default function ProfilePage() {
     
     setIsSaving(true);
     try {
+      let displayName = profile?.display_name || '';
+      let professionalName = profile?.name || '';
+      
+      if (editingField === 'display-name') {
+        displayName = editingValue;
+      } else if (editingField === 'professional-name') {
+        professionalName = editingValue;
+      }
+      
       const result = await createOrUpdateUserProfile(
         user.id,
         user.email || '',
-        editingField === 'professional-name' ? editingValue : profile?.display_name || '',
+        displayName,
+        professionalName,
         profile?.bio || '',
-        profile?.profile_image || ''
+        profile?.skills
       );
       
       if (result.error) {
@@ -132,11 +145,11 @@ export default function ProfilePage() {
       } else if (result.data) {
         setProfile(result.data);
       }
+      cancelEditing();
     } catch (error) {
       console.error('Error saving field:', error);
     } finally {
       setIsSaving(false);
-      cancelEditing();
     }
   };
 
@@ -165,9 +178,16 @@ export default function ProfilePage() {
         updateData.skills = editingValue.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
       }
       
-      const { error } = await supabase
-        .from('freelancer_profiles')
-        .update(updateData)
+      // Build the update object dynamically to avoid TypeScript issues
+      const updateQuery: any = {};
+      if (updateData.hourly_rate !== undefined) updateQuery.hourly_rate = updateData.hourly_rate;
+      if (updateData.experience_level) updateQuery.experience_level = updateData.experience_level;
+      if (updateData.availability) updateQuery.availability = updateData.availability;
+      if (updateData.skills) updateQuery.skills = updateData.skills;
+      
+      const { error } = await (supabase
+        .from('freelancer_profiles') as any)
+        .update(updateQuery)
         .eq('user_id', user.id);
       
       if (error) {
@@ -248,8 +268,13 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-white">Loading profile...</div>
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center">
+        <div className="flex gap-1 mb-4">
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        </div>
+        <div className="text-[#A0A0A0]">Loading profile...</div>
       </div>
     );
   }
@@ -300,14 +325,14 @@ export default function ProfilePage() {
             {/* Profile Info */}
             <div className="flex-1 text-left">
               <div className="mb-4">
-                {editingField === 'name' ? (
+                {editingField === 'display-name' ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
                       className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
-                      placeholder="Enter your professional name"
+                      placeholder="Enter your display name"
                       autoFocus
                     />
                     <div className="flex gap-1">
@@ -320,7 +345,7 @@ export default function ProfilePage() {
                       <button
                         onClick={saveField}
                         disabled={isSaving}
-                        className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                        className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
                       >
                         {isSaving ? (
                           <div className="flex gap-1">
@@ -337,12 +362,12 @@ export default function ProfilePage() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <h1 className="text-2xl font-bold text-white">
-                      {profile?.display_name || 'Your Name'}
+                      {profile?.display_name || 'Your Display Name'}
                     </h1>
                     <button
-                      onClick={() => startEditing('name', profile?.display_name || '')}
+                      onClick={() => startEditing('display-name', profile?.display_name || '')}
                       className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
-                      title="Edit name"
+                      title="Edit display name"
                     >
                       <Edit className="h-4 w-4 text-[#A0A0A0]" />
                     </button>
@@ -439,27 +464,19 @@ export default function ProfilePage() {
                         <button
                           onClick={saveField}
                           disabled={isSaving}
-                          className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                          className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
                         >
-                          {isSaving ? (
-                            <div className="flex gap-1">
-                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                            </div>
-                          ) : (
-                            <Save className="h-3 w-3 text-black" />
-                          )}
+                          <Save className="h-3 w-3 text-black" />
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-white font-medium">
-                        {profile?.display_name || 'No professional name set'}
+                        {profile?.name || 'Not set'}
                       </p>
                       <button
-                        onClick={() => startEditing('professional-name', profile?.display_name || '')}
+                        onClick={() => startEditing('professional-name', profile?.name || '')}
                         className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                         title="Edit professional name"
                       >
