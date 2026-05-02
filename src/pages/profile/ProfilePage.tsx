@@ -124,11 +124,14 @@ export default function ProfilePage() {
     try {
       let displayName = profile?.display_name || '';
       let professionalName = profile?.name || '';
+      let bio = profile?.bio || '';
       
       if (editingField === 'display-name') {
         displayName = editingValue;
       } else if (editingField === 'professional-name') {
         professionalName = editingValue;
+      } else if (editingField === 'bio') {
+        bio = editingValue;
       }
       
       const result = await createOrUpdateUserProfile(
@@ -136,7 +139,7 @@ export default function ProfilePage() {
         user.email || '',
         displayName,
         professionalName,
-        profile?.bio || '',
+        bio,
         profile?.skills
       );
       
@@ -209,13 +212,62 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     
+    // Validate file type and size
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      alert('Image size must be less than 5MB');
+      return;
+    }
+    
     setIsSaving(true);
     try {
-      // For now, just simulate image upload
-      // In a real app, you'd upload to Supabase storage
-      console.log('Image upload simulated for file:', file.name);
+      const { supabase } = await import('../../utils/supabase');
+      
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `profile-images/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+      
+      // Update profile with new image URL
+      const result = await createOrUpdateUserProfile(
+        user.id,
+        user.email || '',
+        profile?.display_name || '',
+        profile?.name || '',
+        profile?.bio || '',
+        profile?.skills,
+        publicUrl
+      );
+      
+      if (result.error) {
+        console.error('Error updating profile image:', result.error);
+        alert('Failed to update profile image');
+      } else if (result.data) {
+        setProfile(result.data);
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
+      alert('Failed to upload image');
     } finally {
       setIsSaving(false);
     }
@@ -331,7 +383,7 @@ export default function ProfilePage() {
                       type="text"
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
-                      className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                      className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter your display name"
                       autoFocus
                     />
@@ -376,30 +428,35 @@ export default function ProfilePage() {
               </div>
               
               {/* Bio */}
-              <div className="mb-4">
+              <div className="mb-4 min-h-[32px]">
                 {editingField === 'bio' ? (
-                  <div>
-                    <textarea
-                      value={editingValue}
-                      onChange={(e) => setEditingValue(e.target.value)}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
-                      placeholder="Tell us about yourself and your work"
-                      autoFocus
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={cancelEditing}
-                        className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={saveField}
-                        disabled={isSaving}
-                        className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50 flex items-center gap-1"
-                      >
-                        {isSaving ? 'Saving...' : 'Save'}
-                      </button>
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-white mb-2">Edit Bio</h3>
+                        <textarea
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-40 resize-none"
+                          placeholder="Tell us about yourself and your work"
+                          autoFocus
+                        />
+                      </div>
+                      <div className="flex gap-3 justify-end">
+                        <button
+                          onClick={cancelEditing}
+                          className="px-4 py-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg text-sm"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={saveField}
+                          disabled={isSaving}
+                          className="px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {isSaving ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -450,7 +507,7 @@ export default function ProfilePage() {
                         type="text"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                         placeholder="Enter your professional name"
                         autoFocus
                       />
@@ -503,7 +560,7 @@ export default function ProfilePage() {
                             type="number"
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                             placeholder="50"
                             autoFocus
                           />
@@ -517,7 +574,7 @@ export default function ProfilePage() {
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -545,7 +602,7 @@ export default function ProfilePage() {
                           <select
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                             autoFocus
                           >
                             <option value="beginner">Beginner</option>
@@ -562,7 +619,7 @@ export default function ProfilePage() {
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -590,7 +647,7 @@ export default function ProfilePage() {
                           <select
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                             autoFocus
                           >
                             <option value="available">Available</option>
@@ -607,7 +664,7 @@ export default function ProfilePage() {
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -646,7 +703,7 @@ export default function ProfilePage() {
                           <textarea
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-white text-sm placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-24 resize-none"
+                            className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-24 resize-none"
                             placeholder="Enter your skills separated by commas (e.g., JavaScript, React, Node.js)"
                             autoFocus
                           />
@@ -671,7 +728,7 @@ export default function ProfilePage() {
                           {freelancerProfile.skills.map((skill: string, index: number) => (
                             <span 
                               key={index}
-                              className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium"
+                              className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded text-xs font-medium"
                             >
                               {skill}
                             </span>
@@ -720,7 +777,7 @@ export default function ProfilePage() {
                       type="text"
                       value={newPortfolio.title}
                       onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter project title"
                     />
                   </div>
@@ -729,7 +786,7 @@ export default function ProfilePage() {
                     <textarea
                       value={newPortfolio.description}
                       onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
                       placeholder="Describe your project and what you accomplished"
                     />
                   </div>
@@ -740,7 +797,7 @@ export default function ProfilePage() {
                         type="url"
                         value={newPortfolio.image_url}
                         onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                         placeholder="https://example.com/image.jpg"
                       />
                     </div>
@@ -750,7 +807,7 @@ export default function ProfilePage() {
                         type="url"
                         value={newPortfolio.external_link}
                         onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                         placeholder="https://example.com/project"
                       />
                     </div>

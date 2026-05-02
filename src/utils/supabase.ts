@@ -334,7 +334,6 @@ export interface Service {
   timeline?: string;
   status?: 'active' | 'draft';
   created_at?: string;
-  updated_at?: string;
 }
 
 // TypeScript interfaces for messaging
@@ -402,7 +401,7 @@ export const getPortfoliosCount = async (userId: string) => {
 }
 
 
-export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string, name?: string, bio?: string, skills?: string[]) => {
+export const createOrUpdateUserProfile = async (userId: string, email: string, displayName?: string, name?: string, bio?: string, skills?: string[], profile_image?: string) => {
   
   const profileData: any = {
     id: userId,
@@ -412,7 +411,7 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   };
   
   // Set created_at for new profiles (when displayName is provided during signup)
-  if (displayName && !name && !bio && !skills) {
+  if (displayName && !name && !bio && !skills && !profile_image) {
     profileData.created_at = new Date().toISOString();
   }
   
@@ -420,6 +419,7 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   if (name) profileData.name = name;
   if (bio) profileData.bio = bio;
   if (skills) profileData.skills = skills;
+  if (profile_image) profileData.profile_image = profile_image;
   
   // Generate username and slug if not present
   if (!profileData.username && displayName) {
@@ -680,7 +680,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   }
   
   // Use the safe user data fetcher
-  const { data, exists } = await getUserDataSafe(userId, 'display_name, bio, profile_image, created_at, id, updated_at, username, slug');
+  const { data, exists } = await getUserDataSafe(userId, 'display_name, name, bio, profile_image, created_at, id, updated_at, username, slug');
   
   // Cache both successful and null results to prevent repeated requests
   const result = exists ? data : null;
@@ -842,13 +842,12 @@ export const getActiveClientsCount = async (freelancerId: string): Promise<numbe
   return data?.length || 0;
 };
 
-export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'created_at' | 'updated_at'>, userId: string): Promise<{ data: Service | null; error: any }> => {
+export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'created_at'>, userId: string): Promise<{ data: Service | null; error: any }> => {
       
   const serviceData = {
     ...service,
     user_id: userId,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    created_at: new Date().toISOString()
   };
   
   try {
@@ -878,8 +877,7 @@ export const createService = async (service: Omit<Service, 'id' | 'user_id' | 'c
 export const updateService = async (id: string, service: Partial<Service>): Promise<{ data: Service | null; error: any }> => {
   
   const updateData = {
-    ...service,
-    updated_at: new Date().toISOString()
+    ...service
   };
   
   try {

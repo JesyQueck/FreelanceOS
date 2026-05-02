@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquare, Target, Eye, Plus, Sparkles } from "lucide-react";
-import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getRecentActivity, ActivityItem, getConversations, Conversation } from "../../utils/supabase";
+import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getFreelancerProfile, getRecentActivity, ActivityItem, getConversations, Conversation } from "../../utils/supabase";
 import MessagingOverlay from "../../components/MessagingOverlay";
 
 interface DashboardData {
@@ -45,8 +45,9 @@ export default function DashboardPage() {
           return;
         }
 
-        const [profile, servicesCount, portfoliosCount, convosCount, activeClientsCount] = await Promise.all([
+        const [profile, freelancerProfile, servicesCount, portfoliosCount, convosCount, activeClientsCount] = await Promise.all([
           getUserProfile(user.id),
+          getFreelancerProfile(user.id),
           getServicesCount(user.id),
           getPortfoliosCount(user.id),
           getConversationsCount(user.id),
@@ -59,7 +60,7 @@ export default function DashboardPage() {
         const recentActivity = await getRecentActivity(user.id);
         
         // Calculate real profile completion percentage
-        const calculateProfileCompletion = (profile: any) => {
+        const calculateProfileCompletion = (profile: any, freelancerProfile: any) => {
           let completedFields = 0;
           const totalFields = 6;
           
@@ -83,8 +84,8 @@ export default function DashboardPage() {
             completedFields++;
           }
           
-          // Check skills array
-          if (profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0) {
+          // Check skills array (from freelancer profile)
+          if (freelancerProfile?.skills && Array.isArray(freelancerProfile.skills) && freelancerProfile.skills.length > 0) {
             completedFields++;
           }
           
@@ -96,7 +97,7 @@ export default function DashboardPage() {
           return Math.round((completedFields / totalFields) * 100);
         };
         
-        const progressPercent = calculateProfileCompletion(profile);
+        const progressPercent = calculateProfileCompletion(profile, freelancerProfile);
         const stepsCompleted = Math.floor((progressPercent / 100) * 5);
 
         setData({
