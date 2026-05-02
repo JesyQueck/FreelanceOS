@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { UserCircle, Mail, Briefcase, Edit, Camera, CheckCircle2, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
+import { UserCircle, Mail, Briefcase, Edit, Camera, X, Save, Plus, ExternalLink, Trash2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getUserProfile, createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, generateShareLink, ensureUserHasSlug } from "../../utils/supabase";
+import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, ensureUserHasSlug, getFreelancerProfile } from "../../utils/supabase";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Freelancer-specific profile state
+  const [freelancerProfile, setFreelancerProfile] = useState<any>(null);
   
   // Portfolio state
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
@@ -83,6 +86,12 @@ export default function ProfilePage() {
           const portfolioData = await getPortfolioItems(user.id);
           setPortfolioItems(portfolioData);
           
+          // Fetch freelancer-specific profile if user is a freelancer
+          if (role === 'freelancer') {
+            const freelancerData = await getFreelancerProfile(user.id);
+            setFreelancerProfile(freelancerData);
+          }
+          
         } catch (error) {
           console.error('Error fetching profile data:', error);
           setProfile(null);
@@ -93,7 +102,7 @@ export default function ProfilePage() {
     };
 
     fetchProfileData();
-  }, [user]);
+  }, [user, role]);
 
   const startEditing = (field: string, value: string) => {
     setEditingField(field);
@@ -105,35 +114,93 @@ export default function ProfilePage() {
     setEditingValue('');
   };
 
-  const removeSkill = async (skillToRemove: string) => {
-    if (!user || !profile?.skills) return;
+  const saveField = async () => {
+    if (!user || !editingField) return;
     
     setIsSaving(true);
     try {
-      const updatedSkills = profile.skills.filter((skill: string) => skill !== skillToRemove);
-      
       const result = await createOrUpdateUserProfile(
         user.id,
         user.email || '',
-        profile?.display_name || '',
-        profile?.name,
-        profile?.bio,
-        updatedSkills
+        editingField === 'professional-name' ? editingValue : profile?.display_name || '',
+        profile?.bio || '',
+        profile?.profile_image || ''
       );
       
       if (result.error) {
-        console.error('Error removing skill:', result.error);
-      } else {
+        console.error('Error updating profile:', result.error);
+      } else if (result.data) {
         setProfile(result.data);
       }
     } catch (error) {
-      console.error('Error removing skill:', error);
+      console.error('Error saving field:', error);
+    } finally {
+      setIsSaving(false);
+      cancelEditing();
+    }
+  };
+
+  const saveFreelancerField = async () => {
+    if (!user || !editingField || !freelancerProfile) return;
+    
+    setIsSaving(true);
+    try {
+      const { supabase } = await import('../../utils/supabase');
+      
+      let updateData: {
+        hourly_rate?: number | null;
+        experience_level?: string;
+        availability?: string;
+        skills?: string[];
+      } = {};
+      
+      if (editingField === 'hourly-rate') {
+        updateData.hourly_rate = editingValue ? parseFloat(editingValue) : null;
+      } else if (editingField === 'experience-level') {
+        updateData.experience_level = editingValue;
+      } else if (editingField === 'availability') {
+        updateData.availability = editingValue;
+      } else if (editingField === 'skills') {
+        // Convert comma-separated string to array
+        updateData.skills = editingValue.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
+      }
+      
+      const { error } = await supabase
+        .from('freelancer_profiles')
+        .update(updateData)
+        .eq('user_id', user.id);
+      
+      if (error) {
+        console.error('Error updating freelancer profile:', error);
+      } else {
+        // Refresh freelancer profile data
+        const freelancerData = await getFreelancerProfile(user.id);
+        setFreelancerProfile(freelancerData);
+      }
+    } catch (error) {
+      console.error('Error saving freelancer field:', error);
+    } finally {
+      setIsSaving(false);
+      cancelEditing();
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    setIsSaving(true);
+    try {
+      // For now, just simulate image upload
+      // In a real app, you'd upload to Supabase storage
+      console.log('Image upload simulated for file:', file.name);
+    } catch (error) {
+      console.error('Error uploading image:', error);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Portfolio functions
   const handleAddPortfolio = async () => {
     if (!user || !newPortfolio.title?.trim()) return;
     
@@ -154,7 +221,7 @@ export default function ProfilePage() {
         setShowAddPortfolio(false);
       }
     } catch (error) {
-      console.error('Error creating portfolio item:', error);
+      console.error('Error adding portfolio item:', error);
     } finally {
       setIsSaving(false);
     }
@@ -179,218 +246,39 @@ export default function ProfilePage() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Temporarily disabled to fix TypeScript build
-    console.log('Image upload temporarily disabled');
-    event.target.value = '';
-  };
-
-const handleShareProfile = async () => {
-    if (!user) return;
-    
-    try {
-      // First ensure user has username and slug
-      const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
-      
-      if (slugResult.error) {
-        // Show error notification
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
-        errorDiv.innerHTML = `
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>Error generating portfolio link. Please try again.</span>
-          </div>
-        `;
-        document.body.appendChild(errorDiv);
-        setTimeout(() => errorDiv.remove(), 3000);
-        return;
-      }
-      
-      // Refresh profile data to get the new username/slug
-      const updatedProfile = await getUserProfile(user.id);
-      setProfile(updatedProfile);
-      
-      const shareLink = generateShareLink(updatedProfile?.username);
-      console.log('Generated share link:', shareLink); // Debug log
-      console.log('User profile:', updatedProfile); // Debug log
-      if (shareLink) {
-        // Copy to clipboard and show success notification
-        navigator.clipboard.writeText(shareLink).then(() => {
-          // Show success notification
-          const successDiv = document.createElement('div');
-          successDiv.className = 'fixed top-4 right-4 z-50 bg-[#FFD700] text-black px-4 py-3 rounded-lg shadow-lg max-w-sm';
-          successDiv.innerHTML = `
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="font-semibold">Portfolio link copied!</span>
-              </div>
-              <div class="text-xs opacity-80 break-all">${shareLink}</div>
-            </div>
-          `;
-          document.body.appendChild(successDiv);
-          setTimeout(() => successDiv.remove(), 1000);
-        }).catch(() => {
-          // Fallback if clipboard API fails
-          const fallbackDiv = document.createElement('div');
-          fallbackDiv.className = 'fixed top-4 right-4 z-50 bg-[#FFD700] text-black px-4 py-3 rounded-lg shadow-lg max-w-sm';
-          fallbackDiv.innerHTML = `
-            <div class="flex flex-col gap-1">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                </svg>
-                <span class="font-semibold">Copy this link:</span>
-              </div>
-              <div class="text-xs bg-black/10 px-2 py-1 rounded break-all">${shareLink}</div>
-            </div>
-          `;
-          document.body.appendChild(fallbackDiv);
-          setTimeout(() => fallbackDiv.remove(), 1000);
-        });
-      } else {
-        // Show no link available notification
-        const noLinkDiv = document.createElement('div');
-        noLinkDiv.className = 'fixed top-4 right-4 z-50 bg-[#1A1A1A] text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
-        noLinkDiv.innerHTML = `
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>No portfolio link available. Please complete your profile first.</span>
-          </div>
-        `;
-        document.body.appendChild(noLinkDiv);
-        setTimeout(() => noLinkDiv.remove(), 1000);
-      }
-    } catch (error) {
-      console.error('Share profile error:', error);
-      // Show generic error notification
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm';
-      errorDiv.innerHTML = `
-        <div class="flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>Something went wrong. Please try again.</span>
-        </div>
-      `;
-      document.body.appendChild(errorDiv);
-      setTimeout(() => errorDiv.remove(), 1000);
-    }
-  };
-
-  const saveField = async () => {
-    if (!user || !editingField) return;
-    
-    setIsSaving(true);
-    try {
-      // Get current profile to preserve existing data
-      const currentProfile = await getUserProfile(user.id);
-      
-      // Create update data with all existing fields
-      const updateData: UserProfile = {
-        display_name: currentProfile?.display_name || profile?.display_name || '',
-        name: currentProfile?.name || profile?.name,
-        bio: currentProfile?.bio || profile?.bio,
-        skills: currentProfile?.skills || profile?.skills,
-        profile_image: currentProfile?.profile_image || profile?.profile_image,
-        created_at: currentProfile?.created_at || profile?.created_at,
-        email: currentProfile?.email || profile?.email,
-        id: currentProfile?.id || profile?.id,
-        updated_at: new Date().toISOString()
-      };
-      
-      // Only update the field being edited
-      if (editingField === 'name') {
-        updateData.name = editingValue;
-      } else if (editingField === 'professional-name') {
-        updateData.name = editingValue;
-      } else if (editingField === 'bio') {
-        updateData.bio = editingValue;
-      } else if (editingField === 'skills') {
-        // Handle individual skill addition
-        const newSkill = editingValue.trim();
-        if (newSkill && !updateData.skills?.includes(newSkill)) {
-          updateData.skills = [...(updateData.skills || []), newSkill];
-        }
-      }
-      
-      const result = await createOrUpdateUserProfile(
-        user.id,
-        user.email || '',
-        updateData.display_name,
-        updateData.name,
-        updateData.bio,
-        updateData.skills
-      );
-      
-      if (result.error) {
-        console.error('Error updating profile:', result.error);
-      } else {
-        setProfile(result.data);
-        cancelEditing();
-      }
-    } catch (error) {
-      console.error('Error saving profile:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <div className="flex gap-1 mb-4">
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-        </div>
-        <div className="text-[#A0A0A0]">Loading profile...</div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-white">Loading profile...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-white">Please log in to view your profile.</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Profile</h1>
-        <button 
-          onClick={handleShareProfile}
-          className="flex items-center gap-2 px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm transition-colors shadow-sm"
-        >
-          <Share2 className="h-4 w-4" />
-          Share Portfolio
-        </button>
-      </div>
-
-      {/* Profile Card */}
-      <div className="bg-[#0A0A0A] rounded-2xl p-8 border border-[#1A1A1A] shadow-sm">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex flex-col items-center md:items-center">
+    <div className="min-h-screen bg-[#0A0A0A] p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Profile Header */}
+        <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            {/* Profile Image */}
             <div className="relative">
               {profile?.profile_image ? (
                 <img 
-                  src={profile?.profile_image} 
-                  alt="Profile" 
+                  src={profile.profile_image} 
+                  alt={profile.display_name || user.email || 'Profile'} 
                   className="w-32 h-32 rounded-2xl object-cover shadow-lg"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = document.createElement('div');
-                    fallback.className = 'w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold';
-                    fallback.innerHTML = (profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U');
-                    e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
-                  }}
                 />
               ) : (
                 <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
-                  {profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
+                  {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
               <button 
@@ -400,17 +288,18 @@ const handleShareProfile = async () => {
               >
                 <Camera className="h-4 w-4 text-white" />
               </button>
+              <input
+                id="profile-image-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
             </div>
-            <div className="mt-4 md:text-center">
-              <div className="flex items-center md:justify-center gap-2">
-                {/* Hidden file input for image upload */}
-                <input
-                  id="profile-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
+            
+            {/* Profile Info */}
+            <div className="flex-1 text-left">
+              <div className="mb-4">
                 {editingField === 'name' ? (
                   <div className="flex items-center gap-2">
                     <input
@@ -446,101 +335,87 @@ const handleShareProfile = async () => {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <h2 className="text-xl font-bold text-white">
-                      {profile?.name || profile?.display_name || 'User'}
-                    </h2>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-white">
+                      {profile?.display_name || 'Your Name'}
+                    </h1>
                     <button
-                      onClick={() => startEditing('name', profile?.name || '')}
+                      onClick={() => startEditing('name', profile?.display_name || '')}
                       className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                       title="Edit name"
                     >
                       <Edit className="h-4 w-4 text-[#A0A0A0]" />
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
-              <p className="text-[#A0A0A0]">
-                Freelancer
-              </p>
-              <div className="flex items-center md:justify-center gap-1 mt-2">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-500">Verified</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">About</h3>
-                <button
-                  onClick={() => startEditing('bio', profile?.bio || '')}
-                  className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
-                  title="Edit bio"
-                >
-                  <Edit className="h-4 w-4 text-[#A0A0A0]" />
-                </button>
-              </div>
-              {editingField === 'bio' ? (
-                <div className="space-y-3">
-                  <textarea
-                    value={editingValue}
-                    onChange={(e) => setEditingValue(e.target.value)}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
-                    placeholder="Tell us about yourself and your work"
-                    autoFocus
-                  />
-                  <div className="flex gap-2">
+              
+              {/* Bio */}
+              <div className="mb-4">
+                {editingField === 'bio' ? (
+                  <div>
+                    <textarea
+                      value={editingValue}
+                      onChange={(e) => setEditingValue(e.target.value)}
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
+                      placeholder="Tell us about yourself and your work"
+                      autoFocus
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={cancelEditing}
+                        className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={saveField}
+                        disabled={isSaving}
+                        className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {isSaving ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2">
+                    <p className="text-[#A0A0A0] leading-relaxed flex-1">
+                      {profile?.bio || 'No bio added yet. Click the edit icon to add your professional bio.'}
+                    </p>
                     <button
-                      onClick={cancelEditing}
-                      className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
+                      onClick={() => startEditing('bio', profile?.bio || '')}
+                      className="p-1 hover:bg-[#2A2A2A] rounded transition-colors flex-shrink-0"
+                      title="Edit bio"
                     >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={saveField}
-                      disabled={isSaving}
-                      className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50 flex items-center gap-1"
-                    >
-                      {isSaving ? (
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                        </div>
-                      ) : (
-                        <Save className="h-3 w-3" />
-                      )}
-                      {isSaving ? 'Saving...' : 'Save'}
+                      <Edit className="h-4 w-4 text-[#A0A0A0]" />
                     </button>
                   </div>
+                )}
+              </div>
+              
+              {/* Contact Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-[#FFD700]" />
+                  <div>
+                    <p className="text-xs text-[#A0A0A0]">Email</p>
+                    <p className="text-sm text-white">{user?.email || 'No email'}</p>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-[#A0A0A0] leading-relaxed">
-                  {profile?.bio || 'No bio added yet. Click the edit icon to add your professional bio.'}
-                </p>
-              )}
-            </div>
+                
+                <div className="flex items-center gap-3">
+                  <UserCircle className="h-5 w-5 text-[#FFD700]" />
+                  <div>
+                    <p className="text-xs text-[#A0A0A0]">Member Since</p>
+                    <p className="text-sm text-white">
+                      {profile?.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-[#FFD700]" />
-                <div>
-                  <p className="text-xs text-[#A0A0A0]">Email</p>
-                  <p className="text-sm text-white">{user?.email || 'No email'}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <UserCircle className="h-5 w-5 text-[#FFD700]" />
-                <div>
-                  <p className="text-xs text-[#A0A0A0]">Display Name</p>
-                  <p className="text-sm text-white">{profile?.display_name || 'Not set'}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
+              {/* Professional Name */}
+              <div className="flex items-center gap-3 mt-4">
                 <Briefcase className="h-5 w-5 text-[#FFD700]" />
                 <div className="flex-1">
                   <p className="text-xs text-[#A0A0A0]">Professional Name</p>
@@ -550,325 +425,403 @@ const handleShareProfile = async () => {
                         type="text"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        className="bg-[#0B0F19] border border-slate-800 rounded px-2 py-1 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                         placeholder="Enter your professional name"
                         autoFocus
                       />
                       <div className="flex gap-1">
                         <button
                           onClick={cancelEditing}
-                          className="p-1 hover:bg-slate-700 rounded transition-colors"
+                          className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                         >
-                          <X className="h-3 w-3 text-slate-400" />
+                          <X className="h-3 w-3 text-[#A0A0A0]" />
                         </button>
                         <button
                           onClick={saveField}
                           disabled={isSaving}
-                          className="p-1 hover:bg-indigo-600 rounded transition-colors disabled:opacity-50"
+                          className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
                         >
                           {isSaving ? (
                             <div className="flex gap-1">
-                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-1 h-1 bg-white animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                              <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                             </div>
                           ) : (
-                            <Save className="h-3 w-3 text-white" />
+                            <Save className="h-3 w-3 text-black" />
                           )}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-white">{profile?.name || 'Not set'}</p>
+                      <p className="text-sm text-white font-medium">
+                        {profile?.display_name || 'No professional name set'}
+                      </p>
                       <button
-                        onClick={() => startEditing('professional-name', profile?.name || '')}
-                        className="p-1 hover:bg-slate-700 rounded transition-colors"
+                        onClick={() => startEditing('professional-name', profile?.display_name || '')}
+                        className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                         title="Edit professional name"
                       >
-                        <Edit className="h-3 w-3 text-slate-400" />
+                        <Edit className="h-3 w-3 text-[#A0A0A0]" />
                       </button>
                     </div>
                   )}
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <UserCircle className="h-5 w-5 text-[#FFD700]" />
-                <div>
-                  <p className="text-xs text-[#A0A0A0]">Member Since</p>
-                  <p className="text-sm text-white">
-                    {profile?.created_at ? (
-                      <span>{getRelativeTime(profile?.created_at)}</span>
-                    ) : (
-                      <span className="text-[#A0A0A0]">Recently joined</span>
-                    )}
-                  </p>
+
+              {/* Freelancer-specific profile information */}
+              {role === 'freelancer' && freelancerProfile && (
+                <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                    Professional Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs text-[#A0A0A0] mb-1">Hourly Rate</p>
+                      {editingField === 'hourly-rate' ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            placeholder="50"
+                            autoFocus
+                          />
+                          <div className="flex gap-1">
+                            <button
+                              onClick={cancelEditing}
+                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                            >
+                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                            </button>
+                            <button
+                              onClick={saveFreelancerField}
+                              disabled={isSaving}
+                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                            >
+                              <Save className="h-3 w-3 text-black" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-white font-medium">
+                            {freelancerProfile.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
+                          </p>
+                          <button
+                            onClick={() => startEditing('hourly-rate', freelancerProfile.hourly_rate?.toString() || '')}
+                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            title="Edit hourly rate"
+                          >
+                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#A0A0A0] mb-1">Experience Level</p>
+                      {editingField === 'experience-level' ? (
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            autoFocus
+                          >
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="expert">Expert</option>
+                          </select>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={cancelEditing}
+                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                            >
+                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                            </button>
+                            <button
+                              onClick={saveFreelancerField}
+                              disabled={isSaving}
+                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                            >
+                              <Save className="h-3 w-3 text-black" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-white font-medium capitalize">
+                            {freelancerProfile.experience_level || 'Not set'}
+                          </p>
+                          <button
+                            onClick={() => startEditing('experience-level', freelancerProfile.experience_level || '')}
+                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            title="Edit experience level"
+                          >
+                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs text-[#A0A0A0] mb-1">Availability</p>
+                      {editingField === 'availability' ? (
+                        <div className="flex items-center gap-2">
+                          <select
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            autoFocus
+                          >
+                            <option value="available">Available</option>
+                            <option value="busy">Busy</option>
+                            <option value="unavailable">Unavailable</option>
+                          </select>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={cancelEditing}
+                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                            >
+                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                            </button>
+                            <button
+                              onClick={saveFreelancerField}
+                              disabled={isSaving}
+                              className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
+                            >
+                              <Save className="h-3 w-3 text-black" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm text-white font-medium capitalize">
+                            {freelancerProfile.availability || 'Not set'}
+                          </p>
+                          <button
+                            onClick={() => startEditing('availability', freelancerProfile.availability || '')}
+                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            title="Edit availability"
+                          >
+                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {freelancerProfile && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs text-[#A0A0A0]">Skills</p>
+                        <button
+                          onClick={() => startEditing('skills', freelancerProfile.skills?.join(', ') || '')}
+                          className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                          title="Edit skills"
+                        >
+                          <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                        </button>
+                      </div>
+                      {editingField === 'skills' ? (
+                        <div>
+                          <textarea
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-white text-sm placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-24 resize-none"
+                            placeholder="Enter your skills separated by commas (e.g., JavaScript, React, Node.js)"
+                            autoFocus
+                          />
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={cancelEditing}
+                              className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={saveFreelancerField}
+                              disabled={isSaving}
+                              className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50"
+                            >
+                              {isSaving ? 'Saving...' : 'Save Skills'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : freelancerProfile.skills && freelancerProfile.skills.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {freelancerProfile.skills.map((skill: string, index: number) => (
+                            <span 
+                              key={index}
+                              className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[#A0A0A0] text-sm">No skills added yet. Click the edit icon to add your skills.</p>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Skills Section */}
-      <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Skills</h3>
-          <button
-            onClick={() => startEditing('skills', '')}
-            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
-            title="Edit skills"
-          >
-            <Edit className="h-4 w-4 text-[#A0A0A0]" />
-          </button>
-        </div>
-        {editingField === 'skills' ? (
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={editingValue}
-                onChange={(e) => setEditingValue(e.target.value)}
-                className="flex-1 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
-                placeholder="Enter a skill"
-                autoFocus
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    saveField();
-                  }
-                }}
-              />
-              <button
-                onClick={saveField}
-                disabled={isSaving || !editingValue.trim()}
-                className="px-4 py-3 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                  </div>
-                ) : (
-                  <span>Add</span>
-                )}
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {profile?.skills?.map((skill: string, index: number) => (
-                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm group">
-                  <span>{skill}</span>
-                  <button
-                    onClick={() => removeSkill(skill)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-[#A0A0A0] hover:text-red-400"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={cancelEditing}
-              className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
+        {/* Portfolio Section */}
+        <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-white">Portfolio</h2>
+            <button 
+              onClick={() => setShowAddPortfolio(true)}
+              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
             >
-              Done
+              <Plus className="h-4 w-4" /> Add Project
             </button>
           </div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0 ? (
-              profile.skills.map((skill: string, index: number) => (
-                <span key={index} className="px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm">
-                  {skill}
-                </span>
-              ))
-            ) : (
-              <p className="text-[#A0A0A0]">No skills added yet. Click the edit icon to add your professional skills.</p>
-            )}
-          </div>
-        )}
-      </div>
 
-      {/* Portfolio Section */}
-      <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-white">Portfolio</h3>
-          <button 
-            onClick={() => setShowAddPortfolio(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm transition-colors shadow-sm"
-          >
-            <Plus className="h-4 w-4" />
-            Add Project
-          </button>
-        </div>
-        
-        {/* Modal Overlay */}
-        {showAddPortfolio && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#FFD700]/20 rounded-lg flex items-center justify-center">
-                    <Plus className="h-5 w-5 text-[#FFD700]" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-semibold">Add New Project</h4>
-                    <p className="text-[#A0A0A0] text-sm">Showcase your best work</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowAddPortfolio(false);
-                    setNewPortfolio({
-                      title: '',
-                      description: '',
-                      image_url: '',
-                      external_link: ''
-                    });
-                  }}
-                  className="p-2 hover:bg-[#2A2A2A] rounded-lg transition-colors"
-                >
-                  <X className="h-5 w-5 text-[#A0A0A0]" />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-white mb-2">Project Title *</label>
-                  <input
-                    type="text"
-                    value={newPortfolio.title}
-                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
-                    placeholder="Enter project title"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-white mb-2">Description</label>
-                  <textarea
-                    value={newPortfolio.description}
-                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
-                    placeholder="Describe your project, what you built, and your role"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Project Image URL</label>
-                  <input
-                    type="url"
-                    value={newPortfolio.image_url}
-                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">External Link</label>
-                  <input
-                    type="url"
-                    value={newPortfolio.external_link}
-                    onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
-                    placeholder="https://www.project.com"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowAddPortfolio(false);
-                    setNewPortfolio({
-                      title: '',
-                      description: '',
-                      image_url: '',
-                      external_link: ''
-                    });
-                  }}
-                  className="px-6 py-3 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddPortfolio}
-                  disabled={isSaving || !newPortfolio.title?.trim()}
-                  className="px-6 py-3 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
-                >
-                  {isSaving ? (
-                    <div className="flex gap-1">
-                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-4 h-4 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    </div>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4" />
-                      Add Project
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {portfolioItems.length > 0 ? (
-            portfolioItems.map((item) => (
-              <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
-                <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
-                  {item.image_url ? (
-                    <img 
-                      src={item.image_url} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <Briefcase className="h-8 w-8 text-[#FFD700]" />
-                        </div>
-                        <span className="text-[#A0A0A0] text-sm">No Image</span>
-                      </div>
-                    </div>
-                  )}
+          {/* Add Portfolio Modal */}
+          {showAddPortfolio && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-white">Add Portfolio Project</h3>
                   <button
-                    onClick={() => handleDeletePortfolio(item.id!)}
-                    className="absolute top-3 right-3 p-2 bg-red-600/90 backdrop-blur-sm text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 shadow-lg"
+                    onClick={() => setShowAddPortfolio(false)}
+                    className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <X className="h-5 w-5 text-[#A0A0A0]" />
                   </button>
                 </div>
-                <div className="p-5">
-                  <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
-                  <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
-                  {item.external_link && (
-                    <a
-                      href={item.external_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] text-sm transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View Project
-                    </a>
-                  )}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Project Title *</label>
+                    <input
+                      type="text"
+                      value={newPortfolio.title}
+                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                      placeholder="Enter project title"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Description</label>
+                    <textarea
+                      value={newPortfolio.description}
+                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
+                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
+                      placeholder="Describe your project and what you accomplished"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Image URL</label>
+                      <input
+                        type="url"
+                        value={newPortfolio.image_url}
+                        onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Project Link</label>
+                      <input
+                        type="url"
+                        value={newPortfolio.external_link}
+                        onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
+                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        placeholder="https://example.com/project"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full">
-              <div className="text-center py-12 px-6">
-                <div className="w-24 h-24 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#2A2A2A]/50">
-                  <Briefcase className="h-12 w-12 text-[#FFD700]" />
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => setShowAddPortfolio(false)}
+                    className="px-4 py-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddPortfolio}
+                    disabled={isSaving || !newPortfolio.title?.trim()}
+                    className="px-4 py-2 text-sm font-medium text-black bg-[#FFD700] rounded-lg hover:bg-[#FFC700] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSaving ? 'Adding...' : 'Add Project'}
+                  </button>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-3">No Projects Yet</h3>
-                <p className="text-[#A0A0A0] mb-6 max-w-md mx-auto">
-                  Start building your portfolio by adding your first project. Showcase your best work and impress potential clients.
-                </p>
               </div>
             </div>
           )}
+
+          {/* Portfolio Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {portfolioItems.length > 0 ? (
+              portfolioItems.map((item) => (
+                <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
+                  <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                    {item.image_url ? (
+                      <img 
+                        src={item.image_url} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <Briefcase className="h-8 w-8 text-[#FFD700]" />
+                          </div>
+                          <span className="text-[#A0A0A0] text-sm">No Image</span>
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => handleDeletePortfolio(item.id!)}
+                      className="absolute top-3 right-3 p-2 bg-red-600/90 backdrop-blur-sm text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 shadow-lg"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="p-5">
+                    <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
+                    <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                    {item.external_link && (
+                      <a
+                        href={item.external_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] text-sm transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        View Project
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full">
+                <div className="text-center py-12 px-6">
+                  <div className="w-24 h-24 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#2A2A2A]/50">
+                    <Briefcase className="h-12 w-12 text-[#A0A0A0]" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">No Portfolio Projects</h3>
+                  <p className="text-[#A0A0A0] mb-6">Showcase your work by adding portfolio projects to your profile.</p>
+                  <button 
+                    onClick={() => setShowAddPortfolio(true)}
+                    className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
+                  >
+                    <Plus className="h-4 w-4" /> Add Your First Project
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

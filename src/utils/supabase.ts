@@ -109,9 +109,45 @@ export const signUpFreelancer = async (email: string, password: string, displayN
 
     if (profileError) {
       console.error('Error creating freelancer profile:', profileError);
-      // Try to clean up the auth user
-      await supabase.auth.admin.deleteUser(data.user.id);
-      return { data: null, error: { message: 'Failed to create freelancer profile' } };
+      
+      // Handle 409 conflict (user already exists)
+      if (profileError.code === '409' || profileError.message?.includes('duplicate')) {
+        console.log('User profile already exists, proceeding with signup');
+        // Don't fail the signup, just continue
+      } else {
+        // For other errors, try to clean up the auth user (but handle permission issues)
+        try {
+          await supabase.auth.admin.deleteUser(data.user.id);
+        } catch (deleteError) {
+          console.warn('Could not delete auth user (permission issue):', deleteError);
+        }
+        return { data: null, error: { message: 'Failed to create freelancer profile' } };
+      }
+    }
+
+    // Step 3: Create freelancer-specific profile
+    const { error: freelancerProfileError } = await supabase
+      .from('freelancer_profiles')
+      .insert({
+        user_id: data.user.id,
+        hourly_rate: null, // Will be set later by user
+        experience_level: 'beginner', // Default value
+        availability: 'available', // Default value
+        bio: null, // Will be set later by user
+        skills: [], // Empty array initially
+        created_at: new Date().toISOString()
+      });
+
+    if (freelancerProfileError) {
+      console.error('Error creating freelancer-specific profile:', freelancerProfileError);
+      
+      // Handle 409 conflict (freelancer profile already exists)
+      if (freelancerProfileError.code === '409' || freelancerProfileError.message?.includes('duplicate')) {
+        console.log('Freelancer profile already exists, proceeding with signup');
+      } else {
+        // For other errors, log but don't fail the signup
+        console.warn('Freelancer profile creation failed, but basic user profile was created:', freelancerProfileError);
+      }
     }
   }
 
@@ -654,6 +690,25 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 }
 
 // Portfolio items functions
+export const getFreelancerProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('freelancer_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') {
+      console.log('Freelancer profile not found for user:', userId);
+      return null;
+    }
+    console.error('Error fetching freelancer profile:', error);
+    return null;
+  }
+  
+  return data;
+};
+
 export const getPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
   const { data, error } = await supabase
     .from('portfolios')

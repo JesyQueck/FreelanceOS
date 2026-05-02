@@ -60,6 +60,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return cachedRole
     }
 
+    // Clear cache for this user to ensure fresh check
+    setRoleCache(prev => {
+      const newCache = new Map(prev)
+      newCache.delete(userId)
+      return newCache
+    })
+
     try {
       const { supabase } = await import('../utils/supabase')
       
@@ -77,8 +84,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Handle different error cases
       if (error) {
         if (error.code === 'PGRST116') {
-          // User not found in users table - this shouldn't happen but default to freelancer
-          console.log('User not found in users table, defaulting to freelancer')
+          // User not found in users table - users table was cleared
+          console.log('User not found in users table (table cleared), defaulting to freelancer')
+          console.log('User should sign up again to create a proper profile')
+          
+          userRole = 'freelancer'
+        } else if (error.code === '406' || error.message?.includes('406') || error.details?.includes('Not Acceptable')) {
+          // 406 Not Acceptable - likely RLS policy or timing issue after signup
+          console.log('406 error during role detection, defaulting to freelancer (likely just signed up):', error)
           userRole = 'freelancer'
         } else {
           // Other error - default to freelancer
