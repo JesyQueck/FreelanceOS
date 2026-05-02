@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, Send, Paperclip, MoreVertical, ArrowLeft } from "lucide-react";
+import { Search, Send, Paperclip, MoreVertical, ArrowLeft, User, Briefcase } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
 import { supabase } from "../../utils/supabase";
@@ -8,7 +8,7 @@ import NotificationDropdown from "../../components/NotificationDropdown";
 import ToastContainer from "../../components/ToastContainer";
 import { useNotifications } from "../../contexts/NotificationContext";
 
-export default function MessagesPage() {
+export default function ClientMessagesPage() {
   const { user } = useAuth();
   const { addToastNotification } = useNotifications();
   const [searchParams] = useSearchParams();
@@ -33,7 +33,7 @@ export default function MessagesPage() {
     if (!user) return;
 
     const channel = supabase
-      .channel(`messages:${user.id}`)
+      .channel(`client_messages:${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -168,31 +168,26 @@ export default function MessagesPage() {
     return `${diffDays}d ago`;
   };
 
-  const getOtherUser = (conversation: Conversation) => {
-    const isFreelancer = conversation.freelancer_id === user?.id;
-    const userData = isFreelancer ? conversation.client_user : conversation.freelancer_user;
+  const getFreelancerUser = (conversation: Conversation) => {
+    // For clients, we always want to see the freelancer's info
+    const userData = conversation.freelancer_user;
     return userData?.[0] || {};
   };
 
   const getDisplayName = (conversation: Conversation) => {
-    const otherUser = getOtherUser(conversation);
+    const freelancerUser = getFreelancerUser(conversation);
     
-    // If we have user data from the relationship, use it
-    if (otherUser.display_name || otherUser.username) {
-      return otherUser.display_name || otherUser.username;
+    // Use freelancer's display name or username
+    if (freelancerUser.display_name || freelancerUser.username) {
+      return freelancerUser.display_name || freelancerUser.username;
     }
     
-    // For client conversations, use the client_user data
-    if (conversation.client_user && conversation.client_user.length > 0) {
-      return conversation.client_user[0].display_name || 'Client';
-    }
-    
-    return 'Unknown User';
+    return 'Freelancer';
   };
 
   const getInitials = (conversation: Conversation) => {
     const name = getDisplayName(conversation);
-    return name?.substring(0, 2).toUpperCase() || 'UN';
+    return name?.substring(0, 2).toUpperCase() || 'FL';
   };
 
   return (
@@ -215,7 +210,7 @@ export default function MessagesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
             <input
               type="text"
-              placeholder="Search conversations..."
+              placeholder="Search freelancers..."
               className="pl-10 pr-4 py-3 bg-[#0A0A0A]/50 backdrop-blur-sm border border-[#1A1A1A]/50 rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base shadow-sm"
             />
           </div>
@@ -231,7 +226,7 @@ export default function MessagesPage() {
           <div className="p-4 border-b border-[#1A1A1A]/30 bg-gradient-to-r from-[#FFD700]/5 to-transparent">
             <h2 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
               <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-pulse"></div>
-              All Conversations
+              Your Conversations
             </h2>
           </div>
           
@@ -248,13 +243,11 @@ export default function MessagesPage() {
             ) : conversations.length === 0 ? (
               <div className="p-6 text-center text-[#A0A0A0] flex flex-col items-center gap-4">
                 <div className="w-16 h-16 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+                  <Briefcase className="w-8 h-8 text-[#FFD700]" />
                 </div>
                 <div>
                   <h3 className="font-medium text-white mb-1">No conversations yet</h3>
-                  <p className="text-xs">Start by discovering freelancers and sending messages</p>
+                  <p className="text-xs">Discover freelancers and start conversations</p>
                 </div>
               </div>
             ) : (
@@ -314,7 +307,7 @@ export default function MessagesPage() {
                     <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
                     <div className="flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <p className="text-xs text-green-400">Active now</p>
+                      <p className="text-xs text-green-400">Freelancer</p>
                     </div>
                   </div>
                 </div>
@@ -334,7 +327,7 @@ export default function MessagesPage() {
                     </div>
                     <div>
                       <h3 className="font-medium text-white mb-1">Start the conversation!</h3>
-                      <p className="text-xs">Send your first message to connect</p>
+                      <p className="text-xs">Send your first message to connect with this freelancer</p>
                     </div>
                   </div>
                 ) : (
@@ -400,7 +393,10 @@ export default function MessagesPage() {
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-[#A0A0A0]">
-              <p>Select a conversation to start messaging</p>
+              <div className="text-center">
+                <Briefcase className="w-16 h-16 text-[#FFD700] mx-auto mb-4" />
+                <p>Select a conversation to start messaging</p>
+              </div>
             </div>
           )}
         </div>

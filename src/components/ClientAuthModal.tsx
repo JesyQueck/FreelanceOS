@@ -67,7 +67,14 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
       const { data, error } = await signUp(signupData.email, signupData.password)
       
       if (error) {
-        setError(error.message)
+        // Handle common signup errors with user-friendly messages
+        if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+          setError('An account with this email already exists. Please sign in instead.')
+        } else if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
+          setError('This email may already be registered. Please try signing in or use a different email.')
+        } else {
+          setError(error.message)
+        }
       } else if (data.user) {
         // Create client profile using clients table
         const { supabase } = await import('../utils/supabase')

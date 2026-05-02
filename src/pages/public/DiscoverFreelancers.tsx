@@ -31,9 +31,7 @@ export default function DiscoverFreelancers() {
   useEffect(() => {
     const filtered = freelancers.filter(freelancer => 
       freelancer.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      freelancer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      freelancer.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      freelancer.skills?.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+      freelancer.bio?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredFreelancers(filtered);
   }, [searchTerm, freelancers]);
@@ -62,43 +60,49 @@ export default function DiscoverFreelancers() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-[#0A0A0A] to-black flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="flex gap-1 mb-4">
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
-          <div className="text-[#A0A0A0]">Discovering freelancers...</div>
+          <div className="text-[#A0A0A0]">Discovering talented freelancers...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0A0A0A] to-black">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]/50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
+            <div className="bg-gradient-to-br from-[#FFD700] to-[#FFC700] p-1.5 rounded-lg text-black shadow-lg flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
             </div>
-            <span className="font-bold text-sm text-white">Discover</span>
+            <div>
+              <span className="font-bold text-sm text-white">Discover</span>
+              <p className="text-xs text-[#A0A0A0]">Find talented freelancers</p>
+            </div>
           </div>
           <div className="w-9"></div> {/* Spacer for balance */}
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]/50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-[#FFD700] to-[#FFC700] p-1.5 rounded-lg text-black shadow-lg flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
               </div>
-              <span className="font-bold text-white">Discover Freelancers</span>
+              <div>
+                <span className="font-bold text-white">Discover Freelancers</span>
+                <p className="text-xs text-[#A0A0A0]">Find and connect with talented professionals</p>
+              </div>
             </div>
           </div>
         </div>
@@ -116,7 +120,7 @@ export default function DiscoverFreelancers() {
                 placeholder="Search freelancers by name, skills, or expertise..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-12 pr-4 py-4 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                className="w-full bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg pl-12 pr-4 py-4 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent shadow-sm transition-all duration-200"
               />
             </div>
           </div>
@@ -140,49 +144,52 @@ export default function DiscoverFreelancers() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredFreelancers.map((freelancer) => (
-                <div key={freelancer.id} className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm hover:shadow-md hover:border-[#FFD700]/50 transition-all group">
+                <div key={freelancer.id} className="group bg-[#0A0A0A]/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1A1A1A]/50 shadow-sm hover:shadow-xl hover:border-[#FFD700]/50 transition-all duration-300 hover:scale-105">
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="relative">
                       {freelancer.profile_image ? (
                         <img 
                           src={freelancer.profile_image} 
-                          alt={freelancer.display_name || freelancer.name} 
-                          className="w-16 h-16 rounded-xl object-cover"
+                          alt={freelancer.display_name || 'Freelancer'} 
+                          className="w-16 h-16 rounded-xl object-cover shadow-sm group-hover:shadow-md transition-shadow"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-xl bg-[#FFD700] flex items-center justify-center text-black text-xl font-bold">
+                        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#FFC700] flex items-center justify-center text-black text-xl font-bold shadow-sm group-hover:shadow-md transition-shadow">
                           {freelancer.display_name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#FFD700] rounded-full border-2 border-[#0A0A0A]"></div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0A0A0A] animate-pulse"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-semibold truncate">
-                        {freelancer.display_name || freelancer.name}
+                      <h3 className="text-white font-semibold truncate group-hover:text-[#FFD700] transition-colors">
+                        {freelancer.display_name || 'Freelancer'}
                       </h3>
-                      <p className="text-[#A0A0A0] text-sm">Freelancer</p>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <p className="text-[#A0A0A0] text-sm">Available</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Bio */}
+                  {/* Bio Preview */}
                   {freelancer.bio && (
                     <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2 leading-relaxed">
                       {freelancer.bio}
                     </p>
                   )}
 
-                  {/* Skills */}
+                  {/* Skills Preview */}
                   {freelancer.skills && freelancer.skills.length > 0 && (
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-1">
                         {freelancer.skills.slice(0, 3).map((skill, index) => (
-                          <span key={index} className="px-2 py-1 bg-[#1A1A1A] text-white rounded text-xs">
+                          <span key={index} className="px-2 py-1 bg-[#1A1A1A]/50 text-[#FFD700] text-xs rounded-full border border-[#FFD700]/20">
                             {skill}
                           </span>
                         ))}
                         {freelancer.skills.length > 3 && (
-                          <span className="px-2 py-1 bg-[#1A1A1A] text-white rounded text-xs">
+                          <span className="px-2 py-1 bg-[#1A1A1A]/50 text-[#A0A0A0] text-xs rounded-full">
                             +{freelancer.skills.length - 3}
                           </span>
                         )}
@@ -194,14 +201,14 @@ export default function DiscoverFreelancers() {
                   <div className="flex gap-2">
                     <Link
                       to={`/freelancer/${freelancer.username}`}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg transition-colors text-sm"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#1A1A1A]/50 hover:bg-[#2A1A1A]/50 text-white rounded-lg transition-all duration-200 text-sm border border-[#2A2A2A]/50 hover:border-[#FFD700]/30"
                     >
                       <ExternalLink className="h-4 w-4" />
                       View Profile
                     </Link>
                     <button
                       onClick={() => handleMessageFreelancer(freelancer.id!, freelancer.username!)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg transition-colors text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-br from-[#FFD700] to-[#FFC700] hover:from-[#FFC700] hover:to-[#FFD700] text-black rounded-lg transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md hover:scale-105"
                     >
                       <MessageCircle className="h-4 w-4" />
                       Message

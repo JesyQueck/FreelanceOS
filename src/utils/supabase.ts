@@ -666,7 +666,7 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
   // For client conversations, we need to get client info separately
   const conversationsWithClientInfo = await Promise.all(
     (data || []).map(async (conv) => {
-      if (conv.client_id && conv.client_id.startsWith('client-')) {
+      if (conv.client_id) {
         // This is a client conversation, get client info from clients table
         const { data: clientData } = await supabase
           .from('clients')
@@ -954,7 +954,6 @@ export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
       .from('users')
       .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
       .not('display_name', 'is', null)
-      .not('bio', 'is', null)
       .order('created_at', { ascending: false })
       .limit(50);
     
