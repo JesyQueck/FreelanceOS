@@ -53,6 +53,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   
   const determineUserRole = async (userId: string): Promise<'freelancer' | 'client'> => {
+    // Check cache first to prevent repeated requests
+    if (roleCache.has(userId)) {
+      const cachedRole = roleCache.get(userId)!
+      console.log('Using cached role for user', userId, ':', cachedRole)
+      return cachedRole
+    }
+
     try {
       const { supabase } = await import('../utils/supabase')
       
