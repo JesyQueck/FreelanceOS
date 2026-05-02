@@ -54,7 +54,26 @@ export default function SignupPage() {
       
       console.log('Freelancer account created successfully:', authData.user.id);
       
-      // Account and profile created successfully by signUpFreelancer
+      // Check if email confirmation is required (no session)
+      if (!authData.session) {
+        setState({ 
+          message: "Account created! Please check your email to confirm your account, then log in.", 
+          success: true 
+        });
+        setIsPending(false);
+        
+        // Clear redirect info since they'll need to login after confirmation
+        sessionStorage.removeItem('redirectAfterLogin');
+        sessionStorage.removeItem('intendedAction');
+        
+        // Redirect to login page after a delay
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+        return;
+      }
+      
+      // Account and profile created successfully with active session
       setState({ message: "Account created successfully! Redirecting...", success: true });
       
       // Handle post-login redirect
@@ -65,7 +84,7 @@ export default function SignupPage() {
       sessionStorage.removeItem('redirectAfterLogin');
       sessionStorage.removeItem('intendedAction');
       
-      // Redirect after a short delay
+      // Redirect after a short delay to allow auth context to update
       setTimeout(() => {
         if (redirectAfterLogin) {
           if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {

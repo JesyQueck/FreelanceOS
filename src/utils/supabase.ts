@@ -849,7 +849,7 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
     let conversations: any[] = [];
     
     if (role === 'freelancer') {
-      // Freelancer: Get conversations with client info in one query
+      // Freelancer: Get conversations directly, no client table check needed
       const { data, error } = await supabase
         .from('conversations')
         .select(`
@@ -857,12 +857,7 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
           freelancer_id,
           client_id,
           created_at,
-          last_message_at,
-          clients!inner (
-            full_name,
-            email,
-            user_id
-          )
+          last_message_at
         `)
         .eq('freelancer_id', userId)
         .order('last_message_at', { ascending: false });
@@ -872,36 +867,57 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
         return [];
       }
       
+      conversations = data || [];
+      
       // Get freelancer info separately for display
       const { data: freelancerInfo } = await getUserDataSafe(userId, 'username, display_name');
       
-      conversations = data || [];
-      
-      // Format conversations for freelancer side
-      const enrichedConversations = conversations.map((conv) => ({
-        ...conv,
-        freelancer_user: freelancerInfo.exists ? [{
-          username: freelancerInfo.data.username || `freelancer-${userId.substring(0, 8)}`,
-          display_name: freelancerInfo.data.display_name || freelancerInfo.data.username || 'Freelancer'
-        }] : [{
-          username: `freelancer-${userId.substring(0, 8)}`,
-          display_name: 'Freelancer'
-        }],
-        client_user: conv.clients ? [{
-          username: conv.clients.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-          display_name: conv.clients.full_name || 'Client',
-          full_name: conv.clients.full_name,
-          email: conv.clients.email,
-          user_id: conv.clients.user_id
-        }] : []
-      }));
+      // Enrich conversations with client info (only if client_id exists)
+      const enrichedConversations = await Promise.all(
+        conversations.map(async (conv) => {
+          let clientInfo = null;
+          
+          // Only fetch client info if we have a client_id
+          if (conv.client_id) {
+            const { data: clientData } = await supabase
+              .from('clients')
+              .select('full_name, email, user_id')
+              .eq('id', conv.client_id)
+              .single()
+              .catch(() => ({ data: null }));
+            
+            clientInfo = clientData;
+          }
+          
+          return {
+            ...conv,
+            freelancer_user: freelancerInfo.exists ? [{
+              username: freelancerInfo.data.username || `freelancer-${userId.substring(0, 8)}`,
+              display_name: freelancerInfo.data.display_name || freelancerInfo.data.username || 'Freelancer'
+            }] : [{
+              username: `freelancer-${userId.substring(0, 8)}`,
+              display_name: 'Freelancer'
+            }],
+            client_user: clientInfo ? [{
+              username: clientInfo.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+              display_name: clientInfo.full_name || 'Client',
+              full_name: clientInfo.full_name,
+              email: clientInfo.email,
+              user_id: clientInfo.user_id
+            }] : [{
+              username: `client-${conv.client_id?.substring(0, 8) || 'unknown'}`,
+              display_name: 'Unknown Client'
+            }]
+          };
+        })
+      );
       
       // Cache the result
       conversationCache.set(cacheKey, { data: enrichedConversations, timestamp: Date.now() });
       return enrichedConversations;
       
     } else {
-      // Client: First get client ID, then get conversations with freelancer info
+      // Client: First get client ID from clients table
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('id, full_name, email')
@@ -913,7 +929,7 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
         return [];
       }
       
-      // Get conversations with freelancer info in one query
+      // Get conversations with freelancer info
       const { data: convData, error: convError } = await supabase
         .from('conversations')
         .select(`
@@ -921,11 +937,7 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
           freelancer_id,
           client_id,
           created_at,
-          last_message_at,
-          users!inner (
-            username,
-            display_name
-          )
+          last_message_at
         `)
         .eq('client_id', clientData.id)
         .order('last_message_at', { ascending: false });
@@ -935,23 +947,30 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
         return [];
       }
       
-      // Format conversations for client side
-      const enrichedConversations = (convData || []).map((conv) => ({
-        ...conv,
-        freelancer_user: conv.users ? [{
-          username: conv.users.username,
-          display_name: conv.users.display_name || conv.users.username
-        }] : [{
-          username: `freelancer-${conv.freelancer_id.substring(0, 8)}`,
-          display_name: 'Unknown Freelancer'
-        }],
-        client_user: [{
-          username: clientData.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-          display_name: clientData.full_name || 'Client',
-          full_name: clientData.full_name,
-          email: clientData.email
-        }]
-      }));
+      // Enrich conversations with freelancer info
+      const enrichedConversations = await Promise.all(
+        (convData || []).map(async (conv) => {
+          // Get freelancer info from users table
+          const { data: freelancerData } = await getUserDataSafe(conv.freelancer_id, 'username, display_name');
+          
+          return {
+            ...conv,
+            freelancer_user: freelancerData.exists ? [{
+              username: freelancerData.data.username,
+              display_name: freelancerData.data.display_name || freelancerData.data.username
+            }] : [{
+              username: `freelancer-${conv.freelancer_id.substring(0, 8)}`,
+              display_name: 'Unknown Freelancer'
+            }],
+            client_user: [{
+              username: clientData.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+              display_name: clientData.full_name || 'Client',
+              full_name: clientData.full_name,
+              email: clientData.email
+            }]
+          };
+        })
+      );
       
       // Cache the result
       conversationCache.set(cacheKey, { data: enrichedConversations, timestamp: Date.now() });

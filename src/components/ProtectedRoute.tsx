@@ -4,10 +4,11 @@ import { useAuth } from '../contexts/AuthContext'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
+  requiredRole?: 'freelancer' | 'client'
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth()
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+  const { user, loading, role } = useAuth()
 
   if (loading) {
     return (
@@ -18,10 +19,33 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
+    // Redirect to appropriate login based on required role
+    if (requiredRole === 'client') {
+      return <Navigate to="/client-login" replace />
+    }
     return <Navigate to="/login" replace />
+  }
+
+  // Check if user has required role
+  if (requiredRole && role !== requiredRole) {
+    // Redirect to appropriate login for the required role
+    if (requiredRole === 'freelancer') {
+      return <Navigate to="/login" replace />
+    } else if (requiredRole === 'client') {
+      return <Navigate to="/client-login" replace />
+    }
   }
 
   return <>{children}</>
 }
+
+// Role-specific protected routes
+export const FreelancerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute requiredRole="freelancer">{children}</ProtectedRoute>
+)
+
+export const ClientRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ProtectedRoute requiredRole="client">{children}</ProtectedRoute>
+)
 
 export default ProtectedRoute

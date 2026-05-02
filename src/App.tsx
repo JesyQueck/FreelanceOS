@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './styles/globals.css'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
-import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedRoute, { FreelancerRoute, ClientRoute } from './components/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -15,6 +15,7 @@ import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import RoleBasedMessages from './components/RoleBasedMessages'
 import SettingsPage from './pages/dashboard/SettingsPage'
+import ClientMessagesPage from './pages/messages/ClientMessagesPage'
 import PublicFreelancerProfile from './pages/public/PublicFreelancerProfile'
 import DiscoverFreelancers from './pages/public/DiscoverFreelancers'
 
@@ -43,9 +44,9 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/dashboard" element={
-                <ProtectedRoute>
+                <FreelancerRoute>
                   <DashboardLayout />
-                </ProtectedRoute>
+                </FreelancerRoute>
               }>
                 <Route index element={<DashboardPage />} />
                 <Route path="profile" element={<ProfilePage />} />
@@ -54,6 +55,13 @@ function App() {
                 <Route path="messages" element={<RoleBasedMessages />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
+              
+              {/* Client Dashboard - uses ClientMessagesPage as main interface */}
+              <Route path="/client-dashboard" element={
+                <ClientRoute>
+                  <ClientMessagesPage />
+                </ClientRoute>
+              } />
             </Routes>
           </Router>
         </NotificationProvider>

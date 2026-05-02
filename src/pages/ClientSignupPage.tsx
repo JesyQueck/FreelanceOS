@@ -71,8 +71,8 @@ export default function ClientSignupPage() {
             navigate(redirectAfterLogin)
           }
         } else {
-          // Default redirect to messages for clients
-          navigate('/messages')
+          // Default redirect to client dashboard
+          navigate('/client-dashboard')
         }
       }
     } catch (err) {

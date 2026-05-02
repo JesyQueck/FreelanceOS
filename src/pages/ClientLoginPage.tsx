@@ -16,7 +16,7 @@ export default function ClientLoginPage() {
 
   // Redirect if already logged in
   if (user) {
-    navigate('/messages')
+    navigate('/client-dashboard')
     return null
   }
 
@@ -54,8 +54,8 @@ export default function ClientLoginPage() {
             navigate(redirectAfterLogin)
           }
         } else {
-          // Default redirect to messages for clients
-          navigate('/messages')
+          // Default redirect to client dashboard
+          navigate('/client-dashboard')
         }
       }
     } catch (err) {
