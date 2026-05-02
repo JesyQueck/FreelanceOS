@@ -5,7 +5,7 @@ import { getAllPublicFreelancers, checkOrCreateConversation, UserProfile } from 
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function DiscoverFreelancers() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [freelancers, setFreelancers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +45,7 @@ export default function DiscoverFreelancers() {
     }
 
     // Check if user has client role using unified system
-    if (user.role !== 'client') {
+    if (role !== 'client') {
       // Store freelancer_id temporarily and redirect to client login
       localStorage.setItem('pending_freelancer_id', freelancerId);
       window.location.href = '/client-login';

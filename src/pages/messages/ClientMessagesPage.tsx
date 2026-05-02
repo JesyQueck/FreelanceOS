@@ -21,17 +21,38 @@ import ToastContainer from "../../components/ToastContainer";
 import { useNotifications } from "../../contexts/NotificationContext";
 
 export default function ClientMessagesPage() {
-  const { user } = useAuth();
+  const { user, role, loading } = useAuth();
   const { addToastNotification } = useNotifications();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const conversationIdParam = searchParams.get('conversation');
+
+  // Redirect if not a client
+  useEffect(() => {
+    if (!loading && role !== 'client') {
+      navigate('/login');
+    }
+  }, [role, loading, navigate]);
+
+  // Show loading while determining role
+  if (loading || role === null) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  // Don't render if role is not client
+  if (role !== 'client') {
+    return null;
+  }
   
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [conversationsLoading, setConversationsLoading] = useState(true);
   const [messageInput, setMessageInput] = useState('');
   const [sending, setSending] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -51,9 +72,9 @@ export default function ClientMessagesPage() {
       }
 
       try {
-        // For clients, fetch data from clients table
+        // For clients, fetch data from client_profiles table
         const { data, error } = await supabase
-          .from('clients')
+          .from('client_profiles')
           .select('full_name, email')
           .eq('user_id', user.id)
           .single() as { data: { full_name?: string; email?: string } | null; error: any };
@@ -169,7 +190,7 @@ export default function ClientMessagesPage() {
                   
                   // Clear the URL parameter
                   window.history.replaceState({}, '', '/messages');
-                  setLoading(false);
+                  setConversationsLoading(false);
                   return;
                 }
               }
@@ -197,7 +218,7 @@ export default function ClientMessagesPage() {
         } catch (error) {
           console.error('Error fetching client conversations:', error);
         } finally {
-          setLoading(false);
+          setConversationsLoading(false);
         }
       }
     };
@@ -449,7 +470,7 @@ const handleSelectConversation = (conversation: Conversation) => {
             </div>
             
             <div className="flex-1 overflow-y-auto">
-              {loading ? (
+              {conversationsLoading ? (
                 <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
               ) : conversations.length === 0 ? (
                 <div className="p-6 text-center text-[#A0A0A0]">No conversations yet. Start a conversation with a freelancer!</div>

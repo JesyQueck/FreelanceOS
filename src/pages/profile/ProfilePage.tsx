@@ -51,22 +51,41 @@ export default function ProfilePage() {
     const fetchProfileData = async () => {
       if (user) {
         try {
-          // First ensure user has username and slug
-          const slugResult = await ensureUserHasSlug(user.id, profile?.display_name, user.email || '');
+          // Clear any cached data to ensure fresh fetch
+          const { supabase } = await import('../../utils/supabase');
           
-          if (slugResult.error) {
-            console.error('Error ensuring user has slug:', slugResult.error);
+          // First fetch profile data directly without cache
+          const { data: profileData, error: profileError } = await supabase
+            .from('users')
+            .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug, role')
+            .eq('id', user.id)
+            .single() as { data: UserProfile | null; error: any };
+          
+          if (profileError) {
+            console.error('Error fetching profile data:', profileError);
+            setProfile(null);
+          } else if (profileData) {
+            setProfile(profileData);
+            
+            // Ensure user has username and slug if missing
+            if (!profileData.username || !profileData.slug) {
+              const slugResult = await ensureUserHasSlug(user.id, profileData.display_name, user.email || '');
+              
+              if (slugResult.error) {
+                console.error('Error ensuring user has slug:', slugResult.error);
+              }
+            }
+          } else {
+            setProfile(null);
           }
           
-          // Then fetch profile data
-          const [profileData, portfolioData] = await Promise.all([
-            getUserProfile(user.id),
-            getPortfolioItems(user.id)
-          ]);
-          setProfile(profileData);
+          // Fetch portfolio items
+          const portfolioData = await getPortfolioItems(user.id);
           setPortfolioItems(portfolioData);
+          
         } catch (error) {
           console.error('Error fetching profile data:', error);
+          setProfile(null);
         } finally {
           setLoading(false);
         }

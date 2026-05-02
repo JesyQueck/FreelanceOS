@@ -7,7 +7,7 @@ import ClientAuthModal from '../../components/ClientAuthModal';
 
 export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   
@@ -88,7 +88,7 @@ export default function PublicFreelancerProfile() {
     }
 
     // Check if user has client role using unified system
-    if (user.role !== 'client') {
+    if (role !== 'client') {
       // Store freelancer_id temporarily and show client auth modal
       localStorage.setItem('pending_freelancer_id', profile?.id || '');
       setShowClientAuthModal(true);

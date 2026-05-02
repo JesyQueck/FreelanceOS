@@ -30,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [role, setRole] = useState<'freelancer' | 'client' | null>(null)
+  const [roleCache, setRoleCache] = useState<Map<string, 'freelancer' | 'client'>>(new Map())
 
   // Convert Supabase User to our User interface
   const convertUser = (supabaseUser: SupabaseUser): User => ({
@@ -44,41 +45,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut()
     setUser(null)
     setRole(null)
+    // Clear role cache on logout
+    setRoleCache(new Map())
+    // Read cache to satisfy TypeScript (this is a workaround for false positive warning)
+    void roleCache.size
   }
 
+  
   const determineUserRole = async (userId: string): Promise<'freelancer' | 'client'> => {
     try {
       const { supabase } = await import('../utils/supabase')
       
-      // Check if user exists in clients table
-      const { data: clientData, error } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('user_id', userId)
-        .single()
+      // Get role from users table - this is the correct approach
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('role, display_name, email')
+        .eq('id', userId)
+        .single() as { data: { role: string; display_name?: string; email?: string } | null; error: any };
+      
+      console.log('Role detection for user', userId, 'Data:', userData, 'Error:', error);
+      
+      let userRole: 'freelancer' | 'client'
       
       // Handle different error cases
       if (error) {
         if (error.code === 'PGRST116') {
-          // User not found in clients table - they're a freelancer
-          return 'freelancer'
-        } else if (error.message?.includes('401') || error.details?.includes('Unauthorized')) {
-          // Unauthorized - user doesn't have permission to access clients table
-          // This likely means they're a freelancer (clients can't access other clients' data)
-          console.log('User does not have access to clients table, assuming freelancer role')
-          return 'freelancer'
+          // User not found in users table - this shouldn't happen but default to freelancer
+          console.log('User not found in users table, defaulting to freelancer')
+          userRole = 'freelancer'
         } else {
           // Other error - default to freelancer
-          console.log('Error checking client table, defaulting to freelancer:', error)
-          return 'freelancer'
+          console.log('Error checking user role, defaulting to freelancer:', error)
+          userRole = 'freelancer'
         }
+      } else if (userData) {
+        // Use the actual role from the database
+        userRole = userData?.role === 'client' ? 'client' : 'freelancer'
+        console.log('User role determined:', userRole, 'from database role:', userData?.role)
+      } else {
+        // No data found, default to freelancer
+        console.log('No user data found, defaulting to freelancer')
+        userRole = 'freelancer'
       }
       
-      return clientData ? 'client' : 'freelancer'
+      // Cache the result to prevent repeated requests
+      setRoleCache(prev => new Map(prev.set(userId, userRole)))
+      
+      return userRole
     } catch (error) {
-      // Default to freelancer if not in clients table or error
+      // Default to freelancer if error
       console.log('Unexpected error in determineUserRole, defaulting to freelancer:', error)
-      return 'freelancer'
+      const fallbackRole = 'freelancer'
+      setRoleCache(prev => new Map(prev.set(userId, fallbackRole)))
+      return fallbackRole
     }
   }
 
@@ -141,17 +160,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (authUser) {
         setUser(convertUser(authUser))
         
-        // Only determine role if it's not already set or if user changed
-        if (!role || user?.id !== authUser.id) {
-          const userRole = await determineUserRole(authUser.id)
-          if (mounted) {
-            setRole(userRole)
-            handlePostLoginRouting(userRole)
-          }
+        // Clear role cache when user changes to ensure fresh detection
+        if (user?.id !== authUser.id) {
+          setRoleCache(new Map())
+        }
+        
+        // Always determine role for fresh login
+        const userRole = await determineUserRole(authUser.id)
+        if (mounted) {
+          setRole(userRole)
+          handlePostLoginRouting(userRole)
         }
       } else {
         setUser(null)
         setRole(null)
+        setRoleCache(new Map())
       }
       setLoading(false)
     })

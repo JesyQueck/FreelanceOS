@@ -90,14 +90,20 @@ export const signUpFreelancer = async (email: string, password: string, displayN
     return { data, error: null };
   }
 
-  // Step 2: Create freelancer profile in users table with role
+  // Step 2: Create freelancer profile in users table
   if (data.user && data.session) {
+    // Generate username and slug from display name
+    const username = displayName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    const slug = username;
+    
     const { error: profileError } = await supabase
       .from('users')
       .insert({
         id: data.user.id,
         display_name: displayName,
         email: email,
+        username: username,
+        slug: slug,
         role: 'freelancer'
       });
 
@@ -135,14 +141,20 @@ export const signUpClient = async (email: string, password: string, fullName: st
     return { data, error: null };
   }
 
-  // Step 2: Create client profile in unified users table with role
+  // Step 2: Create client profile in users table
   if (data.user && data.session) {
+    // Generate username and slug from full name
+    const username = fullName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    const slug = username;
+    
     const { error: profileError } = await supabase
       .from('users')
       .insert({
         id: data.user.id,
         display_name: fullName,
         email: email,
+        username: username,
+        slug: slug,
         role: 'client'
       });
 
@@ -916,7 +928,7 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
             let clientData = null;
             try {
               const result = await supabase
-                .from('clients')
+                .from('client_profiles')
                 .select('full_name, email, user_id')
                 .eq('id', conv.client_id)
                 .single();
@@ -957,9 +969,9 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
       return enrichedConversations;
       
     } else {
-      // Client: First get client ID from clients table
+      // Client: First get client ID from client_profiles table
       const { data: clientData, error: clientError } = await supabase
-        .from('clients')
+        .from('client_profiles')
         .select('id, full_name, email')
         .eq('user_id', userId)
         .single();
