@@ -5,6 +5,32 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!
 
 export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
 
+// Request debouncing to prevent concurrent requests
+const pendingRequests = new Map<string, Promise<any>>();
+
+export const withRequestLock = async <T>(
+  key: string,
+  requestFn: () => Promise<T>
+): Promise<T> => {
+  // Check if there's already a pending request with the same key
+  if (pendingRequests.has(key)) {
+    console.log(`Waiting for existing request: ${key}`);
+    return pendingRequests.get(key) as Promise<T>;
+  }
+
+  // Create new request
+  const request = requestFn()
+    .finally(() => {
+      // Clean up after request completes
+      pendingRequests.delete(key);
+    });
+
+  // Store the pending request
+  pendingRequests.set(key, request);
+
+  return request;
+};
+
 export const createClient = () => {
   return supabase
 }
@@ -124,25 +150,27 @@ export const signOut = async () => {
 }
 
 export const getCurrentUser = async () => {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) {
-      // Handle lock timeout and other errors gracefully
-      if (error.message.includes('Lock') || error.message.includes('stolen')) {
-        console.warn('Supabase lock timeout, retrying...');
-        // Retry once after a short delay
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const retry = await supabase.auth.getUser();
-        return retry.data?.user || null;
+  return withRequestLock('getCurrentUser', async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        // Handle lock timeout and other errors gracefully
+        if (error.message.includes('Lock') || error.message.includes('stolen')) {
+          console.warn('Supabase lock timeout, retrying...');
+          // Retry once after a short delay
+          await new Promise(resolve => setTimeout(resolve, 100));
+          const retry = await supabase.auth.getUser();
+          return retry.data?.user || null;
+        }
+        console.error('Error getting current user:', error);
+        return null;
       }
-      console.error('Error getting current user:', error);
+      return user;
+    } catch (error) {
+      console.error('Unexpected error getting current user:', error);
       return null;
     }
-    return user;
-  } catch (error) {
-    console.error('Unexpected error getting current user:', error);
-    return null;
-  }
+  });
 }
 
 export const onAuthStateChange = (callback: (user: any) => void) => {
@@ -152,25 +180,27 @@ export const onAuthStateChange = (callback: (user: any) => void) => {
 }
 
 export const getUser = async () => {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) {
-      // Handle lock timeout and other errors gracefully
-      if (error.message.includes('Lock') || error.message.includes('stolen')) {
-        console.warn('Supabase lock timeout in getUser, retrying...');
-        // Retry once after a short delay
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const retry = await supabase.auth.getUser();
-        return retry.data?.user || null;
+  return withRequestLock('getUser', async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        // Handle lock timeout and other errors gracefully
+        if (error.message.includes('Lock') || error.message.includes('stolen')) {
+          console.warn('Supabase lock timeout in getUser, retrying...');
+          // Retry once after a short delay
+          await new Promise(resolve => setTimeout(resolve, 100));
+          const retry = await supabase.auth.getUser();
+          return retry.data?.user || null;
+        }
+        console.error('Error in getUser:', error);
+        return null;
       }
-      console.error('Error in getUser:', error);
+      return user;
+    } catch (error) {
+      console.error('Unexpected error in getUser:', error);
       return null;
     }
-    return user;
-  } catch (error) {
-    console.error('Unexpected error in getUser:', error);
-    return null;
-  }
+  });
 }
 
 // TypeScript interface for user profile
@@ -496,7 +526,6 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
 
 // Cache for user profiles to prevent concurrent requests
 const userProfileCache = new Map<string, Promise<UserProfile | null>>();
-const pendingRequests = new Map<string, Promise<UserProfile | null>>();
 
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   
@@ -1242,35 +1271,37 @@ const formatTimeAgo = (dateString: string) => {
 
 // Public profile functions for freelancer discovery
 export const getPublicUserProfile = async (username: string): Promise<UserProfile | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
-      .eq('username', username)
-      .single();
-    
-    if (error) {
-      // Handle lock timeout and other errors gracefully
-      if (error.message.includes('Lock') || error.message.includes('stolen')) {
-        console.warn('Supabase lock timeout in getPublicUserProfile, retrying...');
-        // Retry once after a short delay
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const retry = await supabase
-          .from('users')
-          .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
-          .eq('username', username)
-          .single();
-        return retry.data || null;
+  return withRequestLock(`getPublicUserProfile:${username}`, async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
+        .eq('username', username)
+        .single();
+      
+      if (error) {
+        // Handle lock timeout and other errors gracefully
+        if (error.message.includes('Lock') || error.message.includes('stolen')) {
+          console.warn('Supabase lock timeout in getPublicUserProfile, retrying...');
+          // Retry once after a short delay
+          await new Promise(resolve => setTimeout(resolve, 100));
+          const retry = await supabase
+            .from('users')
+            .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
+            .eq('username', username)
+            .single();
+          return retry.data || null;
+        }
+        console.error('Error fetching public user profile:', error);
+        return null;
       }
-      console.error('Error fetching public user profile:', error);
+      
+      return data;
+    } catch (error) {
+      console.error('Unexpected error in getPublicUserProfile:', error);
       return null;
     }
-    
-    return data;
-  } catch (error) {
-    console.error('Unexpected error in getPublicUserProfile:', error);
-    return null;
-  }
+  });
 };
 
 export const getPublicPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
@@ -1338,14 +1369,28 @@ export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
 // Conversation logic for client-freelancer messaging
 export const checkOrCreateConversation = async (userId1: string, userId2: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
   try {
-    // First check if conversation already exists (try both directions)
+    // Get the client ID for userId1 (assuming userId1 is the client)
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('user_id', userId1)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('Error getting client data:', clientError);
+      return { success: false, error: 'Client not found' };
+    }
+
+    const clientId = clientData.id;
+
+    // First check if conversation already exists
     let existingConversation = null;
 
-    // Try direction 1: user1 as client, user2 as freelancer
+    // Check if conversation already exists with proper client_id
     const { data: conversation1, error: error1 } = await supabase
       .from('conversations')
       .select('id')
-      .eq('client_id', userId1)
+      .eq('client_id', clientId)
       .eq('freelancer_id', userId2)
       .single();
 
@@ -1386,7 +1431,7 @@ export const checkOrCreateConversation = async (userId1: string, userId2: string
       const { data: createdNew, error: createdNewError } = await supabase
         .from('conversations')
         .insert({
-          client_id: userId1,
+          client_id: clientId,
           freelancer_id: userId2
         })
         .select('id')
@@ -1407,7 +1452,7 @@ export const checkOrCreateConversation = async (userId1: string, userId2: string
         const { data: createdOld, error: createdOldError } = await supabase
           .from('conversations')
           .insert({
-            client_id: userId1,
+            client_id: clientId,
             freelancer_id: userId2,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()

@@ -134,6 +134,53 @@ export default function ClientMessagesPage() {
     const fetchConversations = async () => {
       if (user) {
         try {
+          // Check for direct message parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const freelancerUsername = urlParams.get('freelancer');
+          
+          if (freelancerUsername) {
+            // Direct message flow - create conversation with freelancer
+            const { getPublicUserProfile, checkOrCreateConversation } = await import('../utils/supabase');
+            
+            try {
+              const profile = await getPublicUserProfile(freelancerUsername);
+              if (profile) {
+                const result = await checkOrCreateConversation(user.id, profile.id!);
+                if (result.success && result.conversationId) {
+                  // Create a temporary conversation object for immediate display
+                  const tempConversation = {
+                    id: result.conversationId,
+                    freelancer_id: profile.id!,
+                    client_id: '', // Will be filled by the actual client ID
+                    created_at: new Date().toISOString(),
+                    last_message_at: new Date().toISOString(),
+                    freelancer_user: [{
+                      username: profile.username,
+                      display_name: profile.display_name || profile.username
+                    }],
+                    client_user: []
+                  };
+                  
+                  setConversations([tempConversation]);
+                  setSelectedConversation(tempConversation);
+                  setShowChat(true);
+                  
+                  // Fetch messages (should be empty for new conversation)
+                  const messagesData = await getMessages(result.conversationId);
+                  setMessages(messagesData);
+                  
+                  // Clear the URL parameter
+                  window.history.replaceState({}, '', '/messages');
+                  setLoading(false);
+                  return;
+                }
+              }
+            } catch (error) {
+              console.error('Error creating direct message conversation:', error);
+            }
+          }
+          
+          // Normal conversation loading
           const conversationsData = await getClientConversations(user.id);
           setConversations(conversationsData);
           if (conversationsData.length > 0) {
