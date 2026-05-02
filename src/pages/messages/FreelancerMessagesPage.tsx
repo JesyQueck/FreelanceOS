@@ -171,10 +171,13 @@ export default function FreelancerMessagesPage() {
   const getDisplayName = (conversation: Conversation) => {
     // For freelancer messages, always show client info
     if (conversation.client_user && conversation.client_user.length > 0) {
-      return conversation.client_user[0].display_name || conversation.client_user[0].username || 'Client';
+      const client = conversation.client_user[0];
+      return client.display_name || 
+             (client as any).full_name || 
+             client.username || 
+             'Client';
     }
-    
-    return 'Client';
+    return 'Unknown Client';
   };
 
   const getInitials = (conversation: Conversation) => {

@@ -232,20 +232,7 @@ export default function ClientMessagesPage() {
     }
   };
 
-  const handleSelectConversation = (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    setShowChat(true);
-    const loadMessages = async () => {
-      try {
-        const messagesData = await getMessages(conversation.id!);
-        setMessages(messagesData);
-      } catch (error) {
-        console.error('Error loading messages:', error);
-      }
-    };
-    loadMessages();
-  };
-
+  
   const handleBackToList = () => {
     setShowChat(false);
   };
@@ -294,16 +281,32 @@ export default function ClientMessagesPage() {
   const getDisplayName = (conversation: Conversation) => {
     // For client messages, always show freelancer info
     if (conversation.freelancer_user && conversation.freelancer_user.length > 0) {
-      return conversation.freelancer_user[0].display_name || conversation.freelancer_user[0].username || 'Freelancer';
+      const freelancer = conversation.freelancer_user[0];
+      return freelancer.display_name || freelancer.username || 'Freelancer';
     }
-    
-    return 'Freelancer';
+    return 'Unknown Freelancer';
   };
 
   const getInitials = (conversation: Conversation) => {
     const name = getDisplayName(conversation);
     return name?.substring(0, 2).toUpperCase() || 'FL';
   };
+
+const handleSelectConversation = (conversation: Conversation) => {
+  setSelectedConversation(conversation);
+  setShowChat(true);
+  
+  const loadMessages = async () => {
+    try {
+      const messagesData = await getMessages(conversation.id!);
+      setMessages(messagesData);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+  
+  loadMessages();
+};
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">

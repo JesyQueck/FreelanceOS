@@ -537,11 +537,56 @@ export const ensureUserHasSlug = async (userId: string, displayName?: string, em
   }
 }
 
+// Global cache for user data to prevent all repeated requests
+const globalUserCache = new Map<string, { data: any, exists: boolean, timestamp: number }>();
+const USER_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
 // Cache for user profiles to prevent concurrent requests
 const userProfileCache = new Map<string, Promise<UserProfile | null>>();
 
-export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
+// Universal user data fetcher with global cache
+export const getUserDataSafe = async (userId: string, selectFields = 'display_name, email'): Promise<{ data: any, exists: boolean }> => {
+  // Check global cache first
+  const cached = globalUserCache.get(userId);
+  if (cached && Date.now() - cached.timestamp < USER_CACHE_DURATION) {
+    return { data: cached.data, exists: cached.exists };
+  }
   
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select(selectFields)
+      .eq('id', userId)
+      .single();
+    
+    const exists = !error && data !== null;
+    const result = { data: exists ? data : null, exists };
+    
+    // Cache the result (even if user doesn't exist)
+    globalUserCache.set(userId, { 
+      data: exists ? data : null, 
+      exists, 
+      timestamp: Date.now() 
+    });
+    
+    if (!exists && error?.code === 'PGRST116') {
+      // Silent handling of missing user
+      return result;
+    }
+    
+    return result;
+  } catch (error) {
+    // Cache the failure to prevent repeated attempts
+    globalUserCache.set(userId, { 
+      data: null, 
+      exists: false, 
+      timestamp: Date.now() 
+    });
+    return { data: null, exists: false };
+  }
+};
+
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   // Check if there's already a pending request for this user
   if (pendingRequests.has(userId)) {
     return pendingRequests.get(userId)!;
@@ -552,37 +597,14 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     return userProfileCache.get(userId)!;
   }
   
-  // Create new request promise
-  const requestPromise = (async () => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
-        .eq('id', userId)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      } else {
-        return data;
-      }
-    } catch (error) {
-      console.error('Unexpected error in getUserProfile:', error);
-      return null;
-    } finally {
-      // Clean up pending request
-      pendingRequests.delete(userId);
-    }
-  })();
+  // Use the safe user data fetcher
+  const { data, exists } = await getUserDataSafe(userId, 'display_name, bio, profile_image, created_at, id, updated_at, username, slug');
   
-  // Store pending request
-  pendingRequests.set(userId, requestPromise);
+  // Cache both successful and null results to prevent repeated requests
+  const result = exists ? data : null;
+  userProfileCache.set(userId, Promise.resolve(result));
   
-  // Cache the result
-  userProfileCache.set(userId, requestPromise);
-  
-  return requestPromise;
+  return result;
 }
 
 // Portfolio items functions
@@ -810,130 +832,141 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
 };
 
 // Messaging CRUD functions
-export const getClientConversations = async (userId: string): Promise<Conversation[]> => {
+// Optimized conversation handler for complete database structure
+const conversationCache = new Map<string, { data: Conversation[], timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+export const getConversationsByRole = async (userId: string, role: 'freelancer' | 'client'): Promise<Conversation[]> => {
+  const cacheKey = `${userId}-${role}`;
+  const cached = conversationCache.get(cacheKey);
+  
+  // Return cached data if still valid
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  
   try {
-    // First get the client's ID from the clients table
-    const { data: clientData, error: clientError } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('user_id', userId)
-      .single();
+    let conversations: any[] = [];
     
-    if (clientError || !clientData) {
-      console.error('Error fetching client ID:', clientError);
-      return [];
+    if (role === 'freelancer') {
+      // Freelancer: Get conversations with client info in one query
+      const { data, error } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          freelancer_id,
+          client_id,
+          created_at,
+          last_message_at,
+          clients!inner (
+            full_name,
+            email,
+            user_id
+          )
+        `)
+        .eq('freelancer_id', userId)
+        .order('last_message_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching freelancer conversations:', error);
+        return [];
+      }
+      
+      // Get freelancer info separately for display
+      const { data: freelancerInfo } = await getUserDataSafe(userId, 'username, display_name');
+      
+      conversations = data || [];
+      
+      // Format conversations for freelancer side
+      const enrichedConversations = conversations.map((conv) => ({
+        ...conv,
+        freelancer_user: freelancerInfo.exists ? [{
+          username: freelancerInfo.data.username || `freelancer-${userId.substring(0, 8)}`,
+          display_name: freelancerInfo.data.display_name || freelancerInfo.data.username || 'Freelancer'
+        }] : [{
+          username: `freelancer-${userId.substring(0, 8)}`,
+          display_name: 'Freelancer'
+        }],
+        client_user: conv.clients ? [{
+          username: conv.clients.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+          display_name: conv.clients.full_name || 'Client',
+          full_name: conv.clients.full_name,
+          email: conv.clients.email,
+          user_id: conv.clients.user_id
+        }] : []
+      }));
+      
+      // Cache the result
+      conversationCache.set(cacheKey, { data: enrichedConversations, timestamp: Date.now() });
+      return enrichedConversations;
+      
+    } else {
+      // Client: First get client ID, then get conversations with freelancer info
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('id, full_name, email')
+        .eq('user_id', userId)
+        .single();
+      
+      if (clientError || !clientData) {
+        console.log('Client not found for user:', userId);
+        return [];
+      }
+      
+      // Get conversations with freelancer info in one query
+      const { data: convData, error: convError } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          freelancer_id,
+          client_id,
+          created_at,
+          last_message_at,
+          users!inner (
+            username,
+            display_name
+          )
+        `)
+        .eq('client_id', clientData.id)
+        .order('last_message_at', { ascending: false });
+      
+      if (convError) {
+        console.error('Error fetching client conversations:', convError);
+        return [];
+      }
+      
+      // Format conversations for client side
+      const enrichedConversations = (convData || []).map((conv) => ({
+        ...conv,
+        freelancer_user: conv.users ? [{
+          username: conv.users.username,
+          display_name: conv.users.display_name || conv.users.username
+        }] : [{
+          username: `freelancer-${conv.freelancer_id.substring(0, 8)}`,
+          display_name: 'Unknown Freelancer'
+        }],
+        client_user: [{
+          username: clientData.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+          display_name: clientData.full_name || 'Client',
+          full_name: clientData.full_name,
+          email: clientData.email
+        }]
+      }));
+      
+      // Cache the result
+      conversationCache.set(cacheKey, { data: enrichedConversations, timestamp: Date.now() });
+      return enrichedConversations;
     }
-    
-    // Then get conversations using the client ID
-    const { data: conversations, error } = await supabase
-      .from('conversations')
-      .select(`
-        id,
-        freelancer_id,
-        client_id,
-        created_at,
-        last_message_at
-      `)
-      .eq('client_id', clientData.id)
-      .order('last_message_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching client conversations:', error);
-      return [];
-    }
-    
-    // Get freelancer and client info for display
-    const conversationsWithUserInfo = await Promise.all(
-      (conversations || []).map(async (conv: ConversationRecord) => {
-        // Get freelancer user information
-        const { data: freelancerInfo } = await supabase
-          .from('users')
-          .select('username, display_name')
-          .eq('id', conv.freelancer_id)
-          .single() as { data: UserRecord | null; error: any };
-        
-        // Get client information
-        const { data: clientInfo } = await supabase
-          .from('clients')
-          .select('full_name, email')
-          .eq('id', conv.client_id)
-          .single() as { data: ClientRecord | null; error: any };
-        
-        return {
-          ...conv,
-          freelancer_user: freelancerInfo ? [{
-            username: freelancerInfo.username,
-            display_name: freelancerInfo.display_name || freelancerInfo.username
-          }] : [],
-          client_user: clientInfo ? [{
-            full_name: clientInfo.full_name,
-            email: clientInfo.email
-          }] : []
-        };
-      })
-    );
-    
-    return conversationsWithUserInfo;
   } catch (error) {
-    console.error('Unexpected error in getClientConversations:', error);
+    console.error('Unexpected error in getConversationsByRole:', error);
     return [];
   }
 };
 
-export const getFreelancerConversations = async (userId: string): Promise<Conversation[]> => {
-  try {
-    // Get conversations where user is the freelancer
-    const { data, error } = await supabase
-      .from('conversations')
-      .select(`
-        id,
-        freelancer_id,
-        client_id,
-        created_at,
-        last_message_at
-      `)
-      .eq('freelancer_id', userId)
-      .order('last_message_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching freelancer conversations:', error);
-      return [];
-    }
-    
-    // Get freelancer and client info for each conversation
-    const conversationsWithUserInfo = await Promise.all(
-      (data || []).map(async (conv: any) => {
-        // Get freelancer info
-        const { data: freelancerInfo } = await supabase
-          .from('users')
-          .select('username, display_name')
-          .eq('id', conv.freelancer_id)
-          .single();
-        
-        // Get client info
-        const { data: clientInfo } = await supabase
-          .from('clients')
-          .select('full_name, email')
-          .eq('id', conv.client_id)
-          .single();
-        
-        return {
-          ...conv,
-          freelancer_user: freelancerInfo ? [freelancerInfo] : [],
-          client_user: clientInfo ? [{
-            username: clientInfo.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-            display_name: clientInfo.full_name || 'Client'
-          }] : []
-        };
-      })
-    );
-    
-    return conversationsWithUserInfo;
-  } catch (error) {
-    console.error('Unexpected error in getFreelancerConversations:', error);
-    return [];
-  }
-};
+// Backward compatibility wrappers
+export const getFreelancerConversations = (userId: string) => getConversationsByRole(userId, 'freelancer');
+export const getClientConversations = (userId: string) => getConversationsByRole(userId, 'client');
+
 
 export const getConversations = async (userId: string): Promise<Conversation[]> => {
   const { data, error } = await supabase

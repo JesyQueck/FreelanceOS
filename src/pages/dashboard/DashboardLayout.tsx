@@ -12,7 +12,7 @@ import {
   Bell 
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { supabase } from "../../utils/supabase";
+import { supabase, getUserDataSafe } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import MobileBottomNav from "../../components/MobileBottomNav";
 
@@ -20,47 +20,45 @@ export default function DashboardLayout() {
   const { user } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [initial, setInitial] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [userDataFetched, setUserDataFetched] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!user) {
+      if (!user || userDataFetched) {
         setLoading(false);
         return;
       }
 
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('display_name, email')
-          .eq('id', user.id)
-          .single() as { data: { display_name?: string; email?: string } | null; error: any };
+        const { data, exists } = await getUserDataSafe(user.id, 'display_name, email');
 
-        if (error) {
-          console.error('Error fetching user data:', error);
+        if (!exists || !data) {
+          // User doesn't exist in users table, use auth data
           setDisplayName(user.email?.split('@')[0] || 'User');
           setUserEmail(user.email || '');
           setInitial(user.email?.charAt(0).toUpperCase() || 'U');
-        } else if (data) {
+        } else {
           setDisplayName(data.display_name || user.email?.split('@')[0] || 'User');
           setUserEmail(data.email || user.email || '');
           setInitial((data.display_name || user.email || 'U').charAt(0).toUpperCase());
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching user data:', error);
         setDisplayName(user.email?.split('@')[0] || 'User');
         setUserEmail(user.email || '');
         setInitial(user.email?.charAt(0).toUpperCase() || 'U');
       } finally {
         setLoading(false);
+        setUserDataFetched(true); // Prevent repeated requests
       }
     };
 
     fetchUserData();
-  }, [user]);
+  }, [user, userDataFetched]);
 
   const handleLogout = async () => {
     try {
