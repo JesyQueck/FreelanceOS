@@ -140,7 +140,7 @@ export default function ClientMessagesPage() {
           
           if (freelancerUsername) {
             // Direct message flow - create conversation with freelancer
-            const { getPublicUserProfile, checkOrCreateConversation } = await import('../utils/supabase');
+            const { getPublicUserProfile, checkOrCreateConversation } = await import('../../utils/supabase');
             
             try {
               const profile = await getPublicUserProfile(freelancerUsername);
