@@ -1292,37 +1292,23 @@ const formatTimeAgo = (dateString: string) => {
 
 // Public profile functions for freelancer discovery
 export const getPublicUserProfile = async (username: string): Promise<UserProfile | null> => {
-  return withRequestLock(`getPublicUserProfile:${username}`, async () => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
-        .eq('username', username)
-        .single();
-      
-      if (error) {
-        // Handle lock timeout and other errors gracefully
-        if (error.message.includes('Lock') || error.message.includes('stolen')) {
-          console.warn('Supabase lock timeout in getPublicUserProfile, retrying...');
-          // Retry once after a short delay
-          await new Promise(resolve => setTimeout(resolve, 100));
-          const retry = await supabase
-            .from('users')
-            .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
-            .eq('username', username)
-            .single();
-          return retry.data || null;
-        }
-        console.error('Error fetching public user profile:', error);
-        return null;
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Unexpected error in getPublicUserProfile:', error);
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
+      .eq('username', username)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching public user profile:', error);
       return null;
     }
-  });
+    
+    return data;
+  } catch (error) {
+    console.error('Unexpected error in getPublicUserProfile:', error);
+    return null;
+  }
 };
 
 export const getPublicPortfolioItems = async (userId: string): Promise<PortfolioItem[]> => {
