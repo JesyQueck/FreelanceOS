@@ -83,14 +83,15 @@ export const signUpFreelancer = async (email: string, password: string, displayN
     return { data, error: null };
   }
 
-  // Step 2: Create freelancer profile in users table
+  // Step 2: Create freelancer profile in users table with role
   if (data.user && data.session) {
     const { error: profileError } = await supabase
       .from('users')
       .insert({
         id: data.user.id,
         display_name: displayName,
-        email: email
+        email: email,
+        role: 'freelancer'
       });
 
     if (profileError) {
@@ -127,15 +128,15 @@ export const signUpClient = async (email: string, password: string, fullName: st
     return { data, error: null };
   }
 
-  // Step 2: Create client profile in clients table
+  // Step 2: Create client profile in unified users table with role
   if (data.user && data.session) {
     const { error: profileError } = await supabase
-      .from('clients')
+      .from('users')
       .insert({
-        user_id: data.user.id,
-        full_name: fullName,
+        id: data.user.id,
+        display_name: fullName,
         email: email,
-        company: company || ''
+        role: 'client'
       });
 
     if (profileError) {
@@ -143,6 +144,19 @@ export const signUpClient = async (email: string, password: string, fullName: st
       // Try to clean up the auth user
       await supabase.auth.admin.deleteUser(data.user.id);
       return { data: null, error: { message: 'Failed to create client profile' } };
+    }
+
+    // Also create client profile for additional client-specific data
+    const { error: clientProfileError } = await supabase
+      .from('client_profiles')
+      .insert({
+        user_id: data.user.id,
+        company: company || ''
+      });
+
+    if (clientProfileError) {
+      console.error('Error creating client profile:', clientProfileError);
+      // Don't fail completely, just log the error
     }
   }
 
@@ -879,12 +893,18 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
           
           // Only fetch client info if we have a client_id
           if (conv.client_id) {
-            const { data: clientData } = await supabase
-              .from('clients')
-              .select('full_name, email, user_id')
-              .eq('id', conv.client_id)
-              .single()
-              .catch(() => ({ data: null }));
+            let clientData = null;
+            try {
+              const result = await supabase
+                .from('clients')
+                .select('full_name, email, user_id')
+                .eq('id', conv.client_id)
+                .single();
+              clientData = result.data;
+            } catch (error) {
+              // Client not found or other error
+              clientData = null;
+            }
             
             clientInfo = clientData;
           }
@@ -1134,16 +1154,16 @@ export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | '
 export const isUserClient = async (userId: string): Promise<boolean> => {
   try {
     const { data, error } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('user_id', userId)
+      .from('users')
+      .select('role')
+      .eq('id', userId)
       .single();
     
     if (error && error.code !== 'PGRST116') {
       console.error('Error checking if user is client:', error);
     }
     
-    return !!data;
+    return (data as any)?.role === 'client';
   } catch (error) {
     console.error('Unexpected error checking user role:', error);
     return false;
@@ -1152,25 +1172,17 @@ export const isUserClient = async (userId: string): Promise<boolean> => {
 
 export const isUserFreelancer = async (userId: string): Promise<boolean> => {
   try {
-    // A user is a freelancer if they exist in the users table BUT NOT in the clients table
-    const [{ data: userData, error: userError }, { data: clientData, error: clientError }] = await Promise.all([
-      supabase.from('users').select('id').eq('id', userId).single(),
-      supabase.from('clients').select('id').eq('user_id', userId).single()
-    ]);
+    const { data, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', userId)
+      .single();
     
-    if (userError && userError.code !== 'PGRST116') {
-      console.error('Error checking users table:', userError);
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking if user is freelancer:', error);
     }
     
-    if (clientError && clientError.code !== 'PGRST116') {
-      console.error('Error checking clients table:', clientError);
-    }
-    
-    // User is freelancer if they exist in users table but NOT in clients table
-    const existsInUsers = !!userData;
-    const existsInClients = !!clientData;
-    
-    return existsInUsers && !existsInClients;
+    return (data as any)?.role === 'freelancer';
   } catch (error) {
     console.error('Unexpected error checking user role:', error);
     return false;
@@ -1225,7 +1237,7 @@ export const validateClientAccess = async (email: string, password: string): Pro
       return { success: false, error: 'Authentication failed' };
     }
 
-    // Check if user exists in clients table
+    // Check if user has client role using unified system
     const isClient = await isUserClient(authData.user.id);
     
     if (!isClient) {

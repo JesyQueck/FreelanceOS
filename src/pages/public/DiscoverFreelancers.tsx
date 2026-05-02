@@ -36,37 +36,18 @@ export default function DiscoverFreelancers() {
     setFilteredFreelancers(filtered);
   }, [searchTerm, freelancers]);
 
-  const handleMessageFreelancer = async (freelancerId: string, username: string) => {
+  const handleMessageFreelancer = async (freelancerId: string, _username: string) => {
     if (!user) {
-      // Store the intended action and redirect to client login
-      sessionStorage.setItem('redirectAfterLogin', `/freelancer/${username}`);
-      sessionStorage.setItem('intendedAction', 'message');
+      // Store freelancer_id temporarily and redirect to client login
+      localStorage.setItem('pending_freelancer_id', freelancerId);
       window.location.href = '/client-login';
       return;
     }
 
-    // Check if logged-in user is a client
-    const checkIfUserIsClient = async () => {
-      try {
-        const { supabase } = await import('../../utils/supabase');
-        const { data, error } = await supabase
-          .from('clients')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
-        
-        return !error && data; // If user exists in clients table, they're a client
-      } catch {
-        return false;
-      }
-    };
-
-    const isClient = await checkIfUserIsClient();
-    
-    if (!isClient) {
-      // User is not a client - redirect to client login
-      sessionStorage.setItem('redirectAfterLogin', `/freelancer/${username}`);
-      sessionStorage.setItem('intendedAction', 'message');
+    // Check if user has client role using unified system
+    if (user.role !== 'client') {
+      // Store freelancer_id temporarily and redirect to client login
+      localStorage.setItem('pending_freelancer_id', freelancerId);
       window.location.href = '/client-login';
       return;
     }

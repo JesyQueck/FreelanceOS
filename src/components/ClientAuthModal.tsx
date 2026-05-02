@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
-import { validateClientAccess, signUpClient } from '../utils/supabase'
+import { signUpClient, signIn } from '../utils/supabase'
 
 interface ClientAuthModalProps {
   isOpen: boolean
@@ -29,10 +29,11 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
     setLoading(true)
 
     try {
-      const result = await validateClientAccess(loginData.email, loginData.password)
+      // Use regular signIn instead of validateClientAccess to allow role-based routing
+      const { error } = await signIn(loginData.email, loginData.password)
       
-      if (!result.success) {
-        setError(result.error || 'Login failed')
+      if (error) {
+        setError(error.message || 'Login failed')
       } else {
         // Store the intended action for messaging
         sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)

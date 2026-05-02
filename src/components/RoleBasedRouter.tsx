@@ -7,20 +7,20 @@ interface RoleBasedRouterProps {
 }
 
 export default function RoleBasedRouter({ clientRoute, freelancerRoute }: RoleBasedRouterProps) {
-  const { user } = useAuth()
+  const { user, role } = useAuth()
 
   // If not logged in, redirect to client login
   if (!user) {
     return <Navigate to="/client-login" replace />
   }
 
-  // Check user role and redirect accordingly
-  // For now, we'll use a simple check - in a real app, you'd have a role field in the user profile
-  const isClient = !user.email?.includes('freelancer') // Simple heuristic - can be improved
-  
-  if (isClient) {
+  // Check user role and redirect accordingly using unified system
+  if (role === 'client') {
     return <Navigate to={clientRoute} replace />
+  } else if (role === 'freelancer') {
+    return <Navigate to={freelancerRoute} replace />
   } else {
+    // Default to freelancer dashboard if role is not set
     return <Navigate to={freelancerRoute} replace />
   }
 }

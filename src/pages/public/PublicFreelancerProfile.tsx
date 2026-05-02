@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service, supabase } from '../../utils/supabase';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 
@@ -75,39 +75,22 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
-      // Show client auth modal instead of redirecting
+      // Store freelancer_id temporarily and show client auth modal
+      localStorage.setItem('pending_freelancer_id', profile?.id || '');
       setShowClientAuthModal(true);
       return;
     }
 
-    // Temporarily removed self-messaging check for testing modal functionality
-    // TODO: Add back with better logic after testing
-    console.log('Debug - user.id:', user.id);
-    console.log('Debug - profile.id:', profile?.id);
-    console.log('Debug - user.id === profile.id:', user.id === profile?.id);
+    // Check if user is trying to message themselves
+    if (user.id === profile?.id) {
+      setError('You cannot message yourself');
+      return;
+    }
 
-    // Check if logged-in user is a client (has a record in clients table)
-    // If they're not a client, show client auth modal
-    const checkIfUserIsClient = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('clients')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
-        
-        return !error && data; // If user exists in clients table, they're a client
-      } catch {
-        return false;
-      }
-    };
-
-    const isClient = await checkIfUserIsClient();
-    console.log('Debug - isClient:', isClient);
-    
-    if (!isClient) {
-      // User is not a client - show client auth modal
-      console.log('User is not a client, showing modal');
+    // Check if user has client role using unified system
+    if (user.role !== 'client') {
+      // Store freelancer_id temporarily and show client auth modal
+      localStorage.setItem('pending_freelancer_id', profile?.id || '');
       setShowClientAuthModal(true);
       return;
     }
@@ -116,11 +99,12 @@ export default function PublicFreelancerProfile() {
 
     setMessageLoading(true);
     try {
-      // Use client_info-based conversation system
+      // Use unified conversation system
       const result = await checkOrCreateConversation(user.id, profile.id!);
       
       if (result.success && result.conversationId) {
-        // Navigate to the conversation
+        // Clear any stored freelancer_id and navigate to conversation
+        localStorage.removeItem('pending_freelancer_id');
         navigate(`/messages/${result.conversationId}`);
       } else {
         setError(result.error || 'Failed to start conversation');
