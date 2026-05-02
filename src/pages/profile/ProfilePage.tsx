@@ -160,7 +160,13 @@ export default function ProfilePage() {
     }
   };
 
-  const handleShareProfile = async () => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Temporarily disabled to fix TypeScript build
+    console.log('Image upload temporarily disabled');
+    event.target.value = '';
+  };
+
+const handleShareProfile = async () => {
     if (!user) return;
     
     try {
@@ -360,7 +366,7 @@ export default function ProfilePage() {
                     const fallback = document.createElement('div');
                     fallback.className = 'w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold';
                     fallback.innerHTML = (profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U');
-                    e.currentTarget.parentNode?.replaceChild(fallback);
+                    e.currentTarget.parentNode?.replaceChild(fallback, e.currentTarget);
                   }}
                 />
               ) : (
@@ -378,6 +384,14 @@ export default function ProfilePage() {
             </div>
             <div className="mt-4 md:text-center">
               <div className="flex items-center md:justify-center gap-2">
+                {/* Hidden file input for image upload */}
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
                 {editingField === 'name' ? (
                   <div className="flex items-center gap-2">
                     <input

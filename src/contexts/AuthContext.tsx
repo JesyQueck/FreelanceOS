@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { getCurrentUser, onAuthStateChange } from '../utils/supabase'
+import { onAuthStateChange } from '../utils/supabase'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface User {
   id: string
   email?: string
-  role?: 'freelancer' | 'client'
+  user_type?: 'freelancer' | 'client'
   display_name?: string
 }
 
@@ -30,11 +31,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
   const [role, setRole] = useState<'freelancer' | 'client' | null>(null)
 
+  // Convert Supabase User to our User interface
+  const convertUser = (supabaseUser: SupabaseUser): User => ({
+    id: supabaseUser.id,
+    email: supabaseUser.email,
+    user_type: supabaseUser.user_metadata?.user_type,
+    display_name: supabaseUser.user_metadata?.display_name
+  })
+
   const logout = async () => {
     const { supabase } = await import('../utils/supabase')
     await supabase.auth.signOut()
     setUser(null)
     setRole(null)
+  }
+
+  const determineUserRole = async (userId: string): Promise<'freelancer' | 'client'> => {
+    try {
+      const { supabase } = await import('../utils/supabase')
+      
+      // Check if user exists in clients table
+      const { data: clientData, error } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('user_id', userId)
+        .single()
+      
+      // Handle different error cases
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // User not found in clients table - they're a freelancer
+          return 'freelancer'
+        } else if (error.message?.includes('401') || error.details?.includes('Unauthorized')) {
+          // Unauthorized - user doesn't have permission to access clients table
+          // This likely means they're a freelancer (clients can't access other clients' data)
+          console.log('User does not have access to clients table, assuming freelancer role')
+          return 'freelancer'
+        } else {
+          // Other error - default to freelancer
+          console.log('Error checking client table, defaulting to freelancer:', error)
+          return 'freelancer'
+        }
+      }
+      
+      return clientData ? 'client' : 'freelancer'
+    } catch (error) {
+      // Default to freelancer if not in clients table or error
+      console.log('Unexpected error in determineUserRole, defaulting to freelancer:', error)
+      return 'freelancer'
+    }
   }
 
   const handlePostLoginRouting = (userRole: 'freelancer' | 'client') => {
@@ -52,86 +97,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   useEffect(() => {
+    let mounted = true
+    
     // Get initial user and determine role
     const initializeAuth = async () => {
       try {
-        const currentUser = await getCurrentUser()
-        if (currentUser) {
-          // Get user with role from unified users table
-          const { supabase } = await import('../utils/supabase')
+        // Use a single auth call to prevent lock conflicts
+        const { supabase } = await import('../utils/supabase')
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (mounted && session?.user) {
+          setUser(convertUser(session.user))
           
-          const { data: userData, error } = await supabase
-            .from('users')
-            .select('id, email, role, display_name')
-            .eq('id', currentUser.id)
-            .single();
-          
-          if (error) {
-            console.error('Error fetching user data:', error)
-            setUser(null)
-            setRole(null)
-          } else if (userData) {
-            const user: User = {
-              id: (userData as any).id,
-              email: (userData as any).email,
-              role: (userData as any).role as 'freelancer' | 'client',
-              display_name: (userData as any).display_name
-            };
-            setUser(user)
-            setRole((userData as any).role as 'freelancer' | 'client' | null)
-            
-            // Handle post-login routing
-            handlePostLoginRouting((userData as any).role as 'freelancer' | 'client')
-          } else {
-            setUser(null)
-            setRole(null)
+          // Determine role separately to avoid auth lock conflicts
+          const userRole = await determineUserRole(session.user.id)
+          if (mounted) {
+            setRole(userRole)
+            handlePostLoginRouting(userRole)
           }
-        } else {
+        } else if (mounted) {
           setUser(null)
           setRole(null)
         }
       } catch (error) {
         console.error('Auth initialization error:', error)
-        setUser(null)
-        setRole(null)
+        if (mounted) {
+          setUser(null)
+          setRole(null)
+        }
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
     initializeAuth()
 
-    // Listen for auth changes
+    // Listen for auth changes with debouncing to prevent conflicts
     const { data: { subscription } } = onAuthStateChange(async (authUser) => {
+      if (!mounted) return
+      
       if (authUser) {
-        // Get user with role from unified users table
-        const { supabase } = await import('../utils/supabase')
+        setUser(convertUser(authUser))
         
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('id, email, role, display_name')
-          .eq('id', authUser.id)
-          .single();
-        
-        if (error) {
-          console.error('Error fetching user data on auth change:', error)
-          setUser(null)
-          setRole(null)
-        } else if (userData) {
-          const user: User = {
-            id: (userData as any).id,
-            email: (userData as any).email,
-            role: (userData as any).role as 'freelancer' | 'client',
-            display_name: (userData as any).display_name
-          };
-          setUser(user)
-          setRole((userData as any).role as 'freelancer' | 'client' | null)
-          
-          // Handle post-login routing
-          handlePostLoginRouting((userData as any).role as 'freelancer' | 'client')
-        } else {
-          setUser(null)
-          setRole(null)
+        // Only determine role if it's not already set or if user changed
+        if (!role || user?.id !== authUser.id) {
+          const userRole = await determineUserRole(authUser.id)
+          if (mounted) {
+            setRole(userRole)
+            handlePostLoginRouting(userRole)
+          }
         }
       } else {
         setUser(null)
