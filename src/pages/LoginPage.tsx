@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, ArrowRight } from "lucide-react";
-import { signIn } from "../utils/supabase";
+import { validateFreelancerAccess } from "../utils/supabase";
 
 const initialState = {
   message: "",
@@ -22,11 +22,11 @@ export default function LoginPage() {
     const password = formData.get('password') as string;
 
     try {
-      const { data, error } = await signIn(email, password);
+      const result = await validateFreelancerAccess(email, password);
       
-      if (error) {
-        setState({ message: error.message, success: false });
-      } else if (data.user) {
+      if (!result.success) {
+        setState({ message: result.error || 'Login failed', success: false });
+      } else {
         setState({ message: "Login successful", success: true });
         
         // Handle post-login redirect
@@ -49,8 +49,6 @@ export default function LoginPage() {
           // Default redirect to freelancer dashboard
           navigate('/dashboard');
         }
-      } else {
-        setState({ message: "Login failed", success: false });
       }
     } catch (err) {
       setState({ message: "An unexpected error occurred", success: false });

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LogIn, Mail, Lock, ArrowLeft } from 'lucide-react'
-import { signIn } from '../utils/supabase'
+import { validateClientAccess } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function ClientLoginPage() {
@@ -26,11 +26,11 @@ export default function ClientLoginPage() {
     setLoading(true)
 
     try {
-      const { data, error } = await signIn(formData.email, formData.password)
+      const result = await validateClientAccess(formData.email, formData.password)
       
-      if (error) {
-        setError(error.message)
-      } else if (data.user) {
+      if (!result.success) {
+        setError(result.error || 'Login failed')
+      } else {
         // Handle post-login redirect
         const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin')
         const intendedAction = sessionStorage.getItem('intendedAction')
@@ -51,8 +51,6 @@ export default function ClientLoginPage() {
           // Default redirect to messages for clients
           navigate('/messages')
         }
-      } else {
-        setError('Login failed')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { UserPlus, Mail, Lock, User, Briefcase, ArrowLeft } from 'lucide-react'
-import { signIn, signUp } from '../utils/supabase'
+import { signUpClient } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function ClientSignupPage() {
@@ -41,36 +41,14 @@ export default function ClientSignupPage() {
     }
 
     try {
-      // Sign up the user
-      const { data, error } = await signUp(formData.email, formData.password)
+      // Sign up the client with profile
+      const { data, error } = await signUpClient(formData.email, formData.password, formData.fullName, formData.company)
       
       if (error) {
         setError(error.message)
       } else if (data.user) {
-        // Create client profile using Supabase
-        const { supabase } = await import('../utils/supabase')
-        const { error: profileError } = await supabase
-          .from('users')
-          .update({
-            display_name: formData.fullName,
-            company: formData.company,
-            user_type: 'client'
-          })
-          .eq('id', data.user.id)
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
-        }
-
-        // Auto sign in
-        const { error: signInError } = await signIn(formData.email, formData.password)
-        
-        if (signInError) {
-          console.error('Auto sign-in error:', signInError)
-          navigate('/login')
-        } else {
-          navigate('/messages')
-        }
+        // Client account and profile created successfully by signUpClient
+        navigate('/messages')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')

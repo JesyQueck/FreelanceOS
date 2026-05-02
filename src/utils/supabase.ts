@@ -13,9 +13,102 @@ export const signUp = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-  })
-  return { data, error }
-}
+  });
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+};
+
+export const signUpFreelancer = async (email: string, password: string, displayName: string) => {
+  // Step 1: Create auth user with metadata
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        display_name: displayName,
+        user_type: 'freelancer'
+      }
+    }
+  });
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (data.user && !data.session) {
+    // Email confirmation required - user will be created after confirmation
+    return { data, error: null };
+  }
+
+  // Step 2: Create freelancer profile in users table
+  if (data.user && data.session) {
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: data.user.id,
+        display_name: displayName,
+        email: email
+      });
+
+    if (profileError) {
+      console.error('Error creating freelancer profile:', profileError);
+      // Try to clean up the auth user
+      await supabase.auth.admin.deleteUser(data.user.id);
+      return { data: null, error: { message: 'Failed to create freelancer profile' } };
+    }
+  }
+
+  return { data, error: null };
+};
+
+export const signUpClient = async (email: string, password: string, fullName: string, company?: string) => {
+  // Step 1: Create auth user with metadata
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        company: company || '',
+        user_type: 'client'
+      }
+    }
+  });
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (data.user && !data.session) {
+    // Email confirmation required - user will be created after confirmation
+    return { data, error: null };
+  }
+
+  // Step 2: Create client profile in clients table
+  if (data.user && data.session) {
+    const { error: profileError } = await supabase
+      .from('clients')
+      .insert({
+        user_id: data.user.id,
+        full_name: fullName,
+        email: email,
+        company: company || ''
+      });
+
+    if (profileError) {
+      console.error('Error creating client profile:', profileError);
+      // Try to clean up the auth user
+      await supabase.auth.admin.deleteUser(data.user.id);
+      return { data: null, error: { message: 'Failed to create client profile' } };
+    }
+  }
+
+  return { data, error: null };
+};
 
 export const signIn = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -877,6 +970,97 @@ export const isUserClient = async (userId: string): Promise<boolean> => {
   } catch (error) {
     console.error('Unexpected error checking user role:', error);
     return false;
+  }
+};
+
+export const isUserFreelancer = async (userId: string): Promise<boolean> => {
+  try {
+    // A user is a freelancer if they exist in the users table BUT NOT in the clients table
+    const [{ data: userData, error: userError }, { data: clientData, error: clientError }] = await Promise.all([
+      supabase.from('users').select('id').eq('id', userId).single(),
+      supabase.from('clients').select('id').eq('user_id', userId).single()
+    ]);
+    
+    if (userError && userError.code !== 'PGRST116') {
+      console.error('Error checking users table:', userError);
+    }
+    
+    if (clientError && clientError.code !== 'PGRST116') {
+      console.error('Error checking clients table:', clientError);
+    }
+    
+    // User is freelancer if they exist in users table but NOT in clients table
+    const existsInUsers = !!userData;
+    const existsInClients = !!clientData;
+    
+    return existsInUsers && !existsInClients;
+  } catch (error) {
+    console.error('Unexpected error checking user role:', error);
+    return false;
+  }
+};
+
+export const validateFreelancerAccess = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // First attempt to sign in
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      return { success: false, error: authError.message };
+    }
+
+    if (!authData.user) {
+      return { success: false, error: 'Authentication failed' };
+    }
+
+    // Check if user exists in users table (freelancer table)
+    const isFreelancer = await isUserFreelancer(authData.user.id);
+    
+    if (!isFreelancer) {
+      // Sign out the user since they're not a freelancer
+      await supabase.auth.signOut();
+      return { success: false, error: 'Access denied. This account is not registered as a freelancer.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error validating freelancer access:', error);
+    return { success: false, error: 'An unexpected error occurred' };
+  }
+};
+
+export const validateClientAccess = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    // First attempt to sign in
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      return { success: false, error: authError.message };
+    }
+
+    if (!authData.user) {
+      return { success: false, error: 'Authentication failed' };
+    }
+
+    // Check if user exists in clients table
+    const isClient = await isUserClient(authData.user.id);
+    
+    if (!isClient) {
+      // Sign out the user since they're not a client
+      await supabase.auth.signOut();
+      return { success: false, error: 'Access denied. This account is not registered as a client.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error validating client access:', error);
+    return { success: false, error: 'An unexpected error occurred' };
   }
 };
 
