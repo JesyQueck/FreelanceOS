@@ -14,7 +14,7 @@ import {
   MessageSquare 
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getClientConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
+import { getClientConversations, getMessages, createMessage, Conversation, Message, getPublicUserProfile, checkOrCreateConversation } from "../../utils/supabase";
 import { supabase } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import ToastContainer from "../../components/ToastContainer";
@@ -56,14 +56,14 @@ export default function ClientMessagesPage() {
           .from('clients')
           .select('full_name, email')
           .eq('user_id', user.id)
-          .single();
+          .single() as { data: { full_name?: string; email?: string } | null; error: any };
 
         if (error) {
           console.error('Error fetching client data:', error);
           setDisplayName(user.email?.split('@')[0] || 'Client');
           setUserEmail(user.email || '');
           setInitial(user.email?.charAt(0).toUpperCase() || 'C');
-        } else {
+        } else if (data) {
           setDisplayName(data.full_name || user.email?.split('@')[0] || 'Client');
           setUserEmail(data.email || user.email || '');
           setInitial((data.full_name || user.email || 'C').charAt(0).toUpperCase());
@@ -140,8 +140,6 @@ export default function ClientMessagesPage() {
           
           if (freelancerUsername) {
             // Direct message flow - create conversation with freelancer
-            const { getPublicUserProfile, checkOrCreateConversation } = await import('../../utils/supabase');
-            
             try {
               const profile = await getPublicUserProfile(freelancerUsername);
               if (profile) {

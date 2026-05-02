@@ -37,14 +37,14 @@ export default function DashboardLayout() {
           .from('users')
           .select('display_name, email')
           .eq('id', user.id)
-          .single();
+          .single() as { data: { display_name?: string; email?: string } | null; error: any };
 
         if (error) {
           console.error('Error fetching user data:', error);
           setDisplayName(user.email?.split('@')[0] || 'User');
           setUserEmail(user.email || '');
           setInitial(user.email?.charAt(0).toUpperCase() || 'U');
-        } else {
+        } else if (data) {
           setDisplayName(data.display_name || user.email?.split('@')[0] || 'User');
           setUserEmail(data.email || user.email || '');
           setInitial((data.display_name || user.email || 'U').charAt(0).toUpperCase());

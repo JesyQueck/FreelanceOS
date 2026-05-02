@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service, supabase } from '../../utils/supabase';
@@ -9,6 +9,7 @@ export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const mountedRef = useRef(true);
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
@@ -20,9 +21,11 @@ export default function PublicFreelancerProfile() {
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (!username) {
-        setError('Freelancer not found');
-        setLoading(false);
+      if (!username || !mountedRef.current) {
+        if (mountedRef.current) {
+          setError('Freelancer not found');
+          setLoading(false);
+        }
         return;
       }
 
@@ -32,8 +35,10 @@ export default function PublicFreelancerProfile() {
 
         // Fetch public profile data
         const profileData = await getPublicUserProfile(username);
-        if (!profileData) {
-          setError('Freelancer profile not found');
+        if (!profileData || !mountedRef.current) {
+          if (mountedRef.current) {
+            setError('Freelancer profile not found');
+          }
           return;
         }
         setProfile(profileData);
@@ -44,17 +49,28 @@ export default function PublicFreelancerProfile() {
           getPublicServices(profileData.id!)
         ]);
 
-        setPortfolioItems(portfolioData || []);
-        setServices(servicesData || []);
+        if (mountedRef.current) {
+          setPortfolioItems(portfolioData || []);
+          setServices(servicesData || []);
+        }
       } catch (err) {
         console.error('Error fetching profile:', err);
-        setError('Failed to load profile');
+        if (mountedRef.current) {
+          setError('Failed to load profile');
+        }
       } finally {
-        setLoading(false);
+        if (mountedRef.current) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProfileData();
+
+    // Cleanup function
+    return () => {
+      mountedRef.current = false;
+    };
   }, [username]);
 
   const handleMessageFreelancer = async () => {
