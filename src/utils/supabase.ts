@@ -13,21 +13,7 @@ export const supabase = (() => {
       global: {
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'apikey': supabaseAnonKey,
-          'Authorization': `Bearer ${supabaseAnonKey}`
-        },
-        fetch: (url, options = {}) => {
-          return fetch(url, {
-            ...options,
-            headers: {
-              ...options.headers,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'apikey': supabaseAnonKey,
-              'Authorization': `Bearer ${supabaseAnonKey}`
-            }
-          })
+          'Content-Type': 'application/json'
         }
       }
     });
@@ -202,6 +188,18 @@ export const getCurrentUser = async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser()
       if (error) {
+        // Handle specific authentication errors
+        if (error.message.includes('Auth session missing') || error.message.includes('session missing')) {
+          // This is normal when user is not logged in
+          return null;
+        }
+        if (error.message.includes('missing sub claim') || error.message.includes('invalid claim')) {
+          console.warn('Invalid JWT token, clearing session...');
+          // Clear the session and try to get session instead
+          await supabase.auth.signOut({ scope: 'local' });
+          const { data: { session } } = await supabase.auth.getSession();
+          return session?.user || null;
+        }
         // Handle lock timeout and other errors gracefully
         if (error.message.includes('Lock') || error.message.includes('stolen')) {
           console.warn('Supabase lock timeout, retrying...');
@@ -361,7 +359,8 @@ export const createOrUpdateUserProfile = async (userId: string, email: string, d
   const profileData: any = {
     id: userId,
     email: email,
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    role: 'freelancer' // Default role for profile updates
   };
   
   // Set created_at for new profiles (when displayName is provided during signup)

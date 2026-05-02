@@ -354,14 +354,25 @@ export default function ProfilePage() {
                 <img 
                   src={profile?.profile_image} 
                   alt="Profile" 
-                  className="w-32 h-32 rounded-2xl object-cover"
+                  className="w-32 h-32 rounded-2xl object-cover shadow-lg"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold';
+                    fallback.innerHTML = (profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U');
+                    e.currentTarget.parentNode?.replaceChild(fallback);
+                  }}
                 />
               ) : (
-                <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold">
+                <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
                   {profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
-              <button className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10">
+              <button 
+                onClick={() => document.getElementById('profile-image-upload')?.click()}
+                className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10"
+                title="Change profile picture"
+              >
                 <Camera className="h-4 w-4 text-white" />
               </button>
             </div>
