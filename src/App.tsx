@@ -3,7 +3,6 @@ import './styles/globals.css'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import ProtectedRoute from './components/ProtectedRoute'
-import MobileBottomNav from './components/MobileBottomNav'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
@@ -56,7 +55,6 @@ function App() {
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Routes>
-            <MobileBottomNav />
           </Router>
         </NotificationProvider>
       </AuthProvider>
