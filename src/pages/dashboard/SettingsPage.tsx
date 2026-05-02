@@ -131,23 +131,13 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-xl flex items-center justify-center shadow-lg">
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-white">Settings</h1>
-            <p className="text-[#A0A0A0]">Manage your account preferences and notification settings</p>
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
+        <p className="text-[#A0A0A0]">Manage your account preferences and notification settings</p>
       </div>
 
       {/* Feedback Message */}
       {feedback && (
-        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 backdrop-blur-sm border transition-all duration-300 ${
+        <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
           feedback.type === 'success' 
             ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
             : 'bg-red-500/10 border border-red-500/30 text-red-400'
@@ -162,11 +152,9 @@ export default function SettingsPage() {
       )}
 
       {/* Notifications */}
-      <div className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl border border-[#1A1A1A]/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-lg flex items-center justify-center">
-            <Bell className="h-4 w-4 text-black" />
-          </div>
+          <Bell className="h-6 w-6 text-[#FFD700]" />
           <h2 className="text-xl font-semibold text-white">Notifications</h2>
         </div>
         
@@ -178,12 +166,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('notifications', 'email', !preferences.notifications.email)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.notifications.email ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.notifications.email ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.notifications.email ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -197,12 +185,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('notifications', 'push', !preferences.notifications.push)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.notifications.push ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.notifications.push ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.notifications.push ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -216,12 +204,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('notifications', 'sound', !preferences.notifications.sound)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.notifications.sound ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.notifications.sound ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.notifications.sound ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -235,12 +223,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('notifications', 'desktop', !preferences.notifications.desktop)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.notifications.desktop ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.notifications.desktop ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.notifications.desktop ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -250,11 +238,9 @@ export default function SettingsPage() {
       </div>
 
       {/* Appearance */}
-      <div className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl border border-[#1A1A1A]/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-lg flex items-center justify-center">
-            <Sun className="h-4 w-4 text-black" />
-          </div>
+          <Sun className="h-6 w-6 text-[#FFD700]" />
           <h2 className="text-xl font-semibold text-white">Appearance</h2>
         </div>
         
@@ -267,7 +253,7 @@ export default function SettingsPage() {
             <select
               value={preferences.appearance.theme}
               onChange={(e) => updatePreference('appearance', 'theme', e.target.value)}
-              className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-all duration-200"
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
             >
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -283,7 +269,7 @@ export default function SettingsPage() {
             <select
               value={preferences.appearance.language}
               onChange={(e) => updatePreference('appearance', 'language', e.target.value)}
-              className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-all duration-200"
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
             >
               <option value="en">English</option>
               <option value="es">Español</option>
@@ -295,11 +281,9 @@ export default function SettingsPage() {
       </div>
 
       {/* Privacy */}
-      <div className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl border border-[#1A1A1A]/50 p-6 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-lg flex items-center justify-center">
-            <Shield className="h-4 w-4 text-black" />
-          </div>
+          <Shield className="h-6 w-6 text-[#FFD700]" />
           <h2 className="text-xl font-semibold text-white">Privacy</h2>
         </div>
         
@@ -312,7 +296,7 @@ export default function SettingsPage() {
             <select
               value={preferences.privacy.profileVisibility}
               onChange={(e) => updatePreference('privacy', 'profileVisibility', e.target.value)}
-              className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 transition-all duration-200"
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
             >
               <option value="public">Public</option>
               <option value="private">Private</option>
@@ -327,12 +311,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('privacy', 'showOnlineStatus', !preferences.privacy.showOnlineStatus)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.privacy.showOnlineStatus ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.privacy.showOnlineStatus ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.privacy.showOnlineStatus ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -346,12 +330,12 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={() => updatePreference('privacy', 'showLastSeen', !preferences.privacy.showLastSeen)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ${
-                preferences.privacy.showLastSeen ? 'bg-gradient-to-r from-[#FFD700] to-[#FFC700]' : 'bg-[#1A1A1A]'
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                preferences.privacy.showLastSeen ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
               }`}
             >
               <span
-                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-300 ${
+                className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                   preferences.privacy.showLastSeen ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
@@ -365,20 +349,9 @@ export default function SettingsPage() {
         <button
           onClick={handleSavePreferences}
           disabled={saving}
-          className="px-6 py-3 bg-gradient-to-br from-[#FFD700] to-[#FFC700] hover:from-[#FFC700] hover:to-[#FFD700] disabled:from-[#FFD700]/50 disabled:to-[#FFC700]/50 disabled:cursor-not-allowed text-black font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 disabled:hover:scale-100"
+          className="px-6 py-3 bg-[#FFD700] hover:bg-[#FFC700] disabled:bg-[#FFD700]/50 disabled:cursor-not-allowed text-black font-medium rounded-lg transition-colors"
         >
-          {saving ? (
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
-              <span>Saving...</span>
-            </div>
-          ) : (
-            'Save Preferences'
-          )}
+          {saving ? 'Saving...' : 'Save Preferences'}
         </button>
       </div>
     </div>

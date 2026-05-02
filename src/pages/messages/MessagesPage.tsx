@@ -196,88 +196,53 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-black via-[#0A0A0A] to-black">
+    <div className="h-full flex flex-col bg-black">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-xl flex items-center justify-center shadow-lg">
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Messages</h1>
-            <p className="text-xs text-[#A0A0A0]">Connect with freelancers</p>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold text-white">Messages</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
             <input
               type="text"
               placeholder="Search conversations..."
-              className="pl-10 pr-4 py-3 bg-[#0A0A0A]/50 backdrop-blur-sm border border-[#1A1A1A]/50 rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base shadow-sm"
+              className="pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base"
             />
           </div>
           <NotificationDropdown />
         </div>
       </div>
 
-      <div className="flex-1 flex bg-[#0A0A0A]/30 backdrop-blur-xl rounded-2xl border border-[#1A1A1A]/50 overflow-hidden relative shadow-2xl">
+      <div className="flex-1 flex bg-[#0A0A0A] rounded-2xl border border-[#1A1A1A] overflow-hidden relative">
         {/* Conversations List - Always visible */}
-        <div className={`w-full sm:w-80 bg-[#0A0A0A]/50 backdrop-blur-sm flex flex-col transition-transform duration-300 ${
+        <div className={`w-full sm:w-80 bg-[#0A0A0A] flex flex-col transition-transform duration-300 ${
           showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
         } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
-          <div className="p-4 border-b border-[#1A1A1A]/30 bg-gradient-to-r from-[#FFD700]/5 to-transparent">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-              <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-pulse"></div>
-              All Conversations
-            </h2>
+          <div className="p-4 border-b border-[#1A1A1A]">
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">All Conversations</h2>
           </div>
           
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-6 text-center text-[#A0A0A0] flex flex-col items-center gap-3">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
-                <span>Loading conversations...</span>
-              </div>
+              <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
             ) : conversations.length === 0 ? (
-              <div className="p-6 text-center text-[#A0A0A0] flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-white mb-1">No conversations yet</h3>
-                  <p className="text-xs">Start by discovering freelancers and sending messages</p>
-                </div>
-              </div>
+              <div className="p-6 text-center text-[#A0A0A0]">No conversations yet</div>
             ) : (
               conversations.map((conversation) => (
                 <div 
                   key={conversation.id} 
                   onClick={() => handleSelectConversation(conversation)}
-                  className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-all duration-200 border-b border-[#1A1A1A]/30 last:border-b-0 group ${
-                    selectedConversation?.id === conversation.id ? 'bg-gradient-to-r from-[#FFD700]/10 to-[#FFD700]/5 border-l-2 border-l-[#FFD700]' : ''
+                  className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-colors border-b border-[#1A1A1A]/30 last:border-b-0 ${
+                    selectedConversation?.id === conversation.id ? 'bg-[#FFD700]/10' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFC700] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
-                        {getInitials(conversation)}
-                      </div>
-                      {selectedConversation?.id !== conversation.id && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0A0A0A]"></div>
-                      )}
+                    <div className="w-12 h-12 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
+                      {getInitials(conversation)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-sm font-medium text-white truncate group-hover:text-[#FFD700] transition-colors">{getDisplayName(conversation)}</h3>
+                        <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
                         <span className="text-xs text-[#A0A0A0]">{formatTimeAgo(conversation.last_message_at)}</span>
                       </div>
                       <p className="text-xs text-[#A0A0A0] truncate">Click to view messages</p>
@@ -290,72 +255,51 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Area - Slides in from right */}
-        <div className={`flex-1 bg-[#0A0A0A]/30 backdrop-blur-sm overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
+        <div className={`flex-1 bg-[#0A0A0A] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
           showChat ? 'translate-x-0' : 'translate-x-full'
         } ${showChat ? 'absolute inset-0 z-20 sm:relative sm:z-0' : 'absolute inset-0'}`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-[#1A1A1A]/30 bg-gradient-to-r from-[#FFD700]/5 to-transparent flex items-center justify-between">
+              <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={handleBackToList}
-                    className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-all duration-200 hover:scale-105"
+                    className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors"
                   >
                     <ArrowLeft className="h-5 w-5 text-white" />
                   </button>
-                  <div className="relative">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFC700] flex items-center justify-center text-black text-sm font-semibold shadow-sm">
-                      {getInitials(selectedConversation)}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0A0A0A]"></div>
+                  <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+                    {getInitials(selectedConversation)}
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <p className="text-xs text-green-400">Active now</p>
-                    </div>
+                    <p className="text-xs text-green-400">Active now</p>
                   </div>
                 </div>
-                <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-all duration-200 hover:scale-105">
+                <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
                   <MoreVertical className="h-4 w-4 text-[#A0A0A0]" />
                 </button>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-[#FFD700]/5">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
-                  <div className="text-center text-[#A0A0A0] py-8 flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center">
-                      <svg className="w-8 h-8 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-white mb-1">Start the conversation!</h3>
-                      <p className="text-xs">Send your first message to connect</p>
-                    </div>
-                  </div>
+                  <div className="text-center text-[#A0A0A0] py-8">No messages yet. Start the conversation!</div>
                 ) : (
                   <>
                     {messages.map((message) => (
-                      <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
-                        <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md ${
+                      <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl ${
                           message.sender_id === user?.id 
-                            ? 'bg-gradient-to-br from-[#FFD700] to-[#FFC700] text-black rounded-br-sm border border-[#FFD700]/20' 
-                            : 'bg-[#1A1A1A]/80 backdrop-blur-sm text-white rounded-tl-sm border border-[#2A2A2A]/50'
+                            ? 'bg-[#FFD700] text-black rounded-br-sm' 
+                            : 'bg-[#1A1A1A] text-white rounded-tl-sm'
                         }`}>
                           <p className="text-sm leading-relaxed">{message.content}</p>
                           <div className={`flex items-center gap-1 mt-2 text-xs ${
                             message.sender_id === user?.id ? 'text-black/70' : 'text-[#A0A0A0]'
                           }`}>
                             <span>{formatTime(message.created_at)}</span>
-                            {message.sender_id === user?.id && (
-                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -366,9 +310,9 @@ export default function MessagesPage() {
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-[#1A1A1A]/30 bg-gradient-to-r from-[#FFD700]/5 to-transparent">
+              <div className="p-4 border-t border-[#1A1A1A]">
                 <div className="flex items-center gap-3">
-                  <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-all duration-200 hover:scale-105">
+                  <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
                     <Paperclip className="h-5 w-5 text-[#A0A0A0]" />
                   </button>
                   <input
@@ -378,22 +322,14 @@ export default function MessagesPage() {
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Type a message..."
                     disabled={sending}
-                    className="flex-1 px-4 py-3 bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 disabled:opacity-50 text-base shadow-sm transition-all duration-200"
+                    className="flex-1 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 disabled:opacity-50 text-base"
                   />
                   <button 
                     onClick={handleSendMessage}
                     disabled={sending || !messageInput.trim()}
-                    className="p-3 bg-gradient-to-br from-[#FFD700] to-[#FFC700] hover:from-[#FFC700] hover:to-[#FFD700] rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md hover:scale-105 disabled:hover:scale-100"
+                    className="p-3 bg-[#FFD700] hover:bg-[#FFC700] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {sending ? (
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      </div>
-                    ) : (
-                      <Send className="h-5 w-5 text-black" />
-                    )}
+                    <Send className="h-5 w-5 text-black" />
                   </button>
                 </div>
               </div>

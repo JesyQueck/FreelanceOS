@@ -641,6 +641,82 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
 };
 
 // Messaging CRUD functions
+export const getClientConversations = async (userId: string): Promise<Conversation[]> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      id,
+      freelancer_id,
+      client_id,
+      created_at,
+      last_message_at,
+      freelancer_user:users!freelancer_id(
+        username,
+        display_name
+      ),
+      client_user:clients!client_id(
+        full_name,
+        email
+      )
+    `)
+    .eq('client_id', userId)
+    .order('last_message_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching client conversations:', error);
+    return [];
+  }
+  
+  // Format client user data for consistency
+  const formattedConversations = (data || []).map((conv: any) => ({
+    ...conv,
+    client_user: conv.client_user ? [{
+      username: conv.client_user.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+      display_name: conv.client_user.full_name || 'Client'
+    }] : []
+  }));
+  
+  return formattedConversations;
+};
+
+export const getFreelancerConversations = async (userId: string): Promise<Conversation[]> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      id,
+      freelancer_id,
+      client_id,
+      created_at,
+      last_message_at,
+      freelancer_user:users!freelancer_id(
+        username,
+        display_name
+      ),
+      client_user:clients!client_id(
+        full_name,
+        email
+      )
+    `)
+    .eq('freelancer_id', userId)
+    .order('last_message_at', { ascending: false });
+  
+  if (error) {
+    console.error('Error fetching freelancer conversations:', error);
+    return [];
+  }
+  
+  // Format client user data for consistency
+  const formattedConversations = (data || []).map((conv: any) => ({
+    ...conv,
+    client_user: conv.client_user ? [{
+      username: conv.client_user.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+      display_name: conv.client_user.full_name || 'Client'
+    }] : []
+  }));
+  
+  return formattedConversations;
+};
+
 export const getConversations = async (userId: string): Promise<Conversation[]> => {
   const { data, error } = await supabase
     .from('conversations')
@@ -782,6 +858,25 @@ export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | '
   } catch (err) {
     console.error('Unexpected error in createOrUpdateClient:', err);
     return { data: null, error: { message: 'Unexpected error occurred' } };
+  }
+};
+
+export const isUserClient = async (userId: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking if user is client:', error);
+    }
+    
+    return !!data;
+  } catch (error) {
+    console.error('Unexpected error checking user role:', error);
+    return false;
   }
 };
 

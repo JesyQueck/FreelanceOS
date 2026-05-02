@@ -327,7 +327,7 @@ export default function ProfilePage() {
           <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
           <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
         </div>
-        <div className="text-[#A0A0A0]">Loading your profile...</div>
+        <div className="text-[#A0A0A0]">Loading profile...</div>
       </div>
     );
   }
@@ -335,20 +335,10 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-xl flex items-center justify-center shadow-lg">
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Profile</h1>
-            <p className="text-xs text-[#A0A0A0]">Manage your professional profile</p>
-          </div>
-        </div>
+        <h1 className="text-2xl font-bold text-white">Profile</h1>
         <button 
           onClick={handleShareProfile}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-[#FFD700] to-[#FFC700] hover:from-[#FFC700] hover:to-[#FFD700] text-black rounded-lg text-sm transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105"
+          className="flex items-center gap-2 px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm transition-colors shadow-sm"
         >
           <Share2 className="h-4 w-4" />
           Share Portfolio
@@ -356,25 +346,24 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card */}
-      <div className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-2xl p-8 border border-[#1A1A1A]/50 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="bg-[#0A0A0A] rounded-2xl p-8 border border-[#1A1A1A] shadow-sm">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex flex-col items-center md:items-center">
-            <div className="relative group">
+            <div className="relative">
               {profile?.profile_image ? (
                 <img 
                   src={profile?.profile_image} 
                   alt="Profile" 
-                  className="w-32 h-32 rounded-2xl object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                  className="w-32 h-32 rounded-2xl object-cover"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-[#FFD700] to-[#FFC700] flex items-center justify-center text-black text-3xl font-bold shadow-sm group-hover:shadow-md transition-shadow">
+                <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold">
                   {profile?.name?.charAt(0).toUpperCase() || profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
-              <button className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A]/80 backdrop-blur-sm rounded-lg hover:bg-[#2A1A1A]/80 transition-all duration-200 hover:scale-110 z-10">
+              <button className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10">
                 <Camera className="h-4 w-4 text-white" />
               </button>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0A0A0A] animate-pulse"></div>
             </div>
             <div className="mt-4 md:text-center">
               <div className="flex items-center md:justify-center gap-2">
@@ -384,21 +373,21 @@ export default function ProfilePage() {
                       type="text"
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
-                      className="bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-200"
+                      className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter your professional name"
                       autoFocus
                     />
                     <div className="flex gap-1">
                       <button
                         onClick={cancelEditing}
-                        className="p-1 hover:bg-[#2A1A1A]/50 rounded transition-all duration-200 hover:scale-110"
+                        className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                       >
                         <X className="h-3 w-3 text-[#A0A0A0]" />
                       </button>
                       <button
                         onClick={saveField}
                         disabled={isSaving}
-                        className="p-1 hover:bg-[#FFD700] rounded transition-all duration-200 hover:scale-110 disabled:opacity-50"
+                        className="p-1 hover:bg-[#FFD700] rounded transition-colors disabled:opacity-50"
                       >
                         {isSaving ? (
                           <div className="flex gap-1">
@@ -419,7 +408,7 @@ export default function ProfilePage() {
                     </h2>
                     <button
                       onClick={() => startEditing('name', profile?.name || '')}
-                      className="p-1 hover:bg-[#2A1A1A]/50 rounded transition-all duration-200 hover:scale-110"
+                      className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
                       title="Edit name"
                     >
                       <Edit className="h-4 w-4 text-[#A0A0A0]" />
@@ -432,7 +421,7 @@ export default function ProfilePage() {
               </p>
               <div className="flex items-center md:justify-center gap-1 mt-2">
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-500">Verified Profile</span>
+                <span className="text-sm text-green-500">Verified</span>
               </div>
             </div>
           </div>
@@ -579,19 +568,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Skills Section */}
-      <div className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-2xl p-6 border border-[#1A1A1A]/50 shadow-sm hover:shadow-lg transition-all duration-300">
+      <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FFD700] to-[#FFC700] rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-white">Skills</h3>
-          </div>
+          <h3 className="text-lg font-semibold text-white">Skills</h3>
           <button
             onClick={() => startEditing('skills', '')}
-            className="p-1 hover:bg-[#2A1A1A]/50 rounded transition-all duration-200 hover:scale-110"
+            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
             title="Edit skills"
           >
             <Edit className="h-4 w-4 text-[#A0A0A0]" />
@@ -604,7 +586,7 @@ export default function ProfilePage() {
                 type="text"
                 value={editingValue}
                 onChange={(e) => setEditingValue(e.target.value)}
-                className="flex-1 bg-[#1A1A1A]/50 backdrop-blur-sm border border-[#2A2A2A]/50 rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all duration-200"
+                className="flex-1 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                 placeholder="Enter a skill"
                 autoFocus
                 onKeyPress={(e) => {
@@ -616,7 +598,7 @@ export default function ProfilePage() {
               <button
                 onClick={saveField}
                 disabled={isSaving || !editingValue.trim()}
-                className="px-4 py-3 bg-gradient-to-br from-[#FFD700] to-[#FFC700] hover:from-[#FFC700] hover:to-[#FFD700] rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 disabled:hover:scale-100"
+                className="px-4 py-3 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isSaving ? (
                   <div className="flex gap-1">
@@ -631,11 +613,11 @@ export default function ProfilePage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {profile?.skills?.map((skill: string, index: number) => (
-                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-[#1A1A1A]/50 to-[#2A1A1A]/50 text-white rounded-lg text-sm group border border-[#2A2A2A]/30 hover:border-[#FFD700]/30 transition-all duration-200">
-                  <span className="group-hover:text-[#FFD700] transition-colors">{skill}</span>
+                <div key={index} className="flex items-center gap-1 px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm group">
+                  <span>{skill}</span>
                   <button
                     onClick={() => removeSkill(skill)}
-                    className="opacity-0 group-hover:opacity-100 transition-all duration-200 text-[#A0A0A0] hover:text-red-400 hover:scale-110"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-[#A0A0A0] hover:text-red-400"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -653,19 +635,12 @@ export default function ProfilePage() {
           <div className="flex flex-wrap gap-2">
             {profile?.skills && Array.isArray(profile.skills) && profile.skills.length > 0 ? (
               profile.skills.map((skill: string, index: number) => (
-                <span key={index} className="px-3 py-1 bg-gradient-to-r from-[#1A1A1A]/50 to-[#2A1A1A]/50 text-white rounded-lg text-sm border border-[#2A2A2A]/30 hover:border-[#FFD700]/30 transition-all duration-200 hover:text-[#FFD700]">
+                <span key={index} className="px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm">
                   {skill}
                 </span>
               ))
             ) : (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <p className="text-[#A0A0A0]">No skills added yet. Click the edit icon to add your professional skills.</p>
-              </div>
+              <p className="text-[#A0A0A0]">No skills added yet. Click the edit icon to add your professional skills.</p>
             )}
           </div>
         )}

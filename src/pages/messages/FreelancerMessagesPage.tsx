@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Send, Paperclip, MoreVertical, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { getClientConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
+import { getFreelancerConversations, getMessages, createMessage, Conversation, Message } from "../../utils/supabase";
 import { supabase } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import ToastContainer from "../../components/ToastContainer";
 import { useNotifications } from "../../contexts/NotificationContext";
 
-export default function ClientMessagesPage() {
+export default function FreelancerMessagesPage() {
   const { user } = useAuth();
   const { addToastNotification } = useNotifications();
   const [searchParams] = useSearchParams();
@@ -28,23 +28,23 @@ export default function ClientMessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Real-time message subscription for client conversations
+  // Real-time message subscription for freelancer conversations
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
-      .channel(`client_messages:${user.id}`)
+      .channel(`freelancer_messages:${user.id}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `sender_id=neq.${user.id}` // Only messages from freelancers
+          filter: `sender_id=neq.${user.id}` // Only messages from clients
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          console.log('New client message received:', newMessage);
+          console.log('New freelancer message received:', newMessage);
           
           // If this message is from the current conversation, add it to messages
           if (selectedConversation && newMessage.conversation_id === selectedConversation.id) {
@@ -76,7 +76,7 @@ export default function ClientMessagesPage() {
     const fetchConversations = async () => {
       if (user) {
         try {
-          const conversationsData = await getClientConversations(user.id);
+          const conversationsData = await getFreelancerConversations(user.id);
           setConversations(conversationsData);
           if (conversationsData.length > 0) {
             // Check if there's a specific conversation ID in URL
@@ -92,7 +92,7 @@ export default function ClientMessagesPage() {
             // Don't auto-select any conversation - wait for user to click
           }
         } catch (error) {
-          console.error('Error fetching client conversations:', error);
+          console.error('Error fetching freelancer conversations:', error);
         } finally {
           setLoading(false);
         }
@@ -119,7 +119,7 @@ export default function ClientMessagesPage() {
         setMessages(prev => [...prev, result.data!]);
         setMessageInput('');
         // Refresh conversations to update last message
-        const updatedConversations = await getClientConversations(user.id);
+        const updatedConversations = await getFreelancerConversations(user.id);
         setConversations(updatedConversations);
       }
     } catch (error) {
@@ -169,24 +169,24 @@ export default function ClientMessagesPage() {
   };
 
   const getDisplayName = (conversation: Conversation) => {
-    // For client messages, always show freelancer info
-    if (conversation.freelancer_user && conversation.freelancer_user.length > 0) {
-      return conversation.freelancer_user[0].display_name || conversation.freelancer_user[0].username || 'Freelancer';
+    // For freelancer messages, always show client info
+    if (conversation.client_user && conversation.client_user.length > 0) {
+      return conversation.client_user[0].display_name || conversation.client_user[0].username || 'Client';
     }
     
-    return 'Freelancer';
+    return 'Client';
   };
 
   const getInitials = (conversation: Conversation) => {
     const name = getDisplayName(conversation);
-    return name?.substring(0, 2).toUpperCase() || 'FL';
+    return name?.substring(0, 2).toUpperCase() || 'CL';
   };
 
   return (
     <div className="h-full flex flex-col bg-black">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-white">Client Messages</h1>
+        <h1 className="text-2xl font-bold text-white">Freelancer Messages</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
@@ -206,14 +206,14 @@ export default function ClientMessagesPage() {
           showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
         } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
           <div className="p-4 border-b border-[#1A1A1A]">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Your Conversations</h2>
+            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Client Conversations</h2>
           </div>
           
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
             ) : conversations.length === 0 ? (
-              <div className="p-6 text-center text-[#A0A0A0]">No conversations yet. Start a conversation with a freelancer!</div>
+              <div className="p-6 text-center text-[#A0A0A0]">No conversations yet. Clients will appear here when they message you!</div>
             ) : (
               conversations.map((conversation: Conversation) => (
                 <div 
@@ -261,7 +261,7 @@ export default function ClientMessagesPage() {
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
-                    <p className="text-xs text-green-400">Freelancer</p>
+                    <p className="text-xs text-green-400">Client</p>
                   </div>
                 </div>
                 <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">

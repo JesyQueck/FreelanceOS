@@ -14,7 +14,7 @@ import DashboardPage from './pages/dashboard/DashboardPage'
 import ProfilePage from './pages/profile/ProfilePage'
 import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
-import MessagesPage from './pages/messages/MessagesPage'
+import RoleBasedMessages from './components/RoleBasedMessages'
 import SettingsPage from './pages/dashboard/SettingsPage'
 import PublicFreelancerProfile from './pages/public/PublicFreelancerProfile'
 import DiscoverFreelancers from './pages/public/DiscoverFreelancers'
@@ -35,12 +35,12 @@ function App() {
               <Route path="/discover" element={<DiscoverFreelancers />} />
               <Route path="/messages" element={
                 <ProtectedRoute>
-                  <MessagesPage />
+                  <RoleBasedMessages />
                 </ProtectedRoute>
               } />
               <Route path="/messages/:conversationId" element={
                 <ProtectedRoute>
-                  <MessagesPage />
+                  <RoleBasedMessages />
                 </ProtectedRoute>
               } />
               <Route path="/dashboard" element={
@@ -52,7 +52,7 @@ function App() {
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="profile/edit" element={<EditProfilePage />} />
                 <Route path="services" element={<ServicesPage />} />
-                <Route path="messages" element={<MessagesPage />} />
+                <Route path="messages" element={<RoleBasedMessages />} />
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
             </Routes>
