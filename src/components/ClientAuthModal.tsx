@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { X, Mail, Lock, User, Briefcase, UserPlus, LogIn } from 'lucide-react'
+import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
 import { signIn, signUp } from '../utils/supabase'
-import { useAuth } from '../contexts/AuthContext'
 
 interface ClientAuthModalProps {
   isOpen: boolean
@@ -19,17 +18,9 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-    company: ''
+    fullName: ''
   })
-  const { user } = useAuth()
-
-  // Close modal if already logged in
-  if (user && isOpen) {
-    onAuthSuccess()
-    return null
-  }
-
+  
   if (!isOpen) return null
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -78,19 +69,22 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
       if (error) {
         setError(error.message)
       } else if (data.user) {
-        // Create client profile
+        // Create client profile using clients table
         const { supabase } = await import('../utils/supabase')
-        const { error: profileError } = await supabase
-          .from('users')
-          .update({
-            display_name: signupData.fullName,
-            company: signupData.company,
-            user_type: 'client'
-          })
-          .eq('id', data.user.id)
+        const { error: clientError } = await supabase
+          .from('clients')
+          .upsert({
+            user_id: data.user.id,
+            full_name: signupData.fullName,
+            email: signupData.email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' })
+          .select()
+          .single()
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError)
+        if (clientError) {
+          console.error('Client creation error:', clientError)
         }
 
         // Auto sign in
@@ -114,7 +108,7 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-[#0A0A0A] rounded-2xl w-full max-w-md border border-[#1A1A1A] shadow-2xl">
+      <div className="bg-[#0A0A0A] rounded-2xl w-full max-w-lg md:max-w-md border border-[#1A1A1A] shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#1A1A1A]">
           <div className="flex items-center gap-3">
@@ -130,9 +124,9 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+            className="p-1 hover:bg-[#1A1A1A] rounded-lg transition-colors"
           >
-            <X className="h-5 w-5 text-[#A0A0A0]" />
+            <X className="h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
           </button>
         </div>
 
@@ -140,7 +134,7 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
         <div className="flex border-b border-[#1A1A1A]">
           <button
             onClick={() => { setIsLogin(true); setError('') }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 py-1 md:py-2 text-xs md:text-sm font-medium transition-colors ${
               isLogin 
                 ? 'text-[#FFD700] border-b-2 border-[#FFD700]' 
                 : 'text-[#A0A0A0] hover:text-white'
@@ -150,7 +144,7 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
           </button>
           <button
             onClick={() => { setIsLogin(false); setError('') }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 py-1 md:py-2 text-xs md:text-sm font-medium transition-colors ${
               !isLogin 
                 ? 'text-[#FFD700] border-b-2 border-[#FFD700]' 
                 : 'text-[#A0A0A0] hover:text-white'
@@ -161,40 +155,40 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 md:p-4">
           {error && (
-            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg mb-4">
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-2 rounded-lg mb-4">
               {error}
             </div>
           )}
 
           {isLogin ? (
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-3 md:space-y-2">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Email</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Mail className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
                   <input
                     type="email"
                     value={loginData.email}
                     onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Enter your email"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Password</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
                   <input
                     type="password"
                     value={loginData.password}
                     onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Enter your password"
                   />
                 </div>
@@ -203,15 +197,15 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignup} className="space-y-4">
+            <form onSubmit={handleSignup} className="space-y-3 md:space-y-2">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Full Name</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
                   <input
@@ -219,66 +213,52 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
                     value={signupData.fullName}
                     onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Enter your full name"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Company (Optional)</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Email</label>
                 <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
-                  <input
-                    type="text"
-                    value={signupData.company}
-                    onChange={(e) => setSignupData({ ...signupData, company: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
-                    placeholder="Company name"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white mb-2">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Mail className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
                   <input
                     type="email"
                     value={signupData.email}
                     onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Enter your email"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Password</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
                   <input
                     type="password"
                     value={signupData.password}
                     onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Create a password"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Confirm Password</label>
+                <label className="block text-[10px] font-medium text-white mb-1">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-[#A0A0A0]" />
                   <input
                     type="password"
                     value={signupData.confirmPassword}
                     onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent text-sm md:text-base"
                     placeholder="Confirm your password"
                   />
                 </div>
@@ -287,7 +267,7 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service, supabase } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 
@@ -64,11 +64,43 @@ export default function PublicFreelancerProfile() {
       return;
     }
 
+    // Temporarily removed self-messaging check for testing modal functionality
+    // TODO: Add back with better logic after testing
+    console.log('Debug - user.id:', user.id);
+    console.log('Debug - profile.id:', profile?.id);
+    console.log('Debug - user.id === profile.id:', user.id === profile?.id);
+
+    // Check if logged-in user is a client (has a record in clients table)
+    // If they're not a client, show client auth modal
+    const checkIfUserIsClient = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        
+        return !error && data; // If user exists in clients table, they're a client
+      } catch {
+        return false;
+      }
+    };
+
+    const isClient = await checkIfUserIsClient();
+    console.log('Debug - isClient:', isClient);
+    
+    if (!isClient) {
+      // User is not a client - show client auth modal
+      console.log('User is not a client, showing modal');
+      setShowClientAuthModal(true);
+      return;
+    }
+
     if (!profile) return;
 
     setMessageLoading(true);
     try {
-      // Check if conversation already exists or create new one
+      // Use client_info-based conversation system
       const result = await checkOrCreateConversation(user.id, profile.id!);
       
       if (result.success && result.conversationId) {
@@ -342,6 +374,7 @@ export default function PublicFreelancerProfile() {
           if (user && profile) {
             setMessageLoading(true)
             try {
+              // User is now authenticated, proceed with conversation
               const result = await checkOrCreateConversation(user.id, profile.id!)
               if (result.success && result.conversationId) {
                 navigate(`/messages/${result.conversationId}`)

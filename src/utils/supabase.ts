@@ -388,7 +388,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+        .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
         .eq('id', userId)
         .single();
       
@@ -667,18 +667,18 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
   const conversationsWithClientInfo = await Promise.all(
     (data || []).map(async (conv) => {
       if (conv.client_id && conv.client_id.startsWith('client-')) {
-        // This is a client conversation, get client info from client_info table
+        // This is a client conversation, get client info from clients table
         const { data: clientData } = await supabase
-          .from('client_info')
-          .select('name, email')
+          .from('clients')
+          .select('full_name, email')
           .eq('id', conv.client_id)
           .single();
         
         return {
           ...conv,
           client_user: clientData ? [{
-            username: clientData.name.replace(/\s+/g, '-').toLowerCase(),
-            display_name: clientData.name
+            username: clientData.full_name.replace(/\s+/g, '-').toLowerCase(),
+            display_name: clientData.full_name
           }] : []
         };
       }
@@ -755,14 +755,15 @@ export const createOrUpdateClient = async (clientInfo: Omit<ClientInfo, 'id' | '
   
   const clientData = {
     id: clientId,
-    ...clientInfo,
+    full_name: clientInfo.name,
+    email: clientInfo.email,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
   
   try {
     const { data, error } = await supabase
-      .from('client_info')
+      .from('clients')
       .upsert(clientData, { onConflict: 'id' })
       .select()
       .single();
@@ -788,7 +789,7 @@ export const getClientInfo = async (clientId: string): Promise<{ data: ClientInf
   
   try {
     const { data, error } = await supabase
-      .from('client_info')
+      .from('clients')
       .select('*')
       .eq('id', clientId)
       .single();
@@ -890,7 +891,7 @@ export const getPublicUserProfile = async (username: string): Promise<UserProfil
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+      .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
       .eq('username', username)
       .single();
     
@@ -951,7 +952,7 @@ export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('display_name, name, bio, skills, profile_image, created_at, email, id, updated_at, username, slug')
+      .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
       .not('display_name', 'is', null)
       .not('bio', 'is', null)
       .order('created_at', { ascending: false })
@@ -970,45 +971,41 @@ export const getAllPublicFreelancers = async (): Promise<UserProfile[]> => {
 };
 
 // Conversation logic for client-freelancer messaging
-export const checkOrCreateConversation = async (clientId: string, freelancerId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
+export const checkOrCreateConversation = async (userId1: string, userId2: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
   try {
     // First check if conversation already exists (try both directions)
     let existingConversation = null;
-    let checkError = null;
 
-    // Try client->freelancer direction
+    // Try direction 1: user1 as client, user2 as freelancer
     const { data: conversation1, error: error1 } = await supabase
       .from('conversations')
       .select('id')
-      .eq('client_id', clientId)
-      .eq('freelancer_id', freelancerId)
+      .eq('client_id', userId1)
+      .eq('freelancer_id', userId2)
       .single();
 
     if (conversation1) {
       existingConversation = conversation1;
     } else if (error1 && error1.code !== 'PGRST116') {
-      checkError = error1;
-    }
+      // Check if we're using the old table structure
+      if (error1.message?.includes('column') || error1.code === 'PGRST204') {
+        // Try the old table structure
+        const { data: oldConversation, error: oldError } = await supabase
+          .from('conversations')
+          .select('id')
+          .or(`(client_id.eq.${userId1},freelancer_id.eq.${userId2}),(client_id.eq.${userId2},freelancer_id.eq.${userId1})`)
+          .single();
 
-    // Try freelancer->client direction if not found
-    if (!existingConversation && (!error1 || error1.code === 'PGRST116')) {
-      const { data: conversation2, error: error2 } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('client_id', freelancerId)
-        .eq('freelancer_id', clientId)
-        .single();
-
-      if (conversation2) {
-        existingConversation = conversation2;
-      } else if (error2 && error2.code !== 'PGRST116') {
-        checkError = error2;
+        if (oldConversation) {
+          existingConversation = oldConversation;
+        } else if (oldError && oldError.code !== 'PGRST116') {
+          console.error('Error checking conversation (old structure):', oldError);
+          return { success: false, error: 'Failed to check conversation' };
+        }
+      } else {
+        console.error('Error checking conversation:', error1);
+        return { success: false, error: 'Failed to check conversation' };
       }
-    }
-
-    if (checkError) {
-      console.error('Error checking conversation:', checkError);
-      return { success: false, error: 'Failed to check conversation' };
     }
 
     // If conversation exists, return it
@@ -1016,20 +1013,56 @@ export const checkOrCreateConversation = async (clientId: string, freelancerId: 
       return { success: true, conversationId: existingConversation.id };
     }
 
-    // Create new conversation
-    const { data: newConversation, error: createError } = await supabase
-      .from('conversations')
-      .insert({
-        client_id: clientId,
-        freelancer_id: freelancerId,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select('id')
-      .single();
+    // Create new conversation - try new structure first
+    let createError = null;
+    let newConversation = null;
 
-    if (createError) {
-      console.error('Error creating conversation:', createError);
+    try {
+      const { data: createdNew, error: createdNewError } = await supabase
+        .from('conversations')
+        .insert({
+          client_id: userId1,
+          freelancer_id: userId2
+        })
+        .select('id')
+        .single();
+
+      if (createdNew) {
+        newConversation = createdNew;
+      } else {
+        createError = createdNewError;
+      }
+    } catch (err) {
+      createError = err;
+    }
+
+    // If new structure fails, try old structure
+    if (!newConversation && createError) {
+      try {
+        const { data: createdOld, error: createdOldError } = await supabase
+          .from('conversations')
+          .insert({
+            client_id: userId1,
+            freelancer_id: userId2,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select('id')
+          .single();
+
+        if (createdOld) {
+          newConversation = createdOld;
+        } else {
+          console.error('Error creating conversation (both structures):', createdOldError);
+          return { success: false, error: 'Failed to create conversation' };
+        }
+      } catch (err) {
+        console.error('Error creating conversation (fallback):', err);
+        return { success: false, error: 'Failed to create conversation' };
+      }
+    }
+
+    if (!newConversation) {
       return { success: false, error: 'Failed to create conversation' };
     }
 
