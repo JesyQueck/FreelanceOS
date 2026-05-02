@@ -124,8 +124,25 @@ export const signOut = async () => {
 }
 
 export const getCurrentUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error) {
+      // Handle lock timeout and other errors gracefully
+      if (error.message.includes('Lock') || error.message.includes('stolen')) {
+        console.warn('Supabase lock timeout, retrying...');
+        // Retry once after a short delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const retry = await supabase.auth.getUser();
+        return retry.data?.user || null;
+      }
+      console.error('Error getting current user:', error);
+      return null;
+    }
+    return user;
+  } catch (error) {
+    console.error('Unexpected error getting current user:', error);
+    return null;
+  }
 }
 
 export const onAuthStateChange = (callback: (user: any) => void) => {
@@ -135,8 +152,25 @@ export const onAuthStateChange = (callback: (user: any) => void) => {
 }
 
 export const getUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error) {
+      // Handle lock timeout and other errors gracefully
+      if (error.message.includes('Lock') || error.message.includes('stolen')) {
+        console.warn('Supabase lock timeout in getUser, retrying...');
+        // Retry once after a short delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const retry = await supabase.auth.getUser();
+        return retry.data?.user || null;
+      }
+      console.error('Error in getUser:', error);
+      return null;
+    }
+    return user;
+  } catch (error) {
+    console.error('Unexpected error in getUser:', error);
+    return null;
+  }
 }
 
 // TypeScript interface for user profile
@@ -735,79 +769,120 @@ export const deleteService = async (id: string): Promise<{ error: any }> => {
 
 // Messaging CRUD functions
 export const getClientConversations = async (userId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
-    .from('conversations')
-    .select(`
-      id,
-      freelancer_id,
-      client_id,
-      created_at,
-      last_message_at,
-      freelancer_user:users!freelancer_id(
-        username,
-        display_name
-      ),
-      client_user:clients!client_id(
-        full_name,
-        email
-      )
-    `)
-    .eq('client_id', userId)
-    .order('last_message_at', { ascending: false });
-  
-  if (error) {
-    console.error('Error fetching client conversations:', error);
+  try {
+    // First get the client's ID from the clients table
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+    
+    if (clientError || !clientData) {
+      console.error('Error fetching client ID:', clientError);
+      return [];
+    }
+    
+    // Then get conversations using the client ID
+    const { data, error } = await supabase
+      .from('conversations')
+      .select(`
+        id,
+        freelancer_id,
+        client_id,
+        created_at,
+        last_message_at,
+        freelancer_user:users!freelancer_id(
+          username,
+          display_name
+        )
+      `)
+      .eq('client_id', clientData.id)
+      .order('last_message_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching client conversations:', error);
+      return [];
+    }
+    
+    // Get client info for display
+    const conversationsWithClientInfo = await Promise.all(
+      (data || []).map(async (conv: any) => {
+        const { data: clientInfo } = await supabase
+          .from('clients')
+          .select('full_name, email')
+          .eq('id', conv.client_id)
+          .single();
+        
+        return {
+          ...conv,
+          client_user: clientInfo ? [{
+            username: clientInfo.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+            display_name: clientInfo.full_name || 'Client'
+          }] : []
+        };
+      })
+    );
+    
+    return conversationsWithClientInfo;
+  } catch (error) {
+    console.error('Unexpected error in getClientConversations:', error);
     return [];
   }
-  
-  // Format client user data for consistency
-  const formattedConversations = (data || []).map((conv: any) => ({
-    ...conv,
-    client_user: conv.client_user ? [{
-      username: conv.client_user.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-      display_name: conv.client_user.full_name || 'Client'
-    }] : []
-  }));
-  
-  return formattedConversations;
 };
 
 export const getFreelancerConversations = async (userId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
-    .from('conversations')
-    .select(`
-      id,
-      freelancer_id,
-      client_id,
-      created_at,
-      last_message_at,
-      freelancer_user:users!freelancer_id(
-        username,
-        display_name
-      ),
-      client_user:clients!client_id(
-        full_name,
-        email
-      )
-    `)
-    .eq('freelancer_id', userId)
-    .order('last_message_at', { ascending: false });
-  
-  if (error) {
-    console.error('Error fetching freelancer conversations:', error);
+  try {
+    // Get conversations where user is the freelancer
+    const { data, error } = await supabase
+      .from('conversations')
+      .select(`
+        id,
+        freelancer_id,
+        client_id,
+        created_at,
+        last_message_at
+      `)
+      .eq('freelancer_id', userId)
+      .order('last_message_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching freelancer conversations:', error);
+      return [];
+    }
+    
+    // Get freelancer and client info for each conversation
+    const conversationsWithUserInfo = await Promise.all(
+      (data || []).map(async (conv: any) => {
+        // Get freelancer info
+        const { data: freelancerInfo } = await supabase
+          .from('users')
+          .select('username, display_name')
+          .eq('id', conv.freelancer_id)
+          .single();
+        
+        // Get client info
+        const { data: clientInfo } = await supabase
+          .from('clients')
+          .select('full_name, email')
+          .eq('id', conv.client_id)
+          .single();
+        
+        return {
+          ...conv,
+          freelancer_user: freelancerInfo ? [freelancerInfo] : [],
+          client_user: clientInfo ? [{
+            username: clientInfo.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
+            display_name: clientInfo.full_name || 'Client'
+          }] : []
+        };
+      })
+    );
+    
+    return conversationsWithUserInfo;
+  } catch (error) {
+    console.error('Unexpected error in getFreelancerConversations:', error);
     return [];
   }
-  
-  // Format client user data for consistency
-  const formattedConversations = (data || []).map((conv: any) => ({
-    ...conv,
-    client_user: conv.client_user ? [{
-      username: conv.client_user.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-      display_name: conv.client_user.full_name || 'Client'
-    }] : []
-  }));
-  
-  return formattedConversations;
 };
 
 export const getConversations = async (userId: string): Promise<Conversation[]> => {
@@ -1175,6 +1250,18 @@ export const getPublicUserProfile = async (username: string): Promise<UserProfil
       .single();
     
     if (error) {
+      // Handle lock timeout and other errors gracefully
+      if (error.message.includes('Lock') || error.message.includes('stolen')) {
+        console.warn('Supabase lock timeout in getPublicUserProfile, retrying...');
+        // Retry once after a short delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        const retry = await supabase
+          .from('users')
+          .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
+          .eq('username', username)
+          .single();
+        return retry.data || null;
+      }
       console.error('Error fetching public user profile:', error);
       return null;
     }

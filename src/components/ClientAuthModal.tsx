@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
-import { signIn, signUp } from '../utils/supabase'
+import { validateClientAccess, signUpClient } from '../utils/supabase'
 
 interface ClientAuthModalProps {
   isOpen: boolean
@@ -29,12 +29,12 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
     setLoading(true)
 
     try {
-      const { data, error } = await signIn(loginData.email, loginData.password)
+      const result = await validateClientAccess(loginData.email, loginData.password)
       
-      if (error) {
-        setError(error.message)
-      } else if (data.user) {
-        // Store the intended action
+      if (!result.success) {
+        setError(result.error || 'Login failed')
+      } else {
+        // Store the intended action for messaging
         sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)
         sessionStorage.setItem('intendedAction', 'message')
         onAuthSuccess()
@@ -64,7 +64,7 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
     }
 
     try {
-      const { data, error } = await signUp(signupData.email, signupData.password)
+      const { data, error } = await signUpClient(signupData.email, signupData.password, signupData.fullName)
       
       if (error) {
         // Handle common signup errors with user-friendly messages
@@ -76,35 +76,13 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
           setError(error.message)
         }
       } else if (data.user) {
-        // Create client profile using clients table
-        const { supabase } = await import('../utils/supabase')
-        const { error: clientError } = await supabase
-          .from('clients')
-          .upsert({
-            user_id: data.user.id,
-            full_name: signupData.fullName,
-            email: signupData.email,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' })
-          .select()
-          .single()
-
-        if (clientError) {
-          console.error('Client creation error:', clientError)
-        }
-
-        // Auto sign in
-        const { error: signInError } = await signIn(signupData.email, signupData.password)
+        // Client account and profile created successfully by signUpClient
+        console.log('Client account created successfully')
         
-        if (signInError) {
-          console.error('Auto sign-in error:', signInError)
-        } else {
-          // Store the intended action
-          sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)
-          sessionStorage.setItem('intendedAction', 'message')
-          onAuthSuccess()
-        }
+        // Store the intended action for messaging
+        sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)
+        sessionStorage.setItem('intendedAction', 'message')
+        onAuthSuccess()
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')

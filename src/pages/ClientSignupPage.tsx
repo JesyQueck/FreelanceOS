@@ -48,7 +48,54 @@ export default function ClientSignupPage() {
         setError(error.message)
       } else if (data.user) {
         // Client account and profile created successfully by signUpClient
-        navigate('/messages')
+        // Handle post-signup redirect
+        const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin')
+        const intendedAction = sessionStorage.getItem('intendedAction')
+        
+        if (redirectAfterLogin) {
+          // Clear the stored redirect info
+          sessionStorage.removeItem('redirectAfterLogin')
+          sessionStorage.removeItem('intendedAction')
+          
+          // Navigate to intended destination
+          if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {
+            // Extract freelancer username from the URL
+            const freelancerUsername = redirectAfterLogin.replace('/freelancer/', '')
+            
+            // Get freelancer profile and create conversation immediately
+            const createConversationAndRedirect = async () => {
+              try {
+                const { getPublicUserProfile, checkOrCreateConversation } = await import('../utils/supabase');
+                const profile = await getPublicUserProfile(freelancerUsername);
+                
+                if (profile) {
+                  const result = await checkOrCreateConversation(user!.id, profile.id!);
+                  if (result.success && result.conversationId) {
+                    // Navigate directly to the conversation
+                    navigate(`/messages/${result.conversationId}`);
+                  } else {
+                    // Fallback to messages page if conversation creation fails
+                    navigate('/messages');
+                  }
+                } else {
+                  // Fallback to messages page if profile not found
+                  navigate('/messages');
+                }
+              } catch (error) {
+                console.error('Error creating conversation:', error);
+                // Fallback to messages page
+                navigate('/messages');
+              }
+            };
+            
+            createConversationAndRedirect();
+          } else {
+            navigate(redirectAfterLogin)
+          }
+        } else {
+          // Default redirect to messages for clients
+          navigate('/messages')
+        }
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')

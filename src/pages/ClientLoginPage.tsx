@@ -42,8 +42,36 @@ export default function ClientLoginPage() {
           
           // Navigate to intended destination
           if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {
-            // Navigate to the freelancer profile to start messaging
-            navigate(redirectAfterLogin)
+            // Extract freelancer username from the URL
+            const freelancerUsername = redirectAfterLogin.replace('/freelancer/', '')
+            
+            // Get freelancer profile and create conversation immediately
+            const createConversationAndRedirect = async () => {
+              try {
+                const { getPublicUserProfile, checkOrCreateConversation } = await import('../utils/supabase');
+                const profile = await getPublicUserProfile(freelancerUsername);
+                
+                if (profile) {
+                  const result = await checkOrCreateConversation(user!.id, profile.id!);
+                  if (result.success && result.conversationId) {
+                    // Navigate directly to the conversation
+                    navigate(`/messages/${result.conversationId}`);
+                  } else {
+                    // Fallback to messages page if conversation creation fails
+                    navigate('/messages');
+                  }
+                } else {
+                  // Fallback to messages page if profile not found
+                  navigate('/messages');
+                }
+              } catch (error) {
+                console.error('Error creating conversation:', error);
+                // Fallback to messages page
+                navigate('/messages');
+              }
+            };
+            
+            createConversationAndRedirect();
           } else {
             navigate(redirectAfterLogin)
           }

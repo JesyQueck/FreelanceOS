@@ -51,27 +51,28 @@ export default function ClientMessagesPage() {
       }
 
       try {
+        // For clients, fetch data from clients table
         const { data, error } = await supabase
-          .from('users')
-          .select('display_name, email')
-          .eq('id', user.id)
+          .from('clients')
+          .select('full_name, email')
+          .eq('user_id', user.id)
           .single();
 
         if (error) {
-          console.error('Error fetching user data:', error);
-          setDisplayName(user.email?.split('@')[0] || 'User');
+          console.error('Error fetching client data:', error);
+          setDisplayName(user.email?.split('@')[0] || 'Client');
           setUserEmail(user.email || '');
-          setInitial(user.email?.charAt(0).toUpperCase() || 'U');
+          setInitial(user.email?.charAt(0).toUpperCase() || 'C');
         } else {
-          setDisplayName(data.display_name || user.email?.split('@')[0] || 'User');
+          setDisplayName(data.full_name || user.email?.split('@')[0] || 'Client');
           setUserEmail(data.email || user.email || '');
-          setInitial((data.display_name || user.email || 'U').charAt(0).toUpperCase());
+          setInitial((data.full_name || user.email || 'C').charAt(0).toUpperCase());
         }
       } catch (error) {
-        console.error('Unexpected error fetching user data:', error);
-        setDisplayName(user.email?.split('@')[0] || 'User');
+        console.error('Unexpected error fetching client data:', error);
+        setDisplayName(user.email?.split('@')[0] || 'Client');
         setUserEmail(user.email || '');
-        setInitial(user.email?.charAt(0).toUpperCase() || 'U');
+        setInitial(user.email?.charAt(0).toUpperCase() || 'C');
       } finally {
         setUserLoading(false);
       }
