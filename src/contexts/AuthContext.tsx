@@ -44,14 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (pendingFreelancerId && userRole === 'client') {
       // Client was trying to message a freelancer, redirect to messages
       localStorage.removeItem('pending_freelancer_id')
-      window.location.href = `/messages`
-    } else if (userRole === 'freelancer') {
-      // Freelancer goes to dashboard
-      window.location.href = `/dashboard`
-    } else if (userRole === 'client') {
-      // Client goes to messages portal
+      // Use window.location for this specific case since it's a post-login redirect
       window.location.href = `/messages`
     }
+    // For other cases, let the routing components handle navigation
+    // This prevents infinite refresh loops
   }
 
   useEffect(() => {
@@ -154,3 +151,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   )
 }
+

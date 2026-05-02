@@ -252,83 +252,84 @@ export default function ServicesPage() {
               </div>
               <button
                 onClick={cancelEditing}
-                className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
               >
-                <X className="h-5 w-5 text-slate-400" />
+                <X className="h-5 w-5 text-[#A0A0A0]" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Service Title *</label>
+                <label className="block text-sm font-medium text-white mb-2">Service Title *</label>
                 <input
                   type="text"
                   value={editingService.title}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value } : null)}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                   placeholder="Enter service title"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                <label className="block text-sm font-medium text-white mb-2">Description</label>
                 <textarea
                   value={editingService.description}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, description: e.target.value } : null)}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent h-32 resize-none transition-all"
+                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
                   placeholder="Describe your service and what you deliver"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Price</label>
+                  <label className="block text-sm font-medium text-white mb-2">Price</label>
                   <input
                     type="text"
                     value={editingService.price}
                     onChange={(e) => setEditingService(prev => prev ? { ...prev, price: e.target.value } : null)}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                     placeholder="From $500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Timeline</label>
+                  <label className="block text-sm font-medium text-white mb-2">Timeline</label>
                   <input
                     type="text"
                     value={editingService.timeline}
                     onChange={(e) => setEditingService(prev => prev ? { ...prev, timeline: e.target.value } : null)}
-                    className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                     placeholder="2-3 weeks"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
+                <label className="block text-sm font-medium text-white mb-2">Status</label>
                 <select
                   value={editingService.status}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, status: e.target.value as 'active' | 'draft' } : null)}
-                  className="w-full bg-[#0B0F19] border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                 >
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
               <button
                 onClick={cancelEditing}
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateService}
                 disabled={isSaving || !editingService.title?.trim()}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
+                className="px-4 py-2 text-sm font-medium text-black bg-[#FFD700] rounded-lg hover:bg-[#FFC700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSaving ? (
                   <>
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                     </div>
                     Updating...
                   </>
@@ -415,15 +416,15 @@ export default function ServicesPage() {
 
       {/* Empty State */}
       {!loading && services.length === 0 && (
-        <div className="bg-[#151B2B] rounded-2xl p-12 border border-slate-800/60 shadow-sm text-center">
-          <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Target className="h-8 w-8 text-slate-400" />
+        <div className="bg-[#0A0A0A] rounded-2xl p-12 border border-[#1A1A1A] shadow-sm text-center">
+          <div className="w-16 h-16 bg-[#FFD700]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="h-8 w-8 text-[#FFD700]" />
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">No services yet</h3>
-          <p className="text-slate-400 mb-6">Create your first service to start attracting clients</p>
+          <p className="text-[#A0A0A0] mb-6">Create your first service to start attracting clients</p>
           <button 
             onClick={() => setShowAddService(true)}
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all bg-indigo-600 rounded-lg hover:bg-indigo-500 gap-2"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
           >
             <Plus className="h-4 w-4" /> Create Service
           </button>

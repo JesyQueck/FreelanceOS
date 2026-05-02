@@ -9,7 +9,28 @@ let supabaseInstance: ReturnType<typeof createSupabaseClient> | null = null;
 
 export const supabase = (() => {
   if (!supabaseInstance) {
-    supabaseInstance = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+    supabaseInstance = createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey,
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        fetch: (url, options = {}) => {
+          return fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'apikey': supabaseAnonKey,
+              'Authorization': `Bearer ${supabaseAnonKey}`
+            }
+          })
+        }
+      }
+    });
     console.log('Supabase client instance created');
   } else {
     console.log('Using existing Supabase client instance');
@@ -1357,11 +1378,12 @@ const formatTimeAgo = (dateString: string) => {
 // Public profile functions for freelancer discovery
 export const getPublicUserProfile = async (username: string): Promise<UserProfile | null> => {
   try {
+    // Use simple query without complex options
     const { data, error } = await supabase
       .from('users')
       .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
       .eq('username', username)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error('Error fetching public user profile:', error);
