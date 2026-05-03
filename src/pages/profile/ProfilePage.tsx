@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserCircle, Mail, Briefcase, Edit, Camera, X, Save, Plus, ExternalLink, Trash2 } from "lucide-react";
+import { UserCircle, Mail, Briefcase, Edit, Camera, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, ensureUserHasSlug, getFreelancerProfile } from "../../utils/supabase";
 
@@ -225,99 +225,18 @@ export default function ProfilePage() {
     
     setIsSaving(true);
     try {
-      const { supabase } = await import('../../utils/supabase');
-      
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `profile-images/${fileName}`;
-      
       let imageUrl: string = '';
       
-      // Try to create the avatars bucket if it doesn't exist, then upload
-      try {
-        // First try to upload to avatars bucket
-        const { error: uploadError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: true
-          });
-        
-        if (!uploadError) {
-          // Get public URL from avatars bucket
-          const { data: { publicUrl } } = supabase.storage
-            .from('avatars')
-            .getPublicUrl(filePath);
-          imageUrl = publicUrl;
-          console.log('Image uploaded to avatars bucket successfully');
-        } else {
-          throw uploadError;
-        }
-      } catch (error) {
-        console.log('Avatars bucket not found, creating it...');
-        
-        // Try to create the bucket (this might fail due to permissions)
-        try {
-          const { error: createError } = await supabase.storage.createBucket('avatars', {
-            public: true,
-            allowedMimeTypes: ['image/*'],
-            fileSizeLimit: 5242880 // 5MB
-          });
-          
-          if (createError && !createError.message?.includes('already exists')) {
-            console.log('Could not create bucket:', createError.message);
-            console.log('Please create the "avatars" bucket manually in Supabase Dashboard > Storage');
-            throw error;
-          }
-          
-          // Now try to upload again
-          const { error: retryUploadError } = await supabase.storage
-            .from('avatars')
-            .upload(filePath, file, {
-              cacheControl: '3600',
-              upsert: true
-            });
-          
-          if (retryUploadError) {
-            throw retryUploadError;
-          }
-          
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('avatars')
-            .getPublicUrl(filePath);
-          imageUrl = publicUrl;
-          console.log('Bucket created and image uploaded successfully');
-          
-        } catch (createError) {
-          console.error('Failed to create bucket and upload:', createError);
-          
-          // Final fallback: use general-storage bucket
-          try {
-            const { error: publicUploadError } = await supabase.storage
-              .from('general-storage')
-              .upload(`profile-images/${fileName}`, file, {
-                cacheControl: '3600',
-                upsert: true
-              });
-            
-            if (publicUploadError) {
-              throw publicUploadError;
-            }
-            
-            const { data: { publicUrl } } = supabase.storage
-              .from('general-storage')
-              .getPublicUrl(`profile-images/${fileName}`);
-            imageUrl = publicUrl;
-            console.log('Image uploaded to general-storage bucket as fallback');
-            
-          } catch (fallbackError) {
-            console.error('All upload methods failed:', fallbackError);
-            throw new Error('Unable to upload image. Please check your Supabase storage configuration.');
-          }
-        }
-      }
+      // Convert image to base64 and store directly in database
+      const reader = new FileReader();
+      imageUrl = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
       
       // Update profile with new image URL
       const result = await createOrUpdateUserProfile(
@@ -331,13 +250,11 @@ export default function ProfilePage() {
       );
       
       if (result.error) {
-        console.error('Error updating profile image:', result.error);
         alert('Failed to update profile image');
       } else if (result.data) {
         setProfile(result.data);
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
       alert('Failed to upload image');
     } finally {
       setIsSaving(false);
@@ -389,6 +306,36 @@ export default function ProfilePage() {
     }
   };
 
+  const handleSharePortfolio = async () => {
+    if (!user || !profile) return;
+    
+    if (!profile.slug) {
+      // Generate slug if it doesn't exist
+      const result = await ensureUserHasSlug(user.id, profile.display_name, user.email);
+      if (result.data) {
+        setProfile(result.data);
+      }
+    }
+    
+    const slug = profile.slug || user.id;
+    const portfolioUrl = `${window.location.origin}/portfolio/${slug}`;
+    
+    // Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(portfolioUrl);
+      alert('Portfolio URL copied to clipboard!');
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = portfolioUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Portfolio URL copied to clipboard!');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center">
@@ -418,12 +365,14 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Profile Image */}
             <div className="relative">
-              {profile?.profile_image ? (
-                <img 
-                  src={profile.profile_image} 
-                  alt={profile.display_name || user.email || 'Profile'} 
-                  className="w-32 h-32 rounded-2xl object-cover shadow-lg"
-                />
+                            {profile?.profile_image ? (
+                <>
+                  <img 
+                    src={profile.profile_image} 
+                    alt={profile.display_name || user.email || 'Profile'} 
+                    className="w-32 h-32 rounded-2xl object-cover shadow-lg border-2 border-[#FFD700]"
+                  />
+                </>
               ) : (
                 <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
                   {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
@@ -820,12 +769,20 @@ export default function ProfilePage() {
         <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">Portfolio</h2>
-            <button 
-              onClick={() => setShowAddPortfolio(true)}
-              className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
-            >
-              <Plus className="h-4 w-4" /> Add Project
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleSharePortfolio}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:bg-[#2A2A2A] hover:border-[#FFD700] gap-2"
+              >
+                <Share2 className="h-4 w-4" /> Share Portfolio
+              </button>
+              <button 
+                onClick={() => setShowAddPortfolio(true)}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
+              >
+                <Plus className="h-4 w-4" /> Add Project
+              </button>
+            </div>
           </div>
 
           {/* Add Portfolio Modal */}
