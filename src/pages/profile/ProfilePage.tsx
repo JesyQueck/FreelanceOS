@@ -318,12 +318,37 @@ export default function ProfilePage() {
     }
     
     const slug = profile.slug || user.id;
-    const portfolioUrl = `${window.location.origin}/portfolio/${slug}`;
+    const portfolioUrl = `${window.location.origin}/client-login?freelancer=${slug}`;
     
     // Copy to clipboard
     try {
       await navigator.clipboard.writeText(portfolioUrl);
-      alert('Portfolio URL copied to clipboard!');
+      // Show success message with URL
+      const successMessage = document.createElement('div');
+      successMessage.innerHTML = `
+        <div style="position: fixed; top: 20px; right: 20px; background: #FFD700; color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 24px; height: 24px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio URL Copied!</div>
+              <div style="font-size: 12px; opacity: 0.9;">${portfolioUrl}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(successMessage);
+      
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        if (successMessage.parentNode) {
+          successMessage.parentNode.removeChild(successMessage);
+        }
+      }, 4000);
+      
     } catch (error) {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
@@ -332,7 +357,32 @@ export default function ProfilePage() {
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      alert('Portfolio URL copied to clipboard!');
+      
+      // Show fallback success message
+      const fallbackMessage = document.createElement('div');
+      fallbackMessage.innerHTML = `
+        <div style="position: fixed; top: 20px; right: 20px; background: #FFD700; color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 24px; height: 24px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio URL Copied!</div>
+              <div style="font-size: 12px; opacity: 0.9;">${portfolioUrl}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(fallbackMessage);
+      
+      // Auto-remove after 4 seconds
+      setTimeout(() => {
+        if (fallbackMessage.parentNode) {
+          fallbackMessage.parentNode.removeChild(fallbackMessage);
+        }
+      }, 4000);
     }
   };
 
@@ -360,6 +410,16 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-6">
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Share Portfolio Button - Top Right */}
+        <div className="flex justify-end">
+          <button 
+            onClick={handleSharePortfolio}
+            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:bg-[#2A2A2A] hover:border-[#FFD700] gap-2"
+          >
+            <Share2 className="h-4 w-4" /> Share Portfolio
+          </button>
+        </div>
+
         {/* Profile Header */}
         <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -769,20 +829,12 @@ export default function ProfilePage() {
         <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">Portfolio</h2>
-            <div className="flex gap-2">
-              <button 
-                onClick={handleSharePortfolio}
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white transition-all bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:bg-[#2A2A2A] hover:border-[#FFD700] gap-2"
-              >
-                <Share2 className="h-4 w-4" /> Share Portfolio
-              </button>
-              <button 
+            <button 
                 onClick={() => setShowAddPortfolio(true)}
                 className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
               >
                 <Plus className="h-4 w-4" /> Add Project
               </button>
-            </div>
           </div>
 
           {/* Add Portfolio Modal */}
