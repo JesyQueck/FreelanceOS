@@ -318,7 +318,7 @@ export default function ProfilePage() {
     }
     
     const slug = profile.slug || user.id;
-    const portfolioUrl = `${window.location.origin}/client-login?freelancer=${slug}`;
+    const portfolioUrl = `${window.location.origin}/freelancer/${slug}`;
     
     // Copy to clipboard
     try {
