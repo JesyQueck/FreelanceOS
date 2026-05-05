@@ -33,6 +33,16 @@
     --card: #0A0A0A;
     --border: #1A1A1A;
     --accent: #FFD700;
+    --secondary: #1A1A1A;
+    --secondary-foreground: #E5E5E5;
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+    --warning: #F59E0B;
+    --warning-foreground: #FFFFFF;
+    --success: #10B981;
+    --success-foreground: #FFFFFF;
+    --info: #3B82F6;
+    --info-foreground: #FFFFFF;
   }
 
   body {

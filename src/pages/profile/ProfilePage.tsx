@@ -6,8 +6,7 @@ import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItem
 export default function ProfilePage() {
   const { user, role } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editingField, setEditingField] = useState<string | null>(null);
+    const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   
@@ -96,11 +95,9 @@ export default function ProfilePage() {
           console.error('Error fetching profile data:', error);
           setProfile(null);
         } finally {
-          setLoading(false);
         }
       } else {
-        // No user, set loading to false
-        setLoading(false);
+        // No user, no loading state needed
       }
     };
 
@@ -386,19 +383,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center">
-        <div className="flex gap-1 mb-4">
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-        </div>
-        <div className="text-[#A0A0A0]">Loading profile...</div>
-      </div>
-    );
-  }
-
+  
   if (!user) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">

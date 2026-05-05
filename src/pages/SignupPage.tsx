@@ -131,7 +131,7 @@ export default function SignupPage() {
               id="display_name"
               name="display_name"
               required
-              className="w-full px-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 transition-all duration-200"
+              className="w-full px-4 py-3 bg-[var(--card)] border border-[var(--border)] rounded-xl text-white placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)]/50 transition-all duration-200"
               placeholder="John Doe"
             />
           </div>

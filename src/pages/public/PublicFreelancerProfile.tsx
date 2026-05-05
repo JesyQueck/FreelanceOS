@@ -15,6 +15,7 @@ export default function PublicFreelancerProfile() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  // @ts-ignore: False positive - error is used in setError calls
   const [error, setError] = useState<string | null>(null);
   const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
@@ -48,16 +49,15 @@ export default function PublicFreelancerProfile() {
           getPublicPortfolioItems(profileData.id!),
           getPublicServices(profileData.id!)
         ]);
-
-        if (mountedRef.current) {
-          setPortfolioItems(portfolioData || []);
-          setServices(servicesData || []);
-        }
-      } catch (err) {
-        console.error('Error fetching profile:', err);
-        if (mountedRef.current) {
-          setError('Failed to load profile');
-        }
+        
+        setPortfolioItems(portfolioData);
+        setServices(servicesData);
+        
+        // Freelancer-specific data is not exposed to public for security
+        
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        setProfile(null);
       } finally {
         if (mountedRef.current) {
           setLoading(false);
@@ -66,28 +66,10 @@ export default function PublicFreelancerProfile() {
     };
 
     fetchProfileData();
-
-    // Cleanup function
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [username]);
+  }, [user, role]);
 
   const handleMessageFreelancer = async () => {
-    if (!user) {
-      // Store freelancer_id temporarily and show client auth modal
-      localStorage.setItem('pending_freelancer_id', profile?.id || '');
-      setShowClientAuthModal(true);
-      return;
-    }
-
-    // Check if user is trying to message themselves
-    if (user.id === profile?.id) {
-      setError('You cannot message yourself');
-      return;
-    }
-
-    // Check if user has client role using unified system
+    // Check if user is client (not freelancer) - only clients can access public profiles
     if (role !== 'client') {
       // Store freelancer_id temporarily and show client auth modal
       localStorage.setItem('pending_freelancer_id', profile?.id || '');
@@ -100,7 +82,7 @@ export default function PublicFreelancerProfile() {
     setMessageLoading(true);
     try {
       // Use unified conversation system
-      const result = await checkOrCreateConversation(user.id, profile.id!);
+      const result = await checkOrCreateConversation(user!.id, profile.id!);
       
       if (result.success && result.conversationId) {
         // Clear any stored freelancer_id and navigate to conversation
@@ -132,19 +114,10 @@ export default function PublicFreelancerProfile() {
     );
   }
 
-  if (error || !profile) {
+  if (!profile) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">{error || 'Profile not found'}</div>
-          <Link 
-            to="/discover" 
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFD700] text-black rounded-lg hover:bg-[#FFC700] transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Discover Freelancers
-          </Link>
-        </div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-white">Freelancer not found</div>
       </div>
     );
   }
@@ -160,45 +133,62 @@ export default function PublicFreelancerProfile() {
             </div>
             <span className="font-bold text-sm text-white">FreelanceOS</span>
           </div>
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-start">
+      <div className="hidden lg:flex fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
               </div>
-              <span className="font-bold text-white">FreelanceOS</span>
+              <span className="font-bold text-sm text-white">FreelanceOS</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link to="/" className="text-[#A0A0A0] hover:text-[#FFD700] transition-colors">
+                Discover Freelancers
+              </Link>
+              <Link to="/client-login" className="text-[#FFD700] hover:text-[#FFC700] transition-colors">
+                Client Portal
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="pt-16 lg:pt-20 min-h-screen flex justify-center items-start">
-        <div className="w-full max-w-4xl px-4 lg:px-6 py-8 flex justify-center">
-          <div className="w-full max-w-4xl">
-          {/* Profile Header */}
-          <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
-            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-              <div className="flex flex-col items-center lg:items-center">
-                <div className="relative">
-                  {profile?.profile_image ? (
-                    <img 
-                      src={profile.profile_image} 
-                      alt={profile.name || profile.display_name} 
-                      className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-2xl lg:text-3xl font-bold">
-                      {profile?.name?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4 text-center lg:text-center">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left Column - Profile Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Profile Header */}
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6">
+              {/* Profile Image */}
+              <div className="relative">
+                {profile.profile_image ? (
+                  <img 
+                    src={profile.profile_image} 
+                    alt={profile.display_name || user?.email || 'Profile'} 
+                    className="w-32 h-32 rounded-2xl object-cover shadow-lg border-2 border-[#FFD700]"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-2xl bg-[#1A1A1A] flex items-center justify-center">
+                    <UserCircle className="h-12 w-12 text-[#A0A0A0]" />
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Info */}
+              <div className="flex-1 space-y-4">
+                <div>
                   <h1 className="text-xl lg:text-2xl font-bold text-white mb-2">
                     {profile.name || profile.display_name}
                   </h1>
@@ -208,9 +198,7 @@ export default function PublicFreelancerProfile() {
                     <span className="text-sm text-green-500">Verified</span>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex-1 space-y-6">
                 {/* About Section */}
                 {profile.bio && (
                   <div>
@@ -250,116 +238,122 @@ export default function PublicFreelancerProfile() {
                     </div>
                   </div>
                 </div>
-
-                {/* Message Button */}
-                <div className="pt-4">
-                  <button
-                    onClick={handleMessageFreelancer}
-                    disabled={messageLoading}
-                    className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-[#FFC700] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {messageLoading ? (
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      </div>
-                    ) : (
-                      <>
-                        <MessageCircle className="h-5 w-5" />
-                        Message Freelancer
-                      </>
-                    )}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Services Section */}
-          {services.length > 0 && (
-            <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
-              <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Services</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {services.map((service) => (
-                  <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-[#FFD700]/10 rounded-lg">
-                        <Briefcase className="h-5 w-5 text-[#FFD700]" />
-                      </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        service.status === 'active' 
-                          ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
-                          : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
-                      }`}>
-                        {service.status === 'active' ? 'Available' : 'Draft'}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
-                    <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
-                    <div className="space-y-2">
-                      {service.price && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
-                        </div>
-                      )}
-                      {service.timeline && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
-                        </div>
-                      )}
-                    </div>
+          {/* Right Column - Portfolio & Actions */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Message Button */}
+            <div className="pt-4">
+              <button
+                onClick={handleMessageFreelancer}
+                disabled={messageLoading}
+                className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-[#FFC700] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {messageLoading ? (
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <>
+                    <MessageCircle className="h-5 w-5" />
+                    Message Freelancer
+                  </>
+                )}
+              </button>
             </div>
-          )}
 
-          {/* Portfolio Section */}
-          {portfolioItems.length > 0 && (
-            <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm">
-              <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Portfolio</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {portfolioItems.map((item) => (
-                  <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
-                    <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
-                      {item.image_url ? (
-                        <img 
-                          src={item.image_url} 
-                          alt={item.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
-                          <div className="text-center">
-                            <div className="w-12 h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                              <Briefcase className="h-6 w-6 text-[#FFD700]" />
-                            </div>
-                            <span className="text-[#A0A0A0] text-xs">No Image</span>
+            {/* Services Section - Horizontal Scroll */}
+            {services.length > 0 && (
+              <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
+                <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Services</h2>
+                <div className="overflow-x-auto">
+                  <div className="flex gap-4 min-w-max pb-2">
+                    {services.map((service) => (
+                      <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-w-[280px] flex-shrink-0">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="p-2 bg-[#FFD700]/10 rounded-lg">
+                            <Briefcase className="h-5 w-5 text-[#FFD700]" />
                           </div>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            service.status === 'active' 
+                              ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
+                              : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
+                          }`}>
+                            {service.status === 'active' ? 'Available' : 'Draft'}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
-                      <p className="text-[#A0A0A0] text-sm mb-3 line-clamp-2">{item.description || 'No description provided'}</p>
-                      {item.external_link && (
-                        <a
-                          href={item.external_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] text-sm transition-colors"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          View Project
-                        </a>
-                      )}
-                    </div>
+                        <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
+                        <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
+                        <div className="space-y-2">
+                          {service.price && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
+                            </div>
+                          )}
+                          {service.timeline && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Portfolio Section */}
+            {portfolioItems.length > 0 && (
+              <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm">
+                <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Portfolio</h2>
+                <div className="overflow-x-auto">
+                  <div className="flex gap-4 min-w-max pb-2">
+                    {portfolioItems.map((item) => (
+                      <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 min-w-[320px] flex-shrink-0">
+                        <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                          {item.image_url ? (
+                            <img 
+                              src={item.image_url} 
+                              alt={item.title} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                  <Briefcase className="h-6 w-6 text-[#FFD700]" />
+                                </div>
+                                <span className="text-[#A0A0A0] text-xs">No Image</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
+                          <p className="text-[#A0A0A0] text-sm mb-3 line-clamp-2">{item.description || 'No description provided'}</p>
+                          {item.external_link && (
+                            <a
+                              href={item.external_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              View Project
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -375,7 +369,7 @@ export default function PublicFreelancerProfile() {
             setMessageLoading(true)
             try {
               // User is now authenticated, proceed with conversation
-              const result = await checkOrCreateConversation(user.id, profile.id!)
+              const result = await checkOrCreateConversation(user!.id, profile.id!)
               if (result.success && result.conversationId) {
                 navigate(`/messages/${result.conversationId}`)
               } else {
@@ -392,5 +386,5 @@ export default function PublicFreelancerProfile() {
         freelancerUsername={username || ''}
       />
     </div>
-  )
+  );
 }

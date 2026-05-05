@@ -12,8 +12,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="flex gap-1 mb-4">
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <div className="text-[#A0A0A0]">Loading...</div>
+        </div>
       </div>
     )
   }
