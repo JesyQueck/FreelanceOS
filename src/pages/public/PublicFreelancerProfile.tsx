@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
@@ -15,7 +15,6 @@ export default function PublicFreelancerProfile() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  // @ts-ignore: False positive - error is used in setError calls
   const [error, setError] = useState<string | null>(null);
   const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
@@ -52,8 +51,6 @@ export default function PublicFreelancerProfile() {
         
         setPortfolioItems(portfolioData);
         setServices(servicesData);
-        
-        // Freelancer-specific data is not exposed to public for security
         
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -126,7 +123,7 @@ export default function PublicFreelancerProfile() {
     <div className="min-h-screen bg-black">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
-        <div className="flex items-center justify-start px-4 py-6">
+        <div className="flex items-center justify-between px-4 py-6">
           <div className="flex items-center gap-2">
             <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
@@ -165,197 +162,387 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 lg:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Profile Header */}
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6">
-              {/* Profile Image */}
-              <div className="relative">
+      <div className="container mx-auto px-4 py-6 lg:py-12">
+        {/* Hero Section */}
+        <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+            {/* Profile Image */}
+            <div className="lg:col-span-1 flex justify-center lg:justify-start">
+              <div className="relative group">
                 {profile.profile_image ? (
-                  <img 
-                    src={profile.profile_image} 
-                    alt={profile.display_name || user?.email || 'Profile'} 
-                    className="w-32 h-32 rounded-2xl object-cover shadow-lg border-2 border-[#FFD700]"
-                  />
+                  <div className="relative">
+                    <img 
+                      src={profile.profile_image} 
+                      alt={profile.display_name || user?.email || 'Profile'} 
+                      className="w-40 h-40 lg:w-48 lg:h-48 rounded-3xl object-cover shadow-2xl border-4 border-[#FFD700] transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute -bottom-2 -right-2 bg-[#FFD700] rounded-full p-2 shadow-lg">
+                      <CheckCircle2 className="h-6 w-6 text-black" />
+                    </div>
+                  </div>
                 ) : (
-                  <div className="w-32 h-32 rounded-2xl bg-[#1A1A1A] flex items-center justify-center">
-                    <UserCircle className="h-12 w-12 text-[#A0A0A0]" />
+                  <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-3xl bg-[#1A1A1A] flex items-center justify-center border-4 border-[#FFD700] shadow-2xl">
+                    <UserCircle className="h-16 w-16 lg:h-20 lg:w-20 text-[#A0A0A0]" />
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Profile Info */}
-              <div className="flex-1 space-y-4">
-                <div>
-                  <h1 className="text-xl lg:text-2xl font-bold text-white mb-2">
-                    {profile.name || profile.display_name}
-                  </h1>
-                  <p className="text-[#A0A0A0] mb-3">Freelancer</p>
-                  <div className="flex items-center justify-center gap-1">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+            {/* Profile Info */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* Name and Status */}
+              <div className="text-center lg:text-left">
+                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                  {profile.name || profile.display_name}
+                </h1>
+                <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                  <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
+                    Freelancer
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
                     <span className="text-sm text-green-500">Verified</span>
                   </div>
                 </div>
+              </div>
 
-                {/* About Section */}
-                {profile.bio && (
+              {/* Contact Information */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="flex items-center gap-4 bg-[#1A1A1A]/30 rounded-2xl p-4 border border-[#2A2A2A]/30">
+                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
+                    <Mail className="h-6 w-6 text-[#FFD700]" />
+                  </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-3">About</h3>
-                    <p className="text-[#A0A0A0] leading-relaxed">{profile.bio}</p>
+                    <p className="text-xs text-[#A0A0A0] mb-1">Email</p>
+                    <p className="text-sm text-white font-medium">{profile.email || 'Not provided'}</p>
                   </div>
-                )}
-
-                {/* Skills Section */}
-                {profile.skills && profile.skills.length > 0 && (
+                </div>
+                <div className="flex items-center gap-4 bg-[#1A1A1A]/30 rounded-2xl p-4 border border-[#2A2A2A]/30">
+                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
+                    <UserCircle className="h-6 w-6 text-[#FFD700]" />
+                  </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Skills</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {profile.skills.map((skill, index) => (
-                        <span key={index} className="px-3 py-1 bg-[#1A1A1A] text-white rounded-lg text-sm">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Contact Info */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <UserCircle className="h-5 w-5 text-[#FFD700]" />
-                    <div>
-                      <p className="text-xs text-[#A0A0A0]">Display Name</p>
-                      <p className="text-sm text-white">{profile.display_name || 'Not set'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-[#FFD700]" />
-                    <div>
-                      <p className="text-xs text-[#A0A0A0]">Contact</p>
-                      <p className="text-sm text-white">Available for work</p>
-                    </div>
+                    <p className="text-xs text-[#A0A0A0] mb-1">Member Since</p>
+                    <p className="text-sm text-white font-medium">
+                      {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long' 
+                      }) : 'Not available'}
+                    </p>
                   </div>
                 </div>
               </div>
+
+              {/* Bio */}
+              {profile.bio && (
+                <div className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                    About
+                  </h3>
+                  <p className="text-[#A0A0A0] leading-relaxed text-lg">{profile.bio}</p>
+                </div>
+              )}
+
+              {/* Skills */}
+              {profile.skills && profile.skills.length > 0 && (
+                <div className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                  <h3 className="text-lg font-semibold text-white mb-4">Skills</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {profile.skills.map((skill, index) => (
+                      <span key={index} className="px-4 py-2 bg-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/20 rounded-xl text-sm font-medium hover:bg-[#FFD700]/20 transition-colors">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right Column - Portfolio & Actions */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Message Button */}
-            <div className="pt-4">
+          {/* Action Button */}
+          <div className="mt-8 pt-6 border-t border-[#1A1A1A]">
+            <div className="flex justify-center">
               <button
                 onClick={handleMessageFreelancer}
                 disabled={messageLoading}
-                className="w-full lg:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-[#FFC700] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FFD700] text-black font-bold text-lg rounded-xl hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[250px]"
               >
                 {messageLoading ? (
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
                 ) : (
                   <>
-                    <MessageCircle className="h-5 w-5" />
+                    <MessageCircle className="h-6 w-6" />
                     Message Freelancer
                   </>
                 )}
               </button>
             </div>
-
-            {/* Services Section - Horizontal Scroll */}
-            {services.length > 0 && (
-              <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm mb-6">
-                <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Services</h2>
-                <div className="overflow-x-auto">
-                  <div className="flex gap-4 min-w-max pb-2">
-                    {services.map((service) => (
-                      <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-w-[280px] flex-shrink-0">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="p-2 bg-[#FFD700]/10 rounded-lg">
-                            <Briefcase className="h-5 w-5 text-[#FFD700]" />
-                          </div>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            service.status === 'active' 
-                              ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
-                              : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
-                          }`}>
-                            {service.status === 'active' ? 'Available' : 'Draft'}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
-                        <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
-                        <div className="space-y-2">
-                          {service.price && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
-                            </div>
-                          )}
-                          {service.timeline && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Portfolio Section */}
-            {portfolioItems.length > 0 && (
-              <div className="bg-[#0A0A0A] rounded-2xl p-6 lg:p-8 border border-[#1A1A1A] shadow-sm">
-                <h2 className="text-xl lg:text-2xl font-bold text-white mb-6">Portfolio</h2>
-                <div className="overflow-x-auto">
-                  <div className="flex gap-4 min-w-max pb-2">
-                    {portfolioItems.map((item) => (
-                      <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 min-w-[320px] flex-shrink-0">
-                        <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
-                          {item.image_url ? (
-                            <img 
-                              src={item.image_url} 
-                              alt={item.title} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
-                              <div className="text-center">
-                                <div className="w-12 h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                                  <Briefcase className="h-6 w-6 text-[#FFD700]" />
-                                </div>
-                                <span className="text-[#A0A0A0] text-xs">No Image</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
-                          <p className="text-[#A0A0A0] text-sm mb-3 line-clamp-2">{item.description || 'No description provided'}</p>
-                          {item.external_link && (
-                            <a
-                              href={item.external_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              View Project
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Professional Information - From Profile Preferences */}
+        {profile.preferences && (
+          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-8 flex items-center gap-3">
+              <Briefcase className="h-8 w-8 text-[#FFD700]" />
+              Professional Information
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {profile.preferences.hourly_rate && (
+                <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
+                    <DollarSign className="h-6 w-6 text-[#FFD700]" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-white mb-1">
+                      ${profile.preferences.hourly_rate}/hr
+                    </p>
+                    <p className="text-[#A0A0A0] text-sm">Hourly Rate</p>
+                  </div>
+                </div>
+              )}
+              
+              {profile.preferences.response_time && (
+                <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
+                    <Clock className="h-6 w-6 text-[#FFD700]" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-white mb-1">
+                      {profile.preferences.response_time}
+                    </p>
+                    <p className="text-[#A0A0A0] text-sm">Available</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                <div className="bg-[#FFD700]/10 p-3 rounded-xl">
+                  <TrendingUp className="h-6 w-6 text-[#FFD700]" />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-white mb-1">
+                    {portfolioItems.length}
+                  </p>
+                  <p className="text-[#A0A0A0] text-sm">Projects Completed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Experience - From Profile Preferences */}
+        {profile.preferences?.experience && (
+          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-8 flex items-center gap-3">
+              <Briefcase className="h-8 w-8 text-[#FFD700]" />
+              Experience
+            </h2>
+            <div className="space-y-4">
+              {typeof profile.preferences.experience === 'string' ? (
+                <p className="text-[#A0A0A0] leading-relaxed text-lg">{profile.preferences.experience}</p>
+              ) : (
+                Array.isArray(profile.preferences.experience) ? profile.preferences.experience.map((exp: any, index: number) => (
+                  <div key={index} className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
+                    <div className="border-l-2 border-[#FFD700]/30 pl-4">
+                      <h4 className="text-white font-bold text-lg mb-1">{exp.title}</h4>
+                      <p className="text-[#A0A0A0] text-sm mb-1">{exp.company}</p>
+                      <p className="text-[#FFD700] text-sm">{exp.duration}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-[#A0A0A0] text-lg">{JSON.stringify(profile.preferences.experience)}</p>
+                )
+              )}
+            </div>
+          </div>
+        )}
+
+        
+        {/* Services Section */}
+        {services.length > 0 && (
+          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
+                <Briefcase className="h-8 w-8 text-[#FFD700]" />
+                Services
+              </h2>
+              <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
+                {services.length} Services Available
+              </span>
+            </div>
+            {/* Desktop: Grid Layout */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {services.map((service) => (
+                <div key={service.id} className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 bg-[#FFD700]/10 rounded-xl">
+                      <Briefcase className="h-6 w-6 text-[#FFD700]" />
+                    </div>
+                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                      service.status === 'active' 
+                        ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
+                        : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
+                    }`}>
+                      {service.status === 'active' ? 'Available' : 'Draft'}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
+                  <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
+                  <div className="space-y-3">
+                    {service.price && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-[#FFD700]">{service.price}</span>
+                      </div>
+                    )}
+                    {service.timeline && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Mobile: Horizontal Scroll */}
+            <div className="lg:hidden overflow-x-auto">
+              <div className="flex gap-4 min-w-max pb-2">
+                {services.map((service) => (
+                  <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-w-[280px] flex-shrink-0">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="p-2 bg-[#FFD700]/10 rounded-lg">
+                        <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        service.status === 'active' 
+                          ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
+                          : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
+                      }`}>
+                        {service.status === 'active' ? 'Available' : 'Draft'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
+                    <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
+                    <div className="space-y-2">
+                      {service.price && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
+                        </div>
+                      )}
+                      {service.timeline && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Portfolio Section */}
+        {portfolioItems.length > 0 && (
+          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
+                <Briefcase className="h-8 w-8 text-[#FFD700]" />
+                Portfolio
+              </h2>
+              <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
+                {portfolioItems.length} Projects
+              </span>
+            </div>
+            {/* Desktop: Grid Layout */}
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {portfolioItems.map((item) => (
+                <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-2xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
+                  <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                    {item.image_url ? (
+                      <img 
+                        src={item.image_url} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                        <div className="text-center">
+                          <div className="w-12 h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <Briefcase className="h-6 w-6 text-[#FFD700]" />
+                          </div>
+                          <span className="text-[#A0A0A0] text-xs">No Image</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-lg group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
+                    <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                    {item.external_link && (
+                      <a
+                        href={item.external_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        View Project
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Mobile: Horizontal Scroll */}
+            <div className="lg:hidden overflow-x-auto">
+              <div className="flex gap-4 min-w-max pb-2">
+                {portfolioItems.map((item) => (
+                  <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 min-w-[320px] flex-shrink-0">
+                    <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                      {item.image_url ? (
+                        <img 
+                          src={item.image_url} 
+                          alt={item.title} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                          <div className="text-center">
+                            <div className="w-12 h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                              <Briefcase className="h-6 w-6 text-[#FFD700]" />
+                            </div>
+                            <span className="text-[#A0A0A0] text-xs">No Image</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
+                      <p className="text-[#A0A0A0] text-sm mb-3 line-clamp-2">{item.description || 'No description provided'}</p>
+                      {item.external_link && (
+                        <a
+                          href={item.external_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          View Project
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Client Auth Modal */}
