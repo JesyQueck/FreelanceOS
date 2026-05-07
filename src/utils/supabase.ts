@@ -1445,7 +1445,7 @@ export const getPublicUserProfile = async (username: string): Promise<UserProfil
     // Use simple query without complex options
     const { data, error } = await supabase
       .from('users')
-      .select('display_name, bio, profile_image, created_at, id, updated_at, username, slug')
+      .select('display_name, name, bio, profile_image, created_at, id, updated_at, username, slug, email')
       .eq('username', username)
       .maybeSingle();
     

@@ -1,29 +1,54 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, Clock, DollarSign, TrendingUp } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
+import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 
+// Helper function to get relative time
+const getRelativeTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+  const diffInMonths = Math.floor(diffInDays / 30);
+  const diffInYears = Math.floor(diffInDays / 365);
+
+  if (diffInDays < 30) {
+    return 'Recently joined';
+  } else if (diffInMonths === 1) {
+    return '1 month ago';
+  } else if (diffInMonths <= 11) {
+    return `${diffInMonths} months ago`;
+  } else if (diffInYears === 1) {
+    return '1 year ago';
+  } else {
+    return date.toLocaleDateString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  }
+};
+
 export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [freelancerProfile, setFreelancerProfile] = useState<any>(null);
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [messageLoading, setMessageLoading] = useState(false);
+    const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!username || !mountedRef.current) {
         if (mountedRef.current) {
-          setError('Freelancer not found');
           setLoading(false);
         }
         return;
@@ -31,31 +56,33 @@ export default function PublicFreelancerProfile() {
 
       try {
         setLoading(true);
-        setError(null);
-
-        // Fetch public profile data
+        
+        // Fetch user profile first to get the user_id
         const profileData = await getPublicUserProfile(username);
-        if (!profileData || !mountedRef.current) {
+        
+        if (!profileData) {
           if (mountedRef.current) {
-            setError('Freelancer profile not found');
+            setLoading(false);
           }
           return;
         }
-        setProfile(profileData);
-
-        // Fetch portfolio items and services in parallel
-        const [portfolioData, servicesData] = await Promise.all([
+        
+        // Fetch all other data using the user_id from profile data
+        const [freelancerData, portfolioData, servicesData] = await Promise.all([
+          getFreelancerProfile(profileData.id!),
           getPublicPortfolioItems(profileData.id!),
           getPublicServices(profileData.id!)
         ]);
         
-        setPortfolioItems(portfolioData);
-        setServices(servicesData);
-        
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-        setProfile(null);
-      } finally {
+        if (mountedRef.current) {
+          setProfile(profileData);
+          setFreelancerProfile(freelancerData);
+          setPortfolioItems(portfolioData);
+          setServices(servicesData);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching profile data:', err);
         if (mountedRef.current) {
           setLoading(false);
         }
@@ -63,34 +90,30 @@ export default function PublicFreelancerProfile() {
     };
 
     fetchProfileData();
-  }, [user, role]);
+  }, [username]);
 
   const handleMessageFreelancer = async () => {
-    // Check if user is client (not freelancer) - only clients can access public profiles
-    if (role !== 'client') {
-      // Store freelancer_id temporarily and show client auth modal
-      localStorage.setItem('pending_freelancer_id', profile?.id || '');
+    if (!user) {
       setShowClientAuthModal(true);
       return;
     }
 
-    if (!profile) return;
+    if (!profile) {
+      return;
+    }
 
     setMessageLoading(true);
     try {
-      // Use unified conversation system
+      // User is now authenticated, proceed with conversation
       const result = await checkOrCreateConversation(user!.id, profile.id!);
-      
       if (result.success && result.conversationId) {
-        // Clear any stored freelancer_id and navigate to conversation
-        localStorage.removeItem('pending_freelancer_id');
         navigate(`/messages/${result.conversationId}`);
       } else {
-        setError(result.error || 'Failed to start conversation');
+        alert(result.error || 'Failed to start conversation');
       }
     } catch (err) {
       console.error('Error starting conversation:', err);
-      setError('Failed to start conversation');
+      alert('Failed to start conversation');
     } finally {
       setMessageLoading(false);
     }
@@ -98,14 +121,14 @@ export default function PublicFreelancerProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="flex gap-1 mb-4">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex gap-2">
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
             <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
-          <div className="text-[#A0A0A0]">Loading profile...</div>
+          <div className="text-white">Loading freelancer profile...</div>
         </div>
       </div>
     );
@@ -192,7 +215,7 @@ export default function PublicFreelancerProfile() {
             <div className="lg:col-span-3 space-y-6">
               {/* Name and Status */}
               <div className="text-center lg:text-left">
-                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">
                   {profile.name || profile.display_name}
                 </h1>
                 <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
@@ -224,10 +247,7 @@ export default function PublicFreelancerProfile() {
                   <div>
                     <p className="text-xs text-[#A0A0A0] mb-1">Member Since</p>
                     <p className="text-sm text-white font-medium">
-                      {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long' 
-                      }) : 'Not available'}
+                      {profile.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
                     </p>
                   </div>
                 </div>
@@ -240,136 +260,86 @@ export default function PublicFreelancerProfile() {
                     <Briefcase className="h-5 w-5 text-[#FFD700]" />
                     About
                   </h3>
-                  <p className="text-[#A0A0A0] leading-relaxed text-lg">{profile.bio}</p>
+                  <p className="text-[#A0A0A0] leading-relaxed">{profile.bio}</p>
                 </div>
               )}
 
-              {/* Skills */}
-              {profile.skills && profile.skills.length > 0 && (
-                <div className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                  <h3 className="text-lg font-semibold text-white mb-4">Skills</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {profile.skills.map((skill, index) => (
-                      <span key={index} className="px-4 py-2 bg-[#FFD700]/10 text-[#FFD700] border border-[#FFD700]/20 rounded-xl text-sm font-medium hover:bg-[#FFD700]/20 transition-colors">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Action Button */}
-          <div className="mt-8 pt-6 border-t border-[#1A1A1A]">
-            <div className="flex justify-center">
-              <button
-                onClick={handleMessageFreelancer}
-                disabled={messageLoading}
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FFD700] text-black font-bold text-lg rounded-xl hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[250px]"
-              >
-                {messageLoading ? (
-                  <div className="flex gap-2">
-                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                  </div>
-                ) : (
-                  <>
-                    <MessageCircle className="h-6 w-6" />
-                    Message Freelancer
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Professional Information - From Profile Preferences */}
-        {profile.preferences && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-8 flex items-center gap-3">
-              <Briefcase className="h-8 w-8 text-[#FFD700]" />
-              Professional Information
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {profile.preferences.hourly_rate && (
-                <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
-                    <DollarSign className="h-6 w-6 text-[#FFD700]" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-white mb-1">
-                      ${profile.preferences.hourly_rate}/hr
-                    </p>
-                    <p className="text-[#A0A0A0] text-sm">Hourly Rate</p>
-                  </div>
-                </div>
-              )}
-              
-              {profile.preferences.response_time && (
-                <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
-                    <Clock className="h-6 w-6 text-[#FFD700]" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-white mb-1">
-                      {profile.preferences.response_time}
-                    </p>
-                    <p className="text-[#A0A0A0] text-sm">Available</p>
-                  </div>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-4 bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                <div className="bg-[#FFD700]/10 p-3 rounded-xl">
-                  <TrendingUp className="h-6 w-6 text-[#FFD700]" />
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-white mb-1">
-                    {portfolioItems.length}
-                  </p>
-                  <p className="text-[#A0A0A0] text-sm">Projects Completed</p>
+              {/* Action Button */}
+              <div className="mt-8 pt-6 border-t border-[#1A1A1A]">
+                <div className="flex justify-center">
+                  <button
+                    onClick={handleMessageFreelancer}
+                    disabled={messageLoading}
+                    className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FFD700] text-black font-bold text-lg rounded-xl hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[250px]"
+                  >
+                    {messageLoading ? (
+                      <div className="flex gap-2">
+                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    ) : (
+                      <>
+                        <MessageCircle className="h-6 w-6" />
+                        Message Freelancer
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Experience - From Profile Preferences */}
-        {profile.preferences?.experience && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-8 flex items-center gap-3">
-              <Briefcase className="h-8 w-8 text-[#FFD700]" />
-              Experience
-            </h2>
-            <div className="space-y-4">
-              {typeof profile.preferences.experience === 'string' ? (
-                <p className="text-[#A0A0A0] leading-relaxed text-lg">{profile.preferences.experience}</p>
-              ) : (
-                Array.isArray(profile.preferences.experience) ? profile.preferences.experience.map((exp: any, index: number) => (
-                  <div key={index} className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                    <div className="border-l-2 border-[#FFD700]/30 pl-4">
-                      <h4 className="text-white font-bold text-lg mb-1">{exp.title}</h4>
-                      <p className="text-[#A0A0A0] text-sm mb-1">{exp.company}</p>
-                      <p className="text-[#FFD700] text-sm">{exp.duration}</p>
-                    </div>
-                  </div>
-                )) : (
-                  <p className="text-[#A0A0A0] text-lg">{JSON.stringify(profile.preferences.experience)}</p>
-                )
-              )}
+        {/* Professional Information - From Freelancer Profile */}
+        <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
+          <h2 className="text-xl lg:text-2xl font-bold text-white mb-8 flex items-center gap-3">
+            <Briefcase className="h-6 w-6 text-[#FFD700]" />
+            Professional Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs text-[#A0A0A0] mb-1">Hourly Rate</p>
+              <p className="text-sm text-white font-medium">
+                {freelancerProfile?.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#A0A0A0] mb-1">Experience Level</p>
+              <p className="text-sm text-white font-medium capitalize">
+                {freelancerProfile?.experience_level || 'Not set'}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#A0A0A0] mb-1">Availability</p>
+              <p className="text-sm text-white font-medium capitalize">
+                {freelancerProfile?.availability || 'Not set'}
+              </p>
             </div>
           </div>
-        )}
+          {freelancerProfile && freelancerProfile.skills && freelancerProfile.skills.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs text-[#A0A0A0] mb-2">Skills</p>
+              <div className="flex flex-wrap gap-2">
+                {freelancerProfile.skills.map((skill: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-        
         {/* Services Section */}
         {services.length > 0 && (
           <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-                <Briefcase className="h-8 w-8 text-[#FFD700]" />
+              <h2 className="text-xl lg:text-2xl font-bold text-white flex items-center gap-3">
+                <Briefcase className="h-6 w-6 text-[#FFD700]" />
                 Services
               </h2>
               <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
@@ -409,11 +379,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Horizontal Scroll */}
-            <div className="lg:hidden overflow-x-auto">
-              <div className="flex gap-4 min-w-max pb-2">
+            {/* Mobile: Horizontal Scroll - only if more than one service */}
+            <div className={`lg:hidden ${services.length > 1 ? 'overflow-x-auto' : ''}`}>
+              <div className={`flex gap-4 ${services.length > 1 ? 'min-w-max pb-2' : ''}`}>
                 {services.map((service) => (
-                  <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-w-[280px] flex-shrink-0">
+                  <div key={service.id} className={`bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all ${services.length > 1 ? 'min-w-[280px] flex-shrink-0' : ''}`}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[#FFD700]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[#FFD700]" />
@@ -422,7 +392,7 @@ export default function PublicFreelancerProfile() {
                         service.status === 'active' 
                           ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
                           : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
-                      }`}>
+                        }`}>
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
@@ -449,10 +419,10 @@ export default function PublicFreelancerProfile() {
 
         {/* Portfolio Section */}
         {portfolioItems.length > 0 && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl">
+          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-                <Briefcase className="h-8 w-8 text-[#FFD700]" />
+              <h2 className="text-xl lg:text-2xl font-bold text-white flex items-center gap-3">
+                <Briefcase className="h-6 w-6 text-[#FFD700]" />
                 Portfolio
               </h2>
               <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
@@ -499,11 +469,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Horizontal Scroll */}
-            <div className="lg:hidden overflow-x-auto">
-              <div className="flex gap-4 min-w-max pb-2">
+            {/* Mobile: Horizontal Scroll - only if more than one item */}
+            <div className={`lg:hidden ${portfolioItems.length > 1 ? 'overflow-x-auto' : ''}`}>
+              <div className={`flex gap-4 ${portfolioItems.length > 1 ? 'min-w-max pb-2' : ''}`}>
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 min-w-[320px] flex-shrink-0">
+                  <div key={item.id} className={`group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 ${portfolioItems.length > 1 ? 'min-w-[320px] flex-shrink-0' : ''}`}>
                     <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img 
@@ -543,35 +513,35 @@ export default function PublicFreelancerProfile() {
             </div>
           </div>
         )}
-      </div>
 
-      {/* Client Auth Modal */}
-      <ClientAuthModal
-        isOpen={showClientAuthModal}
-        onClose={() => setShowClientAuthModal(false)}
-        onAuthSuccess={async () => {
-          setShowClientAuthModal(false)
-          // After successful auth, proceed with conversation
-          if (user && profile) {
-            setMessageLoading(true)
-            try {
-              // User is now authenticated, proceed with conversation
-              const result = await checkOrCreateConversation(user!.id, profile.id!)
-              if (result.success && result.conversationId) {
-                navigate(`/messages/${result.conversationId}`)
-              } else {
-                setError(result.error || 'Failed to start conversation')
+        {/* Client Auth Modal */}
+        <ClientAuthModal
+          isOpen={showClientAuthModal}
+          onClose={() => setShowClientAuthModal(false)}
+          onAuthSuccess={async () => {
+            setShowClientAuthModal(false);
+            // After successful auth, proceed with conversation
+            if (user && profile) {
+              setMessageLoading(true);
+              try {
+                // User is now authenticated, proceed with conversation
+                const result = await checkOrCreateConversation(user!.id, profile.id!);
+                if (result.success && result.conversationId) {
+                  navigate(`/messages/${result.conversationId}`);
+                } else {
+                  alert(result.error || 'Failed to start conversation');
+                }
+              } catch (err) {
+                console.error('Error starting conversation:', err);
+                alert('Failed to start conversation');
+              } finally {
+                setMessageLoading(false);
               }
-            } catch (err) {
-              console.error('Error starting conversation:', err)
-              setError('Failed to start conversation')
-            } finally {
-              setMessageLoading(false)
             }
-          }
-        }}
-        freelancerUsername={username || ''}
-      />
+          }}
+          freelancerUsername={username || ''}
+        />
+      </div>
     </div>
   );
 }
