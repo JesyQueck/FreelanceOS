@@ -372,11 +372,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Horizontal Scroll - only if more than one service */}
-            <div className={`lg:hidden ${services.length > 1 ? 'overflow-x-auto' : ''}`}>
-              <div className={`flex gap-4 ${services.length > 1 ? 'min-w-max pb-2' : ''}`}>
+            {/* Mobile: Card-by-Card View - only if more than one service */}
+            <div className="lg:hidden">
+              <div className="flex flex-col gap-4">
                 {services.map((service) => (
-                  <div key={service.id} className={`bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all ${services.length > 1 ? 'min-w-[280px] flex-shrink-0' : ''}`}>
+                  <div key={service.id} className={`${services.length > 1 ? 'overflow-x-auto' : ''} bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all ${services.length > 1 ? 'min-w-[280px] flex-shrink-0' : ''}`}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[#FFD700]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[#FFD700]" />
@@ -462,11 +462,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Horizontal Scroll - only if more than one item */}
-            <div className={`lg:hidden ${portfolioItems.length > 1 ? 'overflow-x-auto' : ''}`}>
-              <div className={`flex gap-4 ${portfolioItems.length > 1 ? 'min-w-max pb-2' : ''}`}>
+            {/* Mobile: Card-by-Card View - only if more than one item */}
+            <div className="lg:hidden">
+              <div className="flex flex-col gap-4">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className={`group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 ${portfolioItems.length > 1 ? 'min-w-[320px] flex-shrink-0' : ''}`}>
+                  <div key={item.id} className={`${portfolioItems.length > 1 ? 'overflow-x-auto' : ''} group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 ${portfolioItems.length > 1 ? 'min-w-[320px] flex-shrink-0' : ''}`}>
                     <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img 
