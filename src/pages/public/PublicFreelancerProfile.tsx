@@ -185,7 +185,7 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 lg:py-12">
+      <div className="container mx-auto px-4 pt-24 lg:pt-12 pb-6 lg:pb-12">
         {/* Hero Section */}
         <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
@@ -218,7 +218,7 @@ export default function PublicFreelancerProfile() {
                 <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">
                   {profile.name || profile.display_name}
                 </h1>
-                <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
+                <div className="flex flex-col items-center lg:items-start gap-3 mb-4">
                   <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
                     Freelancer
                   </span>
@@ -349,18 +349,11 @@ export default function PublicFreelancerProfile() {
             {/* Desktop: Grid Layout */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
+                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-6 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
                   <div className="flex items-start justify-between mb-4">
                     <div className="p-3 bg-[#FFD700]/10 rounded-xl">
                       <Briefcase className="h-6 w-6 text-[#FFD700]" />
                     </div>
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                      service.status === 'active' 
-                        ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30' 
-                        : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
-                    }`}>
-                      {service.status === 'active' ? 'Available' : 'Draft'}
-                    </span>
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
                   <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
@@ -432,7 +425,7 @@ export default function PublicFreelancerProfile() {
             {/* Desktop: Grid Layout */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-2xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
+                <div key={item.id} className="group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300">
                   <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                     {item.image_url ? (
                       <img 
@@ -473,7 +466,7 @@ export default function PublicFreelancerProfile() {
             <div className={`lg:hidden ${portfolioItems.length > 1 ? 'overflow-x-auto' : ''}`}>
               <div className={`flex gap-4 ${portfolioItems.length > 1 ? 'min-w-max pb-2' : ''}`}>
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className={`group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300 ${portfolioItems.length > 1 ? 'min-w-[320px] flex-shrink-0' : ''}`}>
+                  <div key={item.id} className={`group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 ${portfolioItems.length > 1 ? 'min-w-[320px] flex-shrink-0' : ''}`}>
                     <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img 
