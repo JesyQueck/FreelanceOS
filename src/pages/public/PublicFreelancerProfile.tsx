@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, DollarSign, Clock } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
@@ -341,22 +341,26 @@ export default function PublicFreelancerProfile() {
             {/* Desktop: Grid Layout */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 lg:p-5 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
+                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 lg:p-5 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group flex flex-col h-full">
                   <div className="flex items-start justify-between mb-3">
                     <div className="p-2 lg:p-3 bg-[#FFD700]/10 rounded-xl">
                       <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[#FFD700]" />
                     </div>
                   </div>
                   <h3 className="text-base lg:text-lg font-semibold text-white mb-2 lg:mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
-                  <p className="text-xs lg:text-sm text-[#A0A0A0] mb-3 lg:mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
-                  <div className="space-y-2 lg:space-y-3">
+                  <div className="flex-grow">
+                    <p className="text-xs lg:text-sm text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
+                  </div>
+                  <div className="space-y-2 lg:space-y-3 mt-auto pt-3 lg:pt-4">
                     {service.price && (
                       <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-[#FFD700]" />
                         <span className="text-base lg:text-lg font-bold text-[#FFD700]">{service.price}</span>
                       </div>
                     )}
                     {service.timeline && (
                       <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-[#A0A0A0]" />
                         <span className="text-xs lg:text-sm text-[#A0A0A0]">{service.timeline}</span>
                       </div>
                     )}
@@ -368,7 +372,7 @@ export default function PublicFreelancerProfile() {
             <div className="lg:hidden overflow-x-auto -mx-6 px-6">
               <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all h-56">
+                  <div key={service.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[#FFD700]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[#FFD700]" />
@@ -382,15 +386,19 @@ export default function PublicFreelancerProfile() {
                       </span>
                     </div>
                     <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 80 ? `${service.title.substring(0, 80)}...` : service.title}</h3>
-                    <p className="text-xs text-[#A0A0A0] mb-3 leading-relaxed">{service.description || 'No description provided'}</p>
-                    <div className="space-y-2">
+                    <div className="flex-grow">
+                      <p className="text-xs text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
+                    </div>
+                    <div className="space-y-2 mt-auto pt-3">
                       {service.price && (
                         <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-[#FFD700]" />
                           <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
                         </div>
                       )}
                       {service.timeline && (
                         <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-[#A0A0A0]" />
                           <span className="text-xs text-[#A0A0A0]">{service.timeline}</span>
                         </div>
                       )}

@@ -343,7 +343,7 @@ export default function ServicesPage() {
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4" />
+                    <Save className="h-4 w-4 flex-shrink-0" />
                     Update Service
                   </>
                 )}
@@ -366,7 +366,7 @@ export default function ServicesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
-            <div key={service.id} className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all">
+            <div key={service.id} className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all flex flex-col h-full">
               <div className="flex items-start justify-between mb-4">
                 <div className="p-2 bg-[#FFD700]/10 rounded-lg">
                   <Target className="h-5 w-5 text-[#FFD700]" />
@@ -383,9 +383,11 @@ export default function ServicesPage() {
               </div>
 
               <h3 className="text-lg font-semibold text-white mb-2">{service.title}</h3>
-              <p className="text-sm text-[#A0A0A0] mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
+              <div className="flex-grow">
+                <p className="text-sm text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
+              </div>
 
-              <div className="space-y-3 mb-4">
+              <div className="space-y-3 mt-auto pt-4">
                 {service.price && (
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-[#FFD700]" />
@@ -400,7 +402,7 @@ export default function ServicesPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 pt-4 border-t border-[#1A1A1A]/60">
+              <div className="flex items-center gap-2 pt-4 border-t border-[#1A1A1A]/60 mt-auto">
                 <button 
                   onClick={() => startEditing(service)}
                   className="flex items-center justify-center p-2 text-[#A0A0A0] hover:text-white hover:bg-[#1A1A1A] rounded-lg transition-colors"
