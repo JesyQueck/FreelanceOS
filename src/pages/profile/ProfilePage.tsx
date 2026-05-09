@@ -861,12 +861,12 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={newPortfolio.title}
-                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value.slice(0, 30) }))}
-                      maxLength={30}
+                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value.slice(0, 80) }))}
+                      maxLength={80}
                       className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter project title"
                     />
-                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.title?.length || 0}/30 characters</p>
+                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.title?.length || 0}/80 characters</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Description</label>

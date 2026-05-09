@@ -381,7 +381,7 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 30 ? `${service.title.substring(0, 30)}...` : service.title}</h3>
+                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 80 ? `${service.title.substring(0, 80)}...` : service.title}</h3>
                     <p className="text-xs text-[#A0A0A0] mb-3 leading-relaxed">{service.description || 'No description provided'}</p>
                     <div className="space-y-2">
                       {service.price && (
@@ -437,7 +437,7 @@ export default function PublicFreelancerProfile() {
                     )}
                   </div>
                   <div className="p-4 lg:p-5">
-                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[#FFD700] transition-colors">{item.title.length > 30 ? `${item.title.substring(0, 30)}...` : item.title}</h4>
+                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[#FFD700] transition-colors">{item.title.length > 80 ? `${item.title.substring(0, 80)}...` : item.title}</h4>
                     <p className="text-[#A0A0A0] text-xs lg:text-sm mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                     {item.external_link && (
                       <a
