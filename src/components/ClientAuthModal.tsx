@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
-import { signUpClient, signIn, checkOrCreateConversation, supabase } from '../utils/supabase'
+import { signUpClient, signIn, supabase } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 interface ClientAuthModalProps {
@@ -26,39 +26,6 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
   
   if (!isOpen) return null
 
-  const handleAuthSuccess = async () => {
-    onAuthSuccess()
-    
-    // Auto-create conversation if requested
-    if (autoCreateConversation && user) {
-      try {
-        // Get freelancer profile to create conversation
-        const { data: freelancerData, error: freelancerError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('slug', freelancerUsername)
-          .single();
-
-        if (freelancerError || !freelancerData) {
-          console.error('Error getting freelancer data:', freelancerError);
-          return;
-        }
-
-        // Create conversation
-        const { checkOrCreateConversation } = await import('../utils/supabase');
-        const result = await checkOrCreateConversation(user.id, freelancerData.id);
-        
-        if (result.success && result.conversationId) {
-          window.location.href = `/messages/${result.conversationId}`;
-        } else {
-          console.error('Failed to create conversation:', result.error);
-        }
-      } catch (error) {
-        console.error('Error creating conversation:', error);
-      }
-    }
-  }
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -74,17 +41,12 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
         // Login successful
         console.log('Login successful')
         
-        // Store the intended action for after successful auth
+        // Store intended action for after successful auth
         sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)
         sessionStorage.setItem('intendedAction', 'message')
         sessionStorage.setItem('targetFreelancer', freelancerUsername)
         
-        // Auto-create conversation if requested
-        if (autoCreateConversation) {
-          onAuthSuccess()
-        } else {
-          onAuthSuccess()
-        }
+        onAuthSuccess()
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -133,17 +95,12 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
           return
         }
         
-        // Store the intended action for after successful auth
+        // Store intended action for after successful auth
         sessionStorage.setItem('redirectAfterLogin', `/freelancer/${freelancerUsername}`)
         sessionStorage.setItem('intendedAction', 'message')
         sessionStorage.setItem('targetFreelancer', freelancerUsername)
         
-        // Auto-create conversation if requested
-        if (autoCreateConversation) {
-          onAuthSuccess()
-        } else {
-          onAuthSuccess()
-        }
+        onAuthSuccess()
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')
