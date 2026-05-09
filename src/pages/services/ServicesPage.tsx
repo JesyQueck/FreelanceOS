@@ -159,12 +159,12 @@ export default function ServicesPage() {
                 <input
                   type="text"
                   value={newService.title}
-                  onChange={(e) => setNewService(prev => ({ ...prev, title: e.target.value.slice(0, 80) }))}
-                  maxLength={80}
+                  onChange={(e) => setNewService(prev => ({ ...prev, title: e.target.value.slice(0, 50) }))}
+                  maxLength={50}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                   placeholder="Enter service title"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{newService.title?.length || 0}/80 characters</p>
+                <p className="text-xs text-[#A0A0A0] mt-1">{newService.title?.length || 0}/50 characters</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">Description</label>
@@ -267,12 +267,12 @@ export default function ServicesPage() {
                 <input
                   type="text"
                   value={editingService.title}
-                  onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value.slice(0, 80) } : null)}
-                  maxLength={80}
+                  onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value.slice(0, 50) } : null)}
+                  maxLength={50}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                   placeholder="Enter service title"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.title?.length || 0}/80 characters</p>
+                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.title?.length || 0}/50 characters</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">Description</label>

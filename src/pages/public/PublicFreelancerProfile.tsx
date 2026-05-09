@@ -347,7 +347,7 @@ export default function PublicFreelancerProfile() {
                       <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[#FFD700]" />
                     </div>
                   </div>
-                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2 lg:mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
+                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2 lg:mb-3 group-hover:text-[#FFD700] transition-colors">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                   <div className="flex-grow">
                     <p className="text-xs lg:text-sm text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
                   </div>
@@ -385,7 +385,7 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 80 ? `${service.title.substring(0, 80)}...` : service.title}</h3>
+                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                     <div className="flex-grow">
                       <p className="text-xs text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
                     </div>
