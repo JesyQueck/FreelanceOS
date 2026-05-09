@@ -462,11 +462,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Card-by-Card View - only if more than one item */}
-            <div className="lg:hidden">
-              <div className="flex gap-3">
+            {/* Mobile: Horizontal Scroll Tray */}
+            <div className="lg:hidden overflow-x-auto -mx-6 px-6">
+              <div className="flex gap-4 pb-4">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="min-w-[280px] flex-shrink-0 group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 h-96">
+                  <div key={item.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
                     <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img
@@ -487,18 +487,22 @@ export default function PublicFreelancerProfile() {
                     </div>
                     <div className="p-4">
                       <h4 className="text-white font-semibold mb-2 line-clamp-1 text-base group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
-                      <p className="text-[#A0A0A0] text-xs mb-3 line-clamp-2">{item.description || 'No description provided'}</p>
-                      {item.external_link && (
-                        <a
-                          href={item.external_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors text-xs"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View Project
-                        </a>
-                      )}
+                      <div className="flex-grow">
+                        <p className="text-[#A0A0A0] text-xs leading-relaxed">{item.description || 'No description provided'}</p>
+                      </div>
+                      <div className="mt-auto pt-3">
+                        {item.external_link && (
+                          <a
+                            href={item.external_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors text-xs"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            View Project
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
