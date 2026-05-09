@@ -6,7 +6,8 @@ import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItem
 export default function ProfilePage() {
   const { user, role } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [editingField, setEditingField] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editingField, setEditingField] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   
@@ -52,27 +53,28 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       if (user) {
+        setLoading(true);
         try {
           // Clear any cached data to ensure fresh fetch
           const { supabase } = await import('../../utils/supabase');
-          
+
           // First fetch profile data directly without cache
           const { data: profileData, error: profileError } = await supabase
             .from('users')
             .select('display_name, name, bio, profile_image, created_at, id, updated_at, username, slug, role')
             .eq('id', user.id)
             .single() as { data: UserProfile | null; error: any };
-          
+
           if (profileError) {
             console.error('Error fetching profile data:', profileError);
             setProfile(null);
           } else if (profileData) {
             setProfile(profileData);
-            
+
             // Ensure user has username and slug if missing
             if (!profileData.username || !profileData.slug) {
               const slugResult = await ensureUserHasSlug(user.id, profileData.display_name, user.email || '');
-              
+
               if (slugResult.error) {
                 console.error('Error ensuring user has slug:', slugResult.error);
               }
@@ -80,24 +82,25 @@ export default function ProfilePage() {
           } else {
             setProfile(null);
           }
-          
+
           // Fetch portfolio items
           const portfolioData = await getPortfolioItems(user.id);
           setPortfolioItems(portfolioData);
-          
+
           // Fetch freelancer-specific profile if user is a freelancer
           if (role === 'freelancer') {
             const freelancerData = await getFreelancerProfile(user.id);
             setFreelancerProfile(freelancerData);
           }
-          
+
         } catch (error) {
           console.error('Error fetching profile data:', error);
           setProfile(null);
         } finally {
+          setLoading(false);
         }
       } else {
-        // No user, no loading state needed
+        setLoading(false);
       }
     };
 
@@ -388,6 +391,21 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-white">Please log in to view your profile.</div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex gap-2">
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <div className="text-white">Loading profile...</div>
+        </div>
       </div>
     );
   }

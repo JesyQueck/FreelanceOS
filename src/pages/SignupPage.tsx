@@ -216,19 +216,6 @@ export default function SignupPage() {
             </Link>
           </p>
         </div>
-
-        {/* Client Portal Link */}
-        <div className="mt-6 text-center">
-          <p className="text-[#A0A0A0] text-xs">
-            Looking to hire freelancers?{' '}
-            <Link 
-              to="/client-login" 
-              className="text-[#FFD700] hover:text-[#FFC700] font-medium transition-colors"
-            >
-              Join as Client
-            </Link>
-          </p>
-        </div>
       </div>
     </div>
   );

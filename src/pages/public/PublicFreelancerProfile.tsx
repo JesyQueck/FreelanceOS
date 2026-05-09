@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -165,20 +165,12 @@ export default function PublicFreelancerProfile() {
       {/* Desktop Header */}
       <div className="hidden lg:flex fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-2">
               <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
               </div>
               <span className="font-bold text-sm text-white">FreelanceOS</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link to="/" className="text-[#A0A0A0] hover:text-[#FFD700] transition-colors">
-                Discover Freelancers
-              </Link>
-              <Link to="/client-login" className="text-[#FFD700] hover:text-[#FFC700] transition-colors">
-                Client Portal
-              </Link>
             </div>
           </div>
         </div>
