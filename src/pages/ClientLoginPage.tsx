@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { LogIn, Mail, Lock, ArrowLeft } from 'lucide-react'
 import { validateClientAccess } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -11,12 +11,50 @@ export default function ClientLoginPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { user } = useAuth()
 
+  // Check for auto-login (48-hour window)
+  useEffect(() => {
+    const checkAutoLogin = async () => {
+      const lastLoginTime = localStorage.getItem('clientLastLogin')
+      const savedEmail = localStorage.getItem('clientEmail')
+      
+      if (lastLoginTime && savedEmail) {
+        const lastLogin = new Date(lastLoginTime)
+        const now = new Date()
+        const hoursDiff = (now.getTime() - lastLogin.getTime()) / (1000 * 60 * 60)
+        
+        // Auto-login if within 48 hours and user is already authenticated
+        if (hoursDiff < 48 && user) {
+          // User is already authenticated, handle redirect
+          const freelancer = searchParams.get('freelancer')
+          if (freelancer) {
+            navigate(`/messages?freelancer=${freelancer}`)
+          } else {
+            navigate('/client-dashboard')
+          }
+          return
+        } else if (hoursDiff >= 48) {
+          // Clear expired login data
+          localStorage.removeItem('clientLastLogin')
+          localStorage.removeItem('clientEmail')
+        }
+      }
+    }
+
+    checkAutoLogin()
+  }, [navigate, searchParams, user])
+
   // Redirect if already logged in
   if (user) {
-    navigate('/client-dashboard')
+    const freelancer = searchParams.get('freelancer')
+    if (freelancer) {
+      navigate(`/messages?freelancer=${freelancer}`)
+    } else {
+      navigate('/client-dashboard')
+    }
     return null
   }
 
@@ -31,30 +69,15 @@ export default function ClientLoginPage() {
       if (!result.success) {
         setError(result.error || 'Login failed')
       } else {
-        // Handle post-login redirect
-        const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin')
-        const intendedAction = sessionStorage.getItem('intendedAction')
+        // Save login info for auto-login (48-hour window)
+        localStorage.setItem('clientLastLogin', new Date().toISOString())
+        localStorage.setItem('clientEmail', formData.email)
         
-        if (redirectAfterLogin) {
-          // Clear the stored redirect info
-          sessionStorage.removeItem('redirectAfterLogin')
-          sessionStorage.removeItem('intendedAction')
-          
-          // Navigate to intended destination
-          if (intendedAction === 'message' && redirectAfterLogin.startsWith('/freelancer/')) {
-            // Extract freelancer username from the URL
-            const freelancerUsername = redirectAfterLogin.replace('/freelancer/', '')
-            
-            // Store the username for direct routing
-            sessionStorage.setItem('directMessageUsername', freelancerUsername);
-            
-            // Navigate directly to messages with username parameter
-            navigate(`/messages?freelancer=${freelancerUsername}`);
-          } else {
-            navigate(redirectAfterLogin)
-          }
+        // Handle post-login redirect
+        const freelancer = searchParams.get('freelancer')
+        if (freelancer) {
+          navigate(`/messages?freelancer=${freelancer}`)
         } else {
-          // Default redirect to client dashboard
           navigate('/client-dashboard')
         }
       }

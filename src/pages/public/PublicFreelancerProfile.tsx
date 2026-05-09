@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, DollarSign, Clock } from 'lucide-react';
 import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
+import { supabase } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 
@@ -94,7 +95,8 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
-      setShowClientAuthModal(true);
+      // Redirect to client login page with freelancer username for return
+      navigate(`/client-login?freelancer=${username}`);
       return;
     }
 
@@ -104,7 +106,20 @@ export default function PublicFreelancerProfile() {
 
     setMessageLoading(true);
     try {
-      // User is now authenticated, proceed with conversation
+      // Check if authenticated user has a client profile
+      const { data: clientProfile, error: clientError } = await supabase
+        .from('client_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (clientError || !clientProfile) {
+        // User doesn't have a client profile, redirect to client signup
+        navigate(`/client-signup?freelancer=${username}`);
+        return;
+      }
+
+      // User has client profile, proceed with conversation
       const result = await checkOrCreateConversation(user!.id, profile.id!);
       if (result.success && result.conversationId) {
         navigate(`/messages/${result.conversationId}`);

@@ -1556,7 +1556,7 @@ export const checkOrCreateConversation = async (userId1: string, userId2: string
   try {
     // Get the client ID for userId1 (assuming userId1 is the client)
     const { data: clientData, error: clientError } = await supabase
-      .from('clients')
+      .from('client_profiles')
       .select('id')
       .eq('user_id', userId1)
       .single();
