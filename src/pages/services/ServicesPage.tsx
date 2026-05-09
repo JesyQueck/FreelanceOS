@@ -159,19 +159,23 @@ export default function ServicesPage() {
                 <input
                   type="text"
                   value={newService.title}
-                  onChange={(e) => setNewService(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => setNewService(prev => ({ ...prev, title: e.target.value.slice(0, 80) }))}
+                  maxLength={80}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                   placeholder="Enter service title"
                 />
+                <p className="text-xs text-[#A0A0A0] mt-1">{newService.title?.length || 0}/80 characters</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">Description</label>
                 <textarea
                   value={newService.description}
-                  onChange={(e) => setNewService(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => setNewService(prev => ({ ...prev, description: e.target.value.slice(0, 150) }))}
+                  maxLength={150}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
                   placeholder="Describe your service and what you deliver"
                 />
+                <p className="text-xs text-[#A0A0A0] mt-1">{newService.description?.length || 0}/150 characters</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -263,19 +267,23 @@ export default function ServicesPage() {
                 <input
                   type="text"
                   value={editingService.title}
-                  onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value } : null)}
+                  onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value.slice(0, 80) } : null)}
+                  maxLength={80}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
                   placeholder="Enter service title"
                 />
+                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.title?.length || 0}/80 characters</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-white mb-2">Description</label>
                 <textarea
                   value={editingService.description}
-                  onChange={(e) => setEditingService(prev => prev ? { ...prev, description: e.target.value } : null)}
+                  onChange={(e) => setEditingService(prev => prev ? { ...prev, description: e.target.value.slice(0, 150) } : null)}
+                  maxLength={150}
                   className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
                   placeholder="Describe your service and what you deliver"
                 />
+                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.description?.length || 0}/150 characters</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

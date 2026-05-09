@@ -252,7 +252,7 @@ export default function PublicFreelancerProfile() {
                     <Briefcase className="h-4 w-4 text-[#FFD700]" />
                     About
                   </h3>
-                  <p className="text-xs text-[#A0A0A0] leading-relaxed">{profile.bio}</p>
+                  <p className="text-xs text-[#A0A0A0] leading-relaxed min-h-[60px]">{profile.bio}</p>
                 </div>
               )}
 
@@ -364,11 +364,11 @@ export default function PublicFreelancerProfile() {
                 </div>
               ))}
             </div>
-            {/* Mobile: Card-by-Card View - only if more than one service */}
-            <div className="lg:hidden">
-              <div className="flex gap-3">
+            {/* Mobile: Horizontal Scroll Tray */}
+            <div className="lg:hidden overflow-x-auto -mx-6 px-6">
+              <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} className="min-w-[260px] flex-shrink-0 bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all h-fit">
+                  <div key={service.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all h-56">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[#FFD700]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[#FFD700]" />
@@ -381,7 +381,7 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-white mb-2">{service.title}</h3>
+                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 30 ? `${service.title.substring(0, 30)}...` : service.title}</h3>
                     <p className="text-xs text-[#A0A0A0] mb-3 leading-relaxed">{service.description || 'No description provided'}</p>
                     <div className="space-y-2">
                       {service.price && (
@@ -437,7 +437,7 @@ export default function PublicFreelancerProfile() {
                     )}
                   </div>
                   <div className="p-4 lg:p-5">
-                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-base lg:text-lg group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
+                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[#FFD700] transition-colors">{item.title.length > 30 ? `${item.title.substring(0, 30)}...` : item.title}</h4>
                     <p className="text-[#A0A0A0] text-xs lg:text-sm mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                     {item.external_link && (
                       <a
@@ -458,7 +458,7 @@ export default function PublicFreelancerProfile() {
             <div className="lg:hidden">
               <div className="flex gap-3">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="min-w-[280px] flex-shrink-0 group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 h-fit">
+                  <div key={item.id} className="min-w-[280px] flex-shrink-0 group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 h-96">
                     <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img

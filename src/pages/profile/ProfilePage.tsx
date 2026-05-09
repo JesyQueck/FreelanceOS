@@ -519,11 +519,13 @@ export default function ProfilePage() {
                         <h3 className="text-lg font-semibold text-white mb-2">Edit Bio</h3>
                         <textarea
                           value={editingValue}
-                          onChange={(e) => setEditingValue(e.target.value)}
+                          onChange={(e) => setEditingValue(e.target.value.slice(0, 200))}
+                          maxLength={200}
                           className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-40 resize-none"
                           placeholder="Tell us about yourself and your work"
                           autoFocus
                         />
+                        <p className="text-xs text-[#A0A0A0] mt-1">{editingValue?.length || 0}/200 characters</p>
                       </div>
                       <div className="flex gap-3 justify-end">
                         <button
@@ -859,19 +861,23 @@ export default function ProfilePage() {
                     <input
                       type="text"
                       value={newPortfolio.title}
-                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value }))}
+                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value.slice(0, 30) }))}
+                      maxLength={30}
                       className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
                       placeholder="Enter project title"
                     />
+                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.title?.length || 0}/30 characters</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white mb-2">Description</label>
                     <textarea
                       value={newPortfolio.description}
-                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value }))}
+                      onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value.slice(0, 150) }))}
+                      maxLength={150}
                       className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
                       placeholder="Describe your project and what you accomplished"
                     />
+                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.description?.length || 0}/150 characters</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
