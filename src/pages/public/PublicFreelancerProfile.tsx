@@ -179,66 +179,66 @@ export default function PublicFreelancerProfile() {
       {/* Main Content */}
       <div className="container mx-auto px-4 pt-24 lg:pt-12 pb-6 lg:pb-12">
         {/* Hero Section */}
-        <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-10 border border-[#1A1A1A] shadow-xl mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Profile Image */}
             <div className="lg:col-span-1 flex justify-center lg:justify-start">
               <div className="relative group">
                 {profile.profile_image ? (
                   <div className="relative">
-                    <img 
-                      src={profile.profile_image} 
-                      alt={profile.display_name || user?.email || 'Profile'} 
-                      className="w-40 h-40 lg:w-48 lg:h-48 rounded-3xl object-cover shadow-2xl border-4 border-[#FFD700] transition-transform duration-300 group-hover:scale-105"
+                    <img
+                      src={profile.profile_image}
+                      alt={profile.display_name || user?.email || 'Profile'}
+                      className="w-32 h-32 lg:w-40 lg:h-40 rounded-full object-cover shadow-2xl border-3 border-[#FFD700] transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute -bottom-2 -right-2 bg-[#FFD700] rounded-full p-2 shadow-lg">
-                      <CheckCircle2 className="h-6 w-6 text-black" />
+                    <div className="absolute -bottom-1 -right-1 bg-[#FFD700] rounded-full p-1.5 shadow-lg">
+                      <CheckCircle2 className="h-5 w-5 text-black" />
                     </div>
                   </div>
                 ) : (
-                  <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-3xl bg-[#1A1A1A] flex items-center justify-center border-4 border-[#FFD700] shadow-2xl">
-                    <UserCircle className="h-16 w-16 lg:h-20 lg:w-20 text-[#A0A0A0]" />
+                  <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#1A1A1A] flex items-center justify-center border-3 border-[#FFD700] shadow-2xl">
+                    <UserCircle className="h-14 w-14 lg:h-18 lg:w-18 text-[#A0A0A0]" />
                   </div>
                 )}
               </div>
             </div>
 
             {/* Profile Info */}
-            <div className="lg:col-span-3 space-y-6">
+            <div className="lg:col-span-3 space-y-4 lg:space-y-5">
               {/* Name and Status */}
               <div className="text-center lg:text-left">
-                <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                <h1 className="text-xl lg:text-2xl font-bold text-white mb-2">
                   {profile.name || profile.display_name}
                 </h1>
-                <div className="flex flex-col items-center lg:items-start gap-3 mb-4">
-                  <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
+                <div className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 mb-3">
+                  <span className="px-3 py-1.5 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30">
                     Freelancer
                   </span>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <span className="text-sm text-green-500">Verified</span>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <span className="text-xs text-green-500">Verified</span>
                   </div>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="flex items-center gap-4 bg-[#1A1A1A]/30 rounded-2xl p-4 border border-[#2A2A2A]/30">
-                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
-                    <Mail className="h-6 w-6 text-[#FFD700]" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 lg:gap-4">
+                <div className="flex items-center gap-3 bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
+                  <div className="bg-[#FFD700]/10 p-2 rounded-lg">
+                    <Mail className="h-5 w-5 text-[#FFD700]" />
                   </div>
                   <div>
-                    <p className="text-xs text-[#A0A0A0] mb-1">Email</p>
-                    <p className="text-sm text-white font-medium">{profile.email || 'Not provided'}</p>
+                    <p className="text-[10px] text-[#A0A0A0] mb-0.5 uppercase tracking-wide">Email</p>
+                    <p className="text-xs text-white font-medium truncate">{profile.email || 'Not provided'}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 bg-[#1A1A1A]/30 rounded-2xl p-4 border border-[#2A2A2A]/30">
-                  <div className="bg-[#FFD700]/10 p-3 rounded-xl">
-                    <UserCircle className="h-6 w-6 text-[#FFD700]" />
+                <div className="flex items-center gap-3 bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
+                  <div className="bg-[#FFD700]/10 p-2 rounded-lg">
+                    <UserCircle className="h-5 w-5 text-[#FFD700]" />
                   </div>
                   <div>
-                    <p className="text-xs text-[#A0A0A0] mb-1">Member Since</p>
-                    <p className="text-sm text-white font-medium">
+                    <p className="text-[10px] text-[#A0A0A0] mb-0.5 uppercase tracking-wide">Member Since</p>
+                    <p className="text-xs text-white font-medium">
                       {profile.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
                     </p>
                   </div>
@@ -247,32 +247,32 @@ export default function PublicFreelancerProfile() {
 
               {/* Bio */}
               {profile.bio && (
-                <div className="bg-[#1A1A1A]/50 rounded-2xl p-6 border border-[#2A2A2A]/50">
-                  <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                <div className="bg-[#1A1A1A]/50 rounded-xl p-4 border border-[#2A2A2A]/50">
+                  <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-[#FFD700]" />
                     About
                   </h3>
-                  <p className="text-[#A0A0A0] leading-relaxed">{profile.bio}</p>
+                  <p className="text-xs text-[#A0A0A0] leading-relaxed">{profile.bio}</p>
                 </div>
               )}
 
               {/* Action Button */}
-              <div className="mt-8 pt-6 border-t border-[#1A1A1A]">
+              <div className="mt-4 pt-4 border-t border-[#1A1A1A]">
                 <div className="flex justify-center">
                   <button
                     onClick={handleMessageFreelancer}
                     disabled={messageLoading}
-                    className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FFD700] text-black font-bold text-lg rounded-xl hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[250px]"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-black font-bold text-sm rounded-lg hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
                   >
                     {messageLoading ? (
-                      <div className="flex gap-2">
-                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-3 h-3 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="flex gap-1.5">
+                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                       </div>
                     ) : (
                       <>
-                        <MessageCircle className="h-6 w-6" />
+                        <MessageCircle className="h-4 w-4" />
                         Message Freelancer
                       </>
                     )}
@@ -284,26 +284,26 @@ export default function PublicFreelancerProfile() {
         </div>
 
         {/* Professional Information - From Freelancer Profile */}
-        <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
-          <h2 className="text-xl lg:text-2xl font-bold text-white mb-8 flex items-center gap-3">
-            <Briefcase className="h-6 w-6 text-[#FFD700]" />
+        <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-8 border border-[#1A1A1A] shadow-xl mb-6">
+          <h2 className="text-lg lg:text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <Briefcase className="h-5 w-5 text-[#FFD700]" />
             Professional Information
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <p className="text-xs text-[#A0A0A0] mb-1">Hourly Rate</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
+              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Hourly Rate</p>
               <p className="text-sm text-white font-medium">
                 {freelancerProfile?.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-[#A0A0A0] mb-1">Experience Level</p>
+            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
+              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Experience Level</p>
               <p className="text-sm text-white font-medium capitalize">
                 {freelancerProfile?.experience_level || 'Not set'}
               </p>
             </div>
-            <div>
-              <p className="text-xs text-[#A0A0A0] mb-1">Availability</p>
+            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
+              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Availability</p>
               <p className="text-sm text-white font-medium capitalize">
                 {freelancerProfile?.availability || 'Not set'}
               </p>
@@ -311,12 +311,12 @@ export default function PublicFreelancerProfile() {
           </div>
           {freelancerProfile && freelancerProfile.skills && freelancerProfile.skills.length > 0 && (
             <div className="mt-4">
-              <p className="text-xs text-[#A0A0A0] mb-2">Skills</p>
+              <p className="text-[10px] text-[#A0A0A0] mb-2 uppercase tracking-wide">Skills</p>
               <div className="flex flex-wrap gap-2">
                 {freelancerProfile.skills.map((skill: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30"
+                    className="px-2.5 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30"
                   >
                     {skill}
                   </span>
@@ -328,36 +328,36 @@ export default function PublicFreelancerProfile() {
 
         {/* Services Section */}
         {services.length > 0 && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-8 lg:p-12 border border-[#1A1A1A] shadow-xl mb-8">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-xl lg:text-2xl font-bold text-white flex items-center gap-3">
-                <Briefcase className="h-6 w-6 text-[#FFD700]" />
+          <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-8 border border-[#1A1A1A] shadow-xl mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg lg:text-xl font-bold text-white flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-[#FFD700]" />
                 Services
               </h2>
-              <span className="px-4 py-2 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-sm font-medium border border-[#FFD700]/30">
+              <span className="px-3 py-1.5 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30">
                 {services.length} Services Available
               </span>
             </div>
             {/* Desktop: Grid Layout */}
-            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-6 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-[#FFD700]/10 rounded-xl">
-                      <Briefcase className="h-6 w-6 text-[#FFD700]" />
+                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 lg:p-5 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-2 lg:p-3 bg-[#FFD700]/10 rounded-xl">
+                      <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[#FFD700]" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
-                  <p className="text-[#A0A0A0] text-sm mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
-                  <div className="space-y-3">
+                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2 lg:mb-3 group-hover:text-[#FFD700] transition-colors">{service.title}</h3>
+                  <p className="text-xs lg:text-sm text-[#A0A0A0] mb-3 lg:mb-4 leading-relaxed">{service.description || 'No description provided'}</p>
+                  <div className="space-y-2 lg:space-y-3">
                     {service.price && (
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-[#FFD700]">{service.price}</span>
+                        <span className="text-base lg:text-lg font-bold text-[#FFD700]">{service.price}</span>
                       </div>
                     )}
                     {service.timeline && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-[#A0A0A0]">{service.timeline}</span>
+                        <span className="text-xs lg:text-sm text-[#A0A0A0]">{service.timeline}</span>
                       </div>
                     )}
                   </div>

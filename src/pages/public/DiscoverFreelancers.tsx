@@ -150,13 +150,13 @@ export default function DiscoverFreelancers() {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="relative">
                       {freelancer.profile_image ? (
-                        <img 
-                          src={freelancer.profile_image} 
-                          alt={freelancer.display_name || 'Freelancer'} 
-                          className="w-16 h-16 rounded-xl object-cover"
+                        <img
+                          src={freelancer.profile_image}
+                          alt={freelancer.display_name || 'Freelancer'}
+                          className="w-16 h-16 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-xl bg-[#FFD700] flex items-center justify-center text-black text-xl font-bold">
+                        <div className="w-16 h-16 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-xl font-bold">
                           {freelancer.display_name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}

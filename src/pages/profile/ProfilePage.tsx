@@ -430,14 +430,14 @@ export default function ProfilePage() {
             <div className="relative">
                             {profile?.profile_image ? (
                 <>
-                  <img 
-                    src={profile.profile_image} 
-                    alt={profile.display_name || user.email || 'Profile'} 
-                    className="w-32 h-32 rounded-2xl object-cover shadow-lg border-2 border-[#FFD700]"
+                  <img
+                    src={profile.profile_image}
+                    alt={profile.display_name || user.email || 'Profile'}
+                    className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-[#FFD700]"
                   />
                 </>
               ) : (
-                <div className="w-32 h-32 rounded-2xl bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
+                <div className="w-32 h-32 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
                   {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
