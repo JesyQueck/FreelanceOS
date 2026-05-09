@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, DollarSign, Clock } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service, ensureClientProfileExists } from '../../utils/supabase';
 import { supabase } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
@@ -95,8 +95,7 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
-      // Redirect to client login page with freelancer username for return
-      navigate(`/client-login?freelancer=${username}`);
+      setShowClientAuthModal(true);
       return;
     }
 
@@ -106,7 +105,15 @@ export default function PublicFreelancerProfile() {
 
     setMessageLoading(true);
     try {
-      // Check if authenticated user has a client profile
+      // Ensure client profile exists (handles email confirmation case)
+      const profileResult = await ensureClientProfileExists(user.id, user.email || '', user.email?.split('@')[0] || 'Client');
+      
+      if (!profileResult.success) {
+        console.error('Failed to ensure client profile exists:', profileResult.error);
+        // Continue anyway - the error might be non-critical
+      }
+
+      // Now check if client profile exists and proceed with conversation
       const { data: clientProfile, error: clientError } = await supabase
         .from('client_profiles')
         .select('id')
@@ -114,8 +121,8 @@ export default function PublicFreelancerProfile() {
         .single();
 
       if (clientError || !clientProfile) {
-        // User doesn't have a client profile, redirect to client signup
-        navigate(`/client-signup?freelancer=${username}`);
+        // If profile still doesn't exist, show signup modal
+        setShowClientAuthModal(true);
         return;
       }
 
@@ -532,26 +539,10 @@ export default function PublicFreelancerProfile() {
           onClose={() => setShowClientAuthModal(false)}
           onAuthSuccess={async () => {
             setShowClientAuthModal(false);
-            // After successful auth, proceed with conversation
-            if (user && profile) {
-              setMessageLoading(true);
-              try {
-                // User is now authenticated, proceed with conversation
-                const result = await checkOrCreateConversation(user!.id, profile.id!);
-                if (result.success && result.conversationId) {
-                  navigate(`/messages/${result.conversationId}`);
-                } else {
-                  alert(result.error || 'Failed to start conversation');
-                }
-              } catch (err) {
-                console.error('Error starting conversation:', err);
-                alert('Failed to start conversation');
-              } finally {
-                setMessageLoading(false);
-              }
-            }
+            // ClientAuthModal will handle auto-conversation creation if autoCreateConversation is true
           }}
           freelancerUsername={username || ''}
+          autoCreateConversation={true}
         />
       </div>
     </div>

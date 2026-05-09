@@ -26,21 +26,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
   }
 
   if (!user) {
-    // Redirect to appropriate login based on required role
-    if (requiredRole === 'client') {
-      return <Navigate to="/client-login" replace />
-    }
+    // Redirect to main login page for all users
     return <Navigate to="/login" replace />
   }
 
   // Check if user has required role
   if (requiredRole && role !== requiredRole) {
-    // Redirect to appropriate login for the required role
-    if (requiredRole === 'freelancer') {
-      return <Navigate to="/login" replace />
-    } else if (requiredRole === 'client') {
-      return <Navigate to="/client-login" replace />
-    }
+    // Redirect to main login for any role mismatch
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>

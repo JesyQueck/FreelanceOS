@@ -75,9 +75,9 @@ export default function ClientMessagesPage() {
         // For clients, fetch data from client_profiles table
         const { data, error } = await supabase
           .from('client_profiles')
-          .select('full_name, email')
+          .select('user_id, company, industry, project_preferences')
           .eq('user_id', user.id)
-          .single() as { data: { full_name?: string; email?: string } | null; error: any };
+          .single() as { data: { user_id?: string; company?: string; industry?: string; project_preferences?: any } | null; error: any };
 
         if (error) {
           console.error('Error fetching client data:', error);
@@ -85,9 +85,23 @@ export default function ClientMessagesPage() {
           setUserEmail(user.email || '');
           setInitial(user.email?.charAt(0).toUpperCase() || 'C');
         } else if (data) {
-          setDisplayName(data.full_name || user.email?.split('@')[0] || 'Client');
-          setUserEmail(data.email || user.email || '');
-          setInitial((data.full_name || user.email || 'C').charAt(0).toUpperCase());
+          // Get display name from users table since client_profiles doesn't have it
+          const { data: userData, error: userDataError } = await supabase
+            .from('users')
+            .select('display_name')
+            .eq('id', user.id)
+            .single() as { data: { display_name?: string } | null; error: any };
+          
+          if (userDataError) {
+            console.error('Error fetching user data:', userDataError);
+            setDisplayName(user.email?.split('@')[0] || 'Client');
+            setUserEmail(user.email || '');
+            setInitial(user.email?.charAt(0).toUpperCase() || 'C');
+          } else {
+            setDisplayName(userData?.display_name || user.email?.split('@')[0] || 'Client');
+            setUserEmail(user.email || '');
+            setInitial((userData?.display_name || user.email || 'C').charAt(0).toUpperCase());
+          }
         }
       } catch (error) {
         console.error('Unexpected error fetching client data:', error);

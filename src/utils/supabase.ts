@@ -154,6 +154,112 @@ export const signUpFreelancer = async (email: string, password: string, displayN
   return { data, error: null };
 };
 
+export const ensureClientProfileExists = async (userId: string, email?: string, fullName?: string) => {
+  try {
+    // Check if client profile already exists
+    const { data: existingProfile, error: checkError } = await supabase
+      .from('client_profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+
+    if (!checkError && existingProfile) {
+      // Profile already exists
+      return { success: true };
+    }
+
+    // Check if user exists in users table
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('display_name, email, role')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !userData) {
+      // User doesn't exist in users table, create it
+      const displayName = fullName || 'Client';
+      const username = displayName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+      
+      const { error: createUserError } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          display_name: displayName,
+          email: email || '',
+          username: username,
+          slug: username,
+          role: 'client'
+        });
+
+      if (createUserError) {
+        console.error('Error creating user record:', createUserError);
+        return { success: false, error: createUserError.message };
+      }
+    }
+
+    // Create client profile
+    const { error: createProfileError } = await supabase
+      .from('client_profiles')
+      .insert({
+        user_id: userId,
+        company: ''
+      });
+
+    if (createProfileError) {
+      console.error('Error creating client profile:', createProfileError);
+      return { success: false, error: createProfileError.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error ensuring client profile exists:', error);
+    return { success: false, error: 'Unexpected error occurred' };
+  }
+};
+
+export const createClientProfileAfterConfirmation = async (userId: string, fullName: string, company?: string) => {
+  try {
+    // Generate username and slug from full name
+    const username = fullName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    const slug = username;
+    
+    // Create client profile in users table
+    const { error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: userId,
+        display_name: fullName,
+        email: '', // Will be filled by trigger or updated separately
+        username: username,
+        slug: slug,
+        role: 'client'
+      });
+
+    if (profileError) {
+      console.error('Error creating client profile after confirmation:', profileError);
+      return { success: false, error: profileError.message };
+    }
+
+    // Create client profile for additional client-specific data
+    const { error: clientProfileError } = await supabase
+      .from('client_profiles')
+      .insert({
+        user_id: userId,
+        company: company || ''
+      });
+
+    if (clientProfileError) {
+      console.error('Error creating client profile after confirmation:', clientProfileError);
+      return { success: false, error: clientProfileError.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error creating client profile after confirmation:', error);
+    return { success: false, error: 'Unexpected error occurred' };
+  }
+};
+
 export const signUpClient = async (email: string, password: string, fullName: string, company?: string) => {
   // Step 1: Create auth user with metadata
   const { data, error } = await supabase.auth.signUp({
