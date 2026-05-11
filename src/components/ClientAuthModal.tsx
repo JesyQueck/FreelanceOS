@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
-import { signUpClient, signIn, supabase } from '../utils/supabase'
-import { useAuth } from '../contexts/AuthContext'
+import { signUpClient, signIn } from '../utils/supabase'
 
 interface ClientAuthModalProps {
   isOpen: boolean
   onClose: () => void
   onAuthSuccess: () => void
   freelancerUsername: string
-  autoCreateConversation?: boolean
 }
 
-export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freelancerUsername, autoCreateConversation }: ClientAuthModalProps) {
+export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freelancerUsername }: ClientAuthModalProps) {
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -22,7 +20,6 @@ export default function ClientAuthModal({ isOpen, onClose, onAuthSuccess, freela
     confirmPassword: '',
     fullName: ''
   })
-  const { user } = useAuth()
   
   if (!isOpen) return null
 
