@@ -570,6 +570,43 @@ export const generateShareLink = (username?: string) => {
   return username ? `${baseUrl}/freelancer/${username}` : null;
 };
 
+export const calculateProfileCompletion = (profile: any, freelancerProfile: any): number => {
+  let completedFields = 0;
+  const totalFields = 6;
+  
+  // Check display_name (set during signup)
+  if (profile?.display_name && profile.display_name.trim().length > 0) {
+    completedFields++;
+  }
+  
+  // Check name (professional name)
+  if (profile?.name && profile.name.trim().length > 0) {
+    completedFields++;
+  }
+  
+  // Check bio
+  if (profile?.bio && profile.bio.trim().length > 0) {
+    completedFields++;
+  }
+  
+  // Check profile_image
+  if (profile?.profile_image && profile.profile_image.trim().length > 0) {
+    completedFields++;
+  }
+  
+  // Check skills array (from freelancer profile)
+  if (freelancerProfile?.skills && Array.isArray(freelancerProfile.skills) && freelancerProfile.skills.length > 0) {
+    completedFields++;
+  }
+  
+  // Check username (for portfolio sharing)
+  if (profile?.username && profile.username.trim().length > 0) {
+    completedFields++;
+  }
+  
+  return Math.round((completedFields / totalFields) * 100);
+};
+
 // Function to ensure user has username and slug (for existing users)
 export const ensureUserHasSlug = async (userId: string, displayName?: string, email?: string): Promise<{ data: UserProfile | null; error: any }> => {
   try {

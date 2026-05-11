@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserCircle, Mail, Briefcase, Edit, Camera, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, ensureUserHasSlug, getFreelancerProfile } from "../../utils/supabase";
+import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, ensureUserHasSlug, getFreelancerProfile, calculateProfileCompletion } from "../../utils/supabase";
 
 export default function ProfilePage() {
   const { user, role } = useAuth();
@@ -308,6 +308,38 @@ export default function ProfilePage() {
 
   const handleSharePortfolio = async () => {
     if (!user || !profile) return;
+    
+    // Calculate profile completion
+    const profileCompletion = calculateProfileCompletion(profile, freelancerProfile);
+    
+    // Check if profile is at least 80% complete before allowing sharing
+    if (profileCompletion < 80) {
+      const errorMessage = document.createElement('div');
+      errorMessage.innerHTML = `
+        <div style="position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 24px; height: 24px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Profile Incomplete</div>
+              <div style="font-size: 12px; opacity: 0.9;">Complete your profile to ${80}% before sharing your portfolio. Current: ${profileCompletion}%</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorMessage);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (errorMessage.parentNode) {
+          errorMessage.parentNode.removeChild(errorMessage);
+        }
+      }, 5000);
+      return;
+    }
     
     if (!profile.slug) {
       // Generate slug if it doesn't exist

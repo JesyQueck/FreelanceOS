@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquare, Target, Eye, Plus, Sparkles } from "lucide-react";
-import { getUser, getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getFreelancerProfile, getRecentActivity, ActivityItem, getConversations, Conversation } from "../../utils/supabase";
+import { useAuth } from "../../contexts/AuthContext";
+import { getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getFreelancerProfile, getRecentActivity, ActivityItem, getConversations, Conversation, calculateProfileCompletion } from "../../utils/supabase";
 import MessagingOverlay from "../../components/MessagingOverlay";
 
 interface DashboardData {
@@ -18,6 +19,7 @@ interface DashboardData {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showMessagingOverlay, setShowMessagingOverlay] = useState(false);
@@ -38,7 +40,6 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadDashboardData = async (retryCount = 0) => {
       try {
-        const user = await getUser();
         if (!user) {
           setError('User not authenticated');
           setLoading(false);
@@ -59,44 +60,7 @@ export default function DashboardPage() {
 
         const recentActivity = await getRecentActivity(user.id);
         
-        // Calculate real profile completion percentage
-        const calculateProfileCompletion = (profile: any, freelancerProfile: any) => {
-          let completedFields = 0;
-          const totalFields = 6;
-          
-          // Check display_name (set during signup)
-          if (profile?.display_name && profile.display_name.trim().length > 0) {
-            completedFields++;
-          }
-          
-          // Check name (professional name)
-          if (profile?.name && profile.name.trim().length > 0) {
-            completedFields++;
-          }
-          
-          // Check bio
-          if (profile?.bio && profile.bio.trim().length > 0) {
-            completedFields++;
-          }
-          
-          // Check profile_image
-          if (profile?.profile_image && profile.profile_image.trim().length > 0) {
-            completedFields++;
-          }
-          
-          // Check skills array (from freelancer profile)
-          if (freelancerProfile?.skills && Array.isArray(freelancerProfile.skills) && freelancerProfile.skills.length > 0) {
-            completedFields++;
-          }
-          
-          // Check username (for portfolio sharing)
-          if (profile?.username && profile.username.trim().length > 0) {
-            completedFields++;
-          }
-          
-          return Math.round((completedFields / totalFields) * 100);
-        };
-        
+        // Calculate real profile completion percentage using shared function
         const progressPercent = calculateProfileCompletion(profile, freelancerProfile);
         const stepsCompleted = Math.floor((progressPercent / 100) * 5);
 
@@ -134,12 +98,11 @@ export default function DashboardPage() {
     };
 
     loadDashboardData();
-  }, []);
+  }, [user]);
 
   // Load conversations for messaging overlay
   useEffect(() => {
     const loadConversations = async () => {
-      const user = await getUser();
       if (user) {
         try {
           const conversationsData = await getConversations(user.id);
@@ -151,7 +114,7 @@ export default function DashboardPage() {
     };
 
     loadConversations();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -201,33 +164,35 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {/* Profile Completion Indicator */}
-      <div className="bg-[#0A0A0A] rounded-xl p-6 border border-[#1A1A1A] shadow-sm relative overflow-hidden group mb-8">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD700]/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-5 w-5 text-[#FFD700]" />
-              <h3 className="font-semibold text-lg text-white">Profile is {data.progressPercent}% complete</h3>
+      {/* Profile Completion Indicator - Only show if not 100% complete */}
+      {data.progressPercent < 100 && (
+        <div className="bg-[#0A0A0A] rounded-xl p-6 border border-[#1A1A1A] shadow-sm relative overflow-hidden group mb-8">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD700]/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-5 w-5 text-[#FFD700]" />
+                <h3 className="font-semibold text-lg text-white">Profile is {data.progressPercent}% complete</h3>
+              </div>
+              <div className="w-full bg-[#1A1A1A] rounded-lg h-2 mb-3">
+                <div 
+                  className="bg-[#FFD700] h-2 rounded-lg transition-all duration-500"
+                  style={{ width: `${data.progressPercent}%` }}
+                />
+              </div>
+              <p className="text-sm text-[#A0A0A0]">
+                Complete your profile to attract more clients and appear in search results.
+              </p>
             </div>
-            <div className="w-full bg-[#1A1A1A] rounded-lg h-2 mb-3">
-              <div 
-                className="bg-[#FFD700] h-2 rounded-lg transition-all duration-500"
-                style={{ width: `${data.progressPercent}%` }}
-              />
-            </div>
-            <p className="text-sm text-[#A0A0A0]">
-              Complete your profile to attract more clients and appear in search results.
-            </p>
+            <button 
+              onClick={() => navigate('/dashboard/profile')}
+              className="px-4 py-3 bg-[#1A1A1A] hover:bg-[#2A2A2A] rounded-xl text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors cursor-pointer min-h-[44px]"
+            >
+              Complete Profile
+            </button>
           </div>
-          <button 
-            onClick={() => navigate('/dashboard/profile')}
-            className="px-4 py-3 bg-[#1A1A1A] hover:bg-[#2A2A2A] rounded-xl text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors cursor-pointer min-h-[44px]"
-          >
-            Complete Profile
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
