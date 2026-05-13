@@ -258,41 +258,48 @@ export default function ClientAuthModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-[#0A0A0A] rounded-2xl w-full max-w-lg md:max-w-md border border-[#1A1A1A] shadow-2xl">
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-10 right-10 w-64 h-64 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-10 left-10 w-48 h-48 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+      
+      <div className="card w-full max-w-lg md:max-w-md animate-scale-in relative overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#1A1A1A]">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#FFD700] rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-[var(--color-primary)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/20">
               {isLogin ? (
-                <LogIn className="h-5 w-5 text-black" />
+                <LogIn className="h-5 w-5 text-white" />
               ) : (
-                <UserPlus className="h-5 w-5 text-black" />
+                <UserPlus className="h-5 w-5 text-white" />
               )}
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-bold text-[var(--color-text-primary)]">
                 {isLogin ? 'Sign In to Message' : 'Join to Message'}
               </h2>
-              <p className="text-sm text-[#A0A0A0]">Connect with this freelancer</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">Connect with this freelancer</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+            className="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-5 w-5 text-[#A0A0A0]" />
+            <X className="h-5 w-5 text-[var(--color-text-secondary)]" />
           </button>
         </div>
 
         {/* Toggle */}
-        <div className="flex border-b border-[#1A1A1A]">
+        <div className="flex border-b border-[var(--color-border)]">
           <button
             onClick={() => toggleAuthMode(true)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               isLogin 
-                ? 'text-[#FFD700] border-b-2 border-[#FFD700]' 
-                : 'text-[#A0A0A0] hover:text-white'
+                ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]' 
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             Sign In
@@ -301,8 +308,8 @@ export default function ClientAuthModal({
             onClick={() => toggleAuthMode(false)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               !isLogin 
-                ? 'text-[#FFD700] border-b-2 border-[#FFD700]' 
-                : 'text-[#A0A0A0] hover:text-white'
+                ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]' 
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             Sign Up
@@ -313,7 +320,7 @@ export default function ClientAuthModal({
         <div className="p-6">
           {error && (
             <div 
-              className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg mb-6"
+              className="bg-[var(--color-error)]/10 border border-[var(--color-error)]/50 text-[var(--color-error)] px-4 py-3 rounded-lg mb-6"
               role="alert"
             >
               {error}
@@ -323,18 +330,18 @@ export default function ClientAuthModal({
           {isLogin ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="login-email" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="login-email"
                     type="email"
                     value={loginData.email}
                     onChange={handleLoginInputChange('email')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Enter your email"
                     autoComplete="email"
                   />
@@ -342,18 +349,18 @@ export default function ClientAuthModal({
               </div>
 
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="login-password" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="login-password"
                     type="password"
                     value={loginData.password}
                     onChange={handleLoginInputChange('password')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Enter your password"
                     autoComplete="current-password"
                   />
@@ -363,7 +370,7 @@ export default function ClientAuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary w-full"
               >
                 {loading ? 'Signing In...' : 'Sign In'}
               </button>
@@ -371,18 +378,18 @@ export default function ClientAuthModal({
           ) : (
             <form onSubmit={handleSignup} className="space-y-4">
               <div>
-                <label htmlFor="signup-name" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="signup-name" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="signup-name"
                     type="text"
                     value={signupData.fullName}
                     onChange={handleSignupInputChange('fullName')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Enter your full name"
                     autoComplete="name"
                   />
@@ -390,18 +397,18 @@ export default function ClientAuthModal({
               </div>
 
               <div>
-                <label htmlFor="signup-email" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="signup-email" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="signup-email"
                     type="email"
                     value={signupData.email}
                     onChange={handleSignupInputChange('email')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Enter your email"
                     autoComplete="email"
                   />
@@ -409,18 +416,18 @@ export default function ClientAuthModal({
               </div>
 
               <div>
-                <label htmlFor="signup-password" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="signup-password" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="signup-password"
                     type="password"
                     value={signupData.password}
                     onChange={handleSignupInputChange('password')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Create a password (min. 6 characters)"
                     autoComplete="new-password"
                   />
@@ -428,18 +435,18 @@ export default function ClientAuthModal({
               </div>
 
               <div>
-                <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
                   <input
                     id="signup-confirm-password"
                     type="password"
                     value={signupData.confirmPassword}
                     onChange={handleSignupInputChange('confirmPassword')}
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                    className="input"
                     placeholder="Confirm your password"
                     autoComplete="new-password"
                   />
@@ -449,7 +456,7 @@ export default function ClientAuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary w-full"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </button>

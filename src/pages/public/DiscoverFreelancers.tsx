@@ -67,43 +67,57 @@ export default function DiscoverFreelancers() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+        {/* Premium Background with Dot Grid */}
+        <div className="fixed inset-0 dot-grid pointer-events-none" />
+        
+        {/* Subtle Blur Elements */}
+        <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+        <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+        
         <div className="flex flex-col items-center">
-          <div className="flex gap-1 mb-4">
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div className="flex gap-2 mb-4 animate-fade-in-up">
+            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
-          <div className="text-[#A0A0A0]">Discovering freelancers...</div>
+          <div className="text-[var(--color-text-secondary)]">Discovering freelancers...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[var(--color-bg-main)]">
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+      
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-card)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
-              <Briefcase className="h-4 w-4" />
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 flex items-center justify-center">
+              <Briefcase className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-sm text-white">Discover</span>
+            <span className="font-bold text-sm text-[var(--color-text-primary)]">Discover</span>
           </div>
           <div className="w-9"></div> {/* Spacer for balance */}
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="hidden lg:block fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-card)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
-                <Briefcase className="h-4 w-4" />
+              <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 flex items-center justify-center">
+                <Briefcase className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-white">Discover Freelancers</span>
+              <span className="font-bold text-[var(--color-text-primary)]">Discover Freelancers</span>
             </div>
           </div>
         </div>
@@ -115,13 +129,13 @@ export default function DiscoverFreelancers() {
           {/* Search Section */}
           <div className="mb-8">
             <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#A0A0A0]" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-text-secondary)]" />
               <input
                 type="text"
                 placeholder="Search freelancers by name, skills, or expertise..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-12 pr-4 py-4 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                className="input w-full pl-12"
               />
             </div>
           </div>
@@ -129,23 +143,23 @@ export default function DiscoverFreelancers() {
           {/* Freelancers Grid */}
           {filteredFreelancers.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-24 h-24 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#2A2A2A]/50">
-                <UserCircle className="h-12 w-12 text-[#FFD700]" />
+              <div className="w-24 h-24 bg-[var(--color-bg-card)]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[var(--color-border)]/50">
+                <UserCircle className="h-12 w-12 text-[var(--color-primary)]" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
+              <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-3">
                 {searchTerm ? 'No freelancers found' : 'No freelancers available'}
               </h3>
-              <p className="text-[#A0A0A0] mb-6 max-w-md mx-auto">
+              <p className="text-[var(--color-text-secondary)] mb-6 max-w-md mx-auto">
                 {searchTerm 
                   ? 'Try adjusting your search terms to find more freelancers.'
-                  : 'Check back later for talented freelancers to join the platform.'
+                  : 'Check back later for talented freelancers to join platform.'
                 }
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredFreelancers.map((freelancer) => (
-                <div key={freelancer.id} className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm hover:shadow-md hover:border-[#FFD700]/50 transition-all group">
+                <div key={freelancer.id} className="card p-6 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: `${Math.random() * 200}ms` }}>
                   {/* Profile Header */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="relative">
@@ -153,26 +167,26 @@ export default function DiscoverFreelancers() {
                         <img
                           src={freelancer.profile_image}
                           alt={freelancer.display_name || 'Freelancer'}
-                          className="w-16 h-16 rounded-full object-cover"
+                          className="w-16 h-16 rounded-full object-cover border-2 border-[var(--color-bg-card)]"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-xl font-bold">
+                        <div className="w-16 h-16 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-[var(--color-primary)]/20">
                           {freelancer.display_name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#FFD700] rounded-full border-2 border-[#0A0A0A]"></div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[var(--color-success)] rounded-full border-2 border-[var(--color-bg-card)]"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-semibold truncate">
+                      <h3 className="text-[var(--color-text-primary)] font-semibold truncate">
                         {freelancer.display_name || 'Freelancer'}
                       </h3>
-                      <p className="text-[#A0A0A0] text-sm">Freelancer</p>
+                      <p className="text-[var(--color-text-secondary)] text-sm">Freelancer</p>
                     </div>
                   </div>
 
                   {/* Bio Preview */}
                   {freelancer.bio && (
-                    <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2 leading-relaxed">
+                    <p className="text-[var(--color-text-secondary)] text-sm mb-4 line-clamp-2 leading-relaxed">
                       {freelancer.bio}
                     </p>
                   )}
@@ -181,14 +195,14 @@ export default function DiscoverFreelancers() {
                   <div className="flex gap-2">
                     <Link
                       to={`/freelancer/${freelancer.username}`}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg transition-colors text-sm"
+                      className="btn btn-secondary flex-1 text-sm"
                     >
                       <ExternalLink className="h-4 w-4" />
                       View Profile
                     </Link>
                     <button
                       onClick={() => handleMessageFreelancer(freelancer.id!, freelancer.username!)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg transition-colors text-sm font-medium"
+                      className="btn btn-primary flex-1 text-sm"
                     >
                       <MessageCircle className="h-4 w-4" />
                       Message

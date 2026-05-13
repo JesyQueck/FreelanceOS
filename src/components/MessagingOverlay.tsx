@@ -108,33 +108,40 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center sm:items-center sm:justify-center">
-      <div className="bg-[#151B2B] w-full sm:w-full sm:max-w-md sm:h-[600px] h-[70vh] sm:h-auto rounded-t-2xl sm:rounded-2xl border border-slate-800/60 shadow-2xl flex flex-col">
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+      
+      <div className="card w-full sm:w-full sm:max-w-md sm:h-[600px] h-[70vh] sm:h-auto rounded-t-2xl sm:rounded-2xl flex flex-col animate-scale-in relative overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800/60">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-3">
             <button 
               onClick={onClose}
-              className="sm:hidden p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+              className="sm:hidden p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5 text-[var(--color-text-secondary)]" />
             </button>
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+            <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-sm font-semibold shadow-lg shadow-[var(--color-primary)]/20">
               {getDisplayName(conversation).charAt(0).toUpperCase()}
             </div>
             <div>
-              <h3 className="text-sm font-medium text-white">{getDisplayName(conversation)}</h3>
-              <p className="text-xs text-green-400">Active now</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{getDisplayName(conversation)}</h3>
+              <p className="text-xs text-[var(--color-success)]">Active now</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="hidden sm:block p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-              <MoreVertical className="h-4 w-4 text-slate-400" />
+            <button className="hidden sm:block p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors">
+              <MoreVertical className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
             <button 
               onClick={onClose}
-              className="hidden sm:block p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
+              className="hidden sm:block p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors"
             >
-              <X className="h-4 w-4 text-slate-400" />
+              <X className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
           </div>
         </div>
@@ -142,9 +149,9 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (
-            <div className="text-center text-slate-400 py-8">
-              <p className="text-sm">No messages yet</p>
-              <p className="text-xs mt-2">Start the conversation!</p>
+            <div className="text-center py-8">
+              <p className="text-sm text-[var(--color-text-secondary)]">No messages yet</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-2">Start the conversation!</p>
             </div>
           ) : (
             messages.map((message) => (
@@ -154,12 +161,12 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
               >
                 <div className={`max-w-xs sm:max-w-md px-4 py-2 rounded-2xl ${
                   message.sender_id === user?.id 
-                    ? 'bg-indigo-600 text-white rounded-br-sm' 
-                    : 'bg-slate-800 text-slate-200 rounded-tl-sm'
+                    ? 'bg-[var(--color-primary)] text-white rounded-br-sm' 
+                    : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-tl-sm'
                 }`}>
                   <p className="text-sm">{message.content}</p>
                   <div className={`flex items-center gap-1 mt-1 text-xs ${
-                    message.sender_id === user?.id ? 'text-indigo-200' : 'text-slate-500'
+                    message.sender_id === user?.id ? 'text-white/80' : 'text-[var(--color-text-muted)]'
                   }`}>
                     <span>{formatTime(message.created_at!)}</span>
                   </div>
@@ -171,10 +178,10 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
         </div>
 
         {/* Message Input */}
-        <div className="p-4 border-t border-slate-800/60">
+        <div className="p-4 border-t border-[var(--color-border)]">
           <div className="flex items-center gap-2">
-            <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors">
-              <Paperclip className="h-4 w-4 text-slate-400" />
+            <button className="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors">
+              <Paperclip className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
             <input
               type="text"
@@ -183,13 +190,13 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
               onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               placeholder="Type a message..."
               disabled={sending}
-              className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-500/50 disabled:opacity-50"
+              className="input flex-1"
               autoFocus
             />
             <button 
               onClick={handleSendMessage}
               disabled={sending || !messageInput.trim()}
-              className="p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-primary p-2"
             >
               <Send className="h-4 w-4 text-white" />
             </button>

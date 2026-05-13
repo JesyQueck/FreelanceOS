@@ -172,7 +172,7 @@ export default function ServicesPage() {
                   value={newService.description}
                   onChange={(e) => setNewService(prev => ({ ...prev, description: e.target.value.slice(0, 150) }))}
                   maxLength={150}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
+                  className="input w-full h-32 resize-none"
                   placeholder="Describe your service and what you deliver"
                 />
                 <p className="text-xs text-[#A0A0A0] mt-1">{newService.description?.length || 0}/150 characters</p>
@@ -184,7 +184,7 @@ export default function ServicesPage() {
                     type="text"
                     value={newService.price}
                     onChange={(e) => setNewService(prev => ({ ...prev, price: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                    className="input w-full"
                     placeholder="From $500"
                   />
                 </div>
@@ -194,7 +194,7 @@ export default function ServicesPage() {
                     type="text"
                     value={newService.timeline}
                     onChange={(e) => setNewService(prev => ({ ...prev, timeline: e.target.value }))}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                    className="input w-full"
                     placeholder="2-3 weeks"
                   />
                 </div>
@@ -204,7 +204,7 @@ export default function ServicesPage() {
                 <select
                   value={newService.status}
                   onChange={(e) => setNewService(prev => ({ ...prev, status: e.target.value as Service['status'] }))}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                  className="input w-full"
                 >
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
@@ -224,14 +224,14 @@ export default function ServicesPage() {
                     status: 'draft'
                   });
                 }}
-                className="px-4 py-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors"
+                className="btn btn-secondary text-sm font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddService}
                 disabled={isSaving || !newService.title?.trim()}
-                className="px-4 py-2 text-sm font-medium text-black bg-[#FFD700] rounded-lg hover:bg-[#FFC700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="btn btn-primary text-sm font-medium"
               >
                 {isSaving ? 'Creating...' : 'Create Service'}
               </button>
@@ -246,73 +246,73 @@ export default function ServicesPage() {
           <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#FFD700]/20 rounded-lg flex items-center justify-center">
-                  <Edit className="h-5 w-5 text-[#FFD700]" />
+                <div className="w-10 h-10 bg-[var(--color-primary)]/20 rounded-lg flex items-center justify-center">
+                  <Edit className="h-5 w-5 text-[var(--color-primary)]" />
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold">Edit Service</h4>
-                  <p className="text-[#A0A0A0] text-sm">Update your service details</p>
+                  <h4 className="text-[var(--color-text-primary)] font-semibold">Edit Service</h4>
+                  <p className="text-[var(--color-text-secondary)] text-sm">Update your service details</p>
                 </div>
               </div>
               <button
                 onClick={cancelEditing}
-                className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors"
               >
-                <X className="h-5 w-5 text-[#A0A0A0]" />
+                <X className="h-5 w-5 text-[var(--color-text-secondary)]" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Service Title *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Service Title *</label>
                 <input
                   type="text"
                   value={editingService.title}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, title: e.target.value.slice(0, 50) } : null)}
                   maxLength={50}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                  className="input w-full"
                   placeholder="Enter service title"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.title?.length || 0}/50 characters</p>
+                <p className="text-xs text-[var(--color-text-secondary)] mt-1">{editingService.title?.length || 0}/50 characters</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Description</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Description</label>
                 <textarea
                   value={editingService.description}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, description: e.target.value.slice(0, 150) } : null)}
                   maxLength={150}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none transition-all"
+                  className="input w-full h-32 resize-none"
                   placeholder="Describe your service and what you deliver"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{editingService.description?.length || 0}/150 characters</p>
+                <p className="text-xs text-[var(--color-text-secondary)] mt-1">{editingService.description?.length || 0}/150 characters</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">Price</label>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Price</label>
                   <input
                     type="text"
                     value={editingService.price}
                     onChange={(e) => setEditingService(prev => prev ? { ...prev, price: e.target.value } : null)}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                    className="input w-full"
                     placeholder="From $500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">Timeline</label>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Timeline</label>
                   <input
                     type="text"
                     value={editingService.timeline}
                     onChange={(e) => setEditingService(prev => prev ? { ...prev, timeline: e.target.value } : null)}
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                    className="input w-full"
                     placeholder="2-3 weeks"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Status</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Status</label>
                 <select
                   value={editingService.status}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, status: e.target.value as 'active' | 'draft' } : null)}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all"
                 >
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
@@ -323,14 +323,14 @@ export default function ServicesPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={cancelEditing}
-                className="px-4 py-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors"
+                className="btn btn-secondary text-sm font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateService}
                 disabled={isSaving || !editingService.title?.trim()}
-                className="px-4 py-2 text-sm font-medium text-black bg-[#FFD700] rounded-lg hover:bg-[#FFC700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="btn btn-primary text-sm font-medium"
               >
                 {isSaving ? (
                   <>

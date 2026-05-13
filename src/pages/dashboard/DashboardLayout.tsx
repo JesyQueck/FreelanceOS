@@ -80,32 +80,39 @@ export default function DashboardLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
+    <div className="flex h-screen bg-[var(--color-bg-main)] text-[var(--color-text-primary)] overflow-hidden font-sans">
+      
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
       
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+          className="lg:hidden fixed inset-0 text-white/50 backdrop-blur-sm z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* DESKTOP SIDEBAR - Always Visible */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[#1A1A1A] lg:bg-[#0A0A0A]/50 lg:backdrop-blur-xl lg:flex-shrink-0">
-        <div className="h-20 flex items-center px-6 border-b border-transparent">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[var(--color-border)] lg:bg-[var(--color-bg-card)]/80 lg:backdrop-blur-xl lg:flex-shrink-0">
+        <div className="h-20 flex items-center px-6 border-b border-[var(--color-border)]">
           <Link 
             className="flex items-center gap-2.5 group" 
             to="/dashboard"
           >
-            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
-              <Briefcase className="h-5 w-5 text-black" />
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
+              <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
+            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
           </Link>
         </div>
         
         <div className="px-4 py-4">
-          <p className="px-3 text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">
+          <p className="px-3 text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
             Overview
           </p>
           <nav className="space-y-1">
@@ -115,8 +122,8 @@ export default function DashboardLayout() {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-[#FFD700]/20 text-white'
-                    : 'text-[#A0A0A0] hover:bg-[#0A0A0A]/50 hover:text-white'
+                    ? 'bg-[var(--color-primary)]/20 text-[var(--color-text-primary)]'
+                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -132,7 +139,7 @@ export default function DashboardLayout() {
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[var(--color-text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -145,14 +152,14 @@ export default function DashboardLayout() {
         </div>
 
         {/* User Profile Section */}
-        <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
+        <div className="mt-auto p-4 border-t border-[var(--color-border)]">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-sm font-semibold">
               {loading ? (
                 <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               ) : (
                 initial
@@ -162,12 +169,12 @@ export default function DashboardLayout() {
               <p className="text-sm font-medium text-white truncate">
                 {loading ? 'Loading...' : displayName}
               </p>
-              <p className="text-xs text-[#A0A0A0] truncate">
+              <p className="text-xs text-[var(--color-text-secondary)] truncate">
                 {loading ? 'Loading...' : userEmail}
               </p>
             </div>
-            <button className="p-1.5 rounded-lg hover:bg-[#0A0A0A]/50 transition-colors">
-              <Bell className="h-4 w-4 text-[#A0A0A0]" />
+            <button className="p-1.5 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors">
+              <Bell className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
           </div>
         </div>
@@ -175,26 +182,26 @@ export default function DashboardLayout() {
 
       {/* MOBILE SIDEBAR - Slide out overlay */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 border-r border-[#1A1A1A] bg-[#0A0A0A]/50 backdrop-blur-xl flex-shrink-0 flex flex-col
+        fixed inset-y-0 left-0 z-40 w-64 border-r border-[var(--color-border)] bg-[var(--color-bg-card)]/80 backdrop-blur-xl flex-shrink-0 flex flex-col
         lg:hidden
         transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="h-20 flex items-center px-6 border-b border-transparent">
+        <div className="h-20 flex items-center px-6 border-b border-[var(--color-border)]">
           <Link 
             className="flex items-center gap-2.5 group" 
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
           >
-            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
-              <Briefcase className="h-5 w-5 text-black" />
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
+              <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
+            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
           </Link>
         </div>
         
         <div className="px-4 py-4">
-          <p className="px-3 text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">
+          <p className="px-3 text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
             Overview
           </p>
           <nav className="space-y-1">
@@ -204,8 +211,8 @@ export default function DashboardLayout() {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-[#FFD700]/20 text-white'
-                    : 'text-[#A0A0A0] hover:bg-[#0A0A0A]/50 hover:text-white'
+                    ? 'bg-[var(--color-primary)]/20 text-[var(--color-text-primary)]'
+                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-text-primary)]'
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -222,7 +229,7 @@ export default function DashboardLayout() {
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[var(--color-text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -235,14 +242,14 @@ export default function DashboardLayout() {
         </div>
 
         {/* User Profile Section */}
-        <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
+        <div className="mt-auto p-4 border-t border-[var(--color-border)]">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-sm font-semibold">
               {loading ? (
                 <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-1.5 h-1.5 text-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               ) : (
                 initial
@@ -252,42 +259,42 @@ export default function DashboardLayout() {
               <p className="text-sm font-medium text-white truncate">
                 {loading ? 'Loading...' : displayName}
               </p>
-              <p className="text-xs text-[#A0A0A0] truncate">
+              <p className="text-xs text-[var(--color-text-secondary)] truncate">
                 {loading ? 'Loading...' : userEmail}
               </p>
             </div>
-            <button className="p-1.5 rounded-lg hover:bg-[#0A0A0A]/50 transition-colors">
-              <Bell className="h-4 w-4 text-[#A0A0A0]" />
+            <button className="p-1.5 rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors">
+              <Bell className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
           </div>
         </div>
       </aside>
 
       {/* MOBILE NAVBAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-card)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-3">
           <Link 
             className="flex items-center gap-2.5 group" 
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
           >
-            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
-              <Briefcase className="h-4 w-4 text-black" />
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
+              <Briefcase className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
+            <span className="font-bold text-sm tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
           </Link>
           
           <div className="flex items-center gap-2">
             <NotificationDropdown />
             <Link
               to="/dashboard/settings"
-              className="p-2 rounded-lg bg-[#1A1A1A]/50 hover:bg-[#1A1A1A] transition-colors"
+              className="p-2 rounded-lg bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-muted)] transition-colors"
             >
-              <Settings className="h-5 w-5 text-white" />
+              <Settings className="h-5 w-5 text-[var(--color-text-primary)]" />
             </Link>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg bg-red-500/50 hover:bg-red-500/70 transition-colors"
+              className="p-2 rounded-lg bg-[var(--color-error)]/50 hover:bg-[var(--color-error)]/70 transition-colors"
             >
               <LogOut className="h-5 w-5 text-white" />
             </button>

@@ -119,10 +119,10 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex gap-1">
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        <div className="flex gap-2 animate-fade-in-up">
+          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
         </div>
       </div>
     );
@@ -132,10 +132,10 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="text-red-500 mb-4">{error}</div>
+          <div className="text-[var(--color-error)] mb-4">{error}</div>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+            className="btn btn-primary"
           >
             Retry
           </button>
@@ -146,160 +146,170 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Header & Welcome */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#F9FAFB] mb-2">
-            Good afternoon, {data.displayName}
-          </h1>
-          <p className="text-[#9CA3AF] text-lg">
-            Here's what is happening with your freelance business today.
-          </p>
-        </div>
-        <button 
-          onClick={() => navigate('/dashboard/services')}
-          className="inline-flex items-center justify-center px-6 py-4 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-xl hover:bg-[#FFC700] shadow-lg shadow-[#FFD700]/20 gap-2 min-h-[48px]"
-        >
-          <Plus className="h-5 w-5" /> Add Service
-        </button>
-      </div>
-
-      {/* Profile Completion Indicator - Only show if not 100% complete */}
-      {data.progressPercent < 100 && (
-        <div className="bg-[#0A0A0A] rounded-xl p-6 border border-[#1A1A1A] shadow-sm relative overflow-hidden group mb-8">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFD700]/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
-          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5 text-[#FFD700]" />
-                <h3 className="font-semibold text-lg text-white">Profile is {data.progressPercent}% complete</h3>
-              </div>
-              <div className="w-full bg-[#1A1A1A] rounded-lg h-2 mb-3">
-                <div 
-                  className="bg-[#FFD700] h-2 rounded-lg transition-all duration-500"
-                  style={{ width: `${data.progressPercent}%` }}
-                />
-              </div>
-              <p className="text-sm text-[#A0A0A0]">
-                Complete your profile to attract more clients and appear in search results.
-              </p>
-            </div>
-            <button 
-              onClick={() => navigate('/dashboard/profile')}
-              className="px-4 py-3 bg-[#1A1A1A] hover:bg-[#2A2A2A] rounded-xl text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors cursor-pointer min-h-[44px]"
-            >
-              Complete Profile
-            </button>
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+      
+      {/* Main Content */}
+      <div className="relative z-10">
+        {/* Header & Welcome */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 animate-fade-in-up">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--color-text-primary)] mb-2">
+              Good afternoon, {data.displayName}
+            </h1>
+            <p className="text-[var(--color-text-secondary)] text-lg">
+              Here's what is happening with your freelance business today.
+            </p>
           </div>
-        </div>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#0A0A0A] rounded-xl p-4 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-[#FFD700]/10 rounded-lg">
-              <Target className="h-5 w-5 text-[#FFD700]" />
-            </div>
-            <span className="text-xs text-[#A0A0A0] font-medium">{data.servicesCount > 0 ? '+12%' : '0%'}</span>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-1">{data.servicesCount}</h3>
-          <p className="text-sm text-[#A0A0A0]">Active Services</p>
+          <button 
+            onClick={() => navigate('/dashboard/services')}
+            className="btn btn-primary"
+          >
+            <Plus className="h-5 w-5" /> Add Service
+          </button>
         </div>
 
-        <div className="bg-[#0A0A0A] rounded-xl p-4 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-green-600/10 rounded-lg">
-              <Eye className="h-5 w-5 text-green-400" />
-            </div>
-            <span className="text-xs text-[#A0A0A0] font-medium">{data.portfoliosCount > 0 ? '+25%' : '0%'}</span>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-1">{data.portfoliosCount}</h3>
-          <p className="text-sm text-[#A0A0A0]">Portfolio Items</p>
-        </div>
-
-        <div className="bg-[#0A0A0A] rounded-xl p-4 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-purple-600/10 rounded-lg">
-              <MessageSquare className="h-5 w-5 text-purple-400" />
-            </div>
-            <span className="text-xs text-[#A0A0A0] font-medium">{data.activeClientsCount > 0 ? '+8%' : '0%'}</span>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-1">{data.activeClientsCount}</h3>
-          <p className="text-sm text-[#A0A0A0]">Active Clients</p>
-        </div>
-
-        <div className="bg-[#0A0A0A] rounded-xl p-4 border border-[#1A1A1A] shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-green-600/10 rounded-lg">
-              <MessageSquare className="h-5 w-5 text-green-400" />
-            </div>
-            <span className="text-xs text-[#A0A0A0] font-medium">{data.responseRate > 0 ? '+5%' : '0%'}</span>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-1">{data.responseRate}%</h3>
-          <p className="text-sm text-[#A0A0A0]">Response Rate</p>
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
-        <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] shadow-sm overflow-hidden">
-          <div className="divide-y divide-[#1A1A1A]/60">
-            {data.recentActivity.map((activity: ActivityItem) => (
-              <div 
-                key={activity.id} 
-                className={`p-6 flex items-center justify-between transition-colors ${
-                  activity.type === 'message' ? 'hover:bg-[#1A1A1A]/30 cursor-pointer' : 'hover:bg-[#1A1A1A]/30'
-                }`}
-                onClick={() => {
-                  if (activity.type === 'message') {
-                    const conversation = conversations.find(conv => conv.id === activity.id);
-                    if (conversation) {
-                      setSelectedConversation(conversation);
-                      setShowMessagingOverlay(true);
-                    }
-                  }
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-3 h-3 rounded-lg ${
-                    activity.type === 'message' ? 'bg-green-500' :
-                    activity.type === 'system' ? 'bg-blue-500' : 'bg-amber-500'
-                  }`}></div>
-                  <div>
-                    <p className="text-base font-medium text-white">
-                      {activity.type === 'message' ? (
-                        <span className="hover:text-[#FFD700] transition-colors">{activity.name}</span>
-                      ) : (
-                        activity.name
-                      )}
-                    </p>
-                    <p className="text-sm text-[#A0A0A0]">{activity.time}</p>
-                  </div>
+        {/* Profile Completion Indicator - Only show if not 100% complete */}
+        {data.progressPercent < 100 && (
+          <div className="card p-6 relative overflow-hidden group mb-8 animate-scale-in">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-primary)]/10 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-5 w-5 text-[var(--color-primary)]" />
+                  <h3 className="font-semibold text-lg text-[var(--color-text-primary)]">Profile is {data.progressPercent}% complete</h3>
                 </div>
-                {activity.type === 'message' ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#FFD700] hover:text-[#FFC700] transition-colors">View chat</span>
-                    <MessageSquare className="h-5 w-5 text-[#A0A0A0] hover:text-[#FFD700] transition-colors" />
-                  </div>
-                ) : activity.type === 'system' ? (
-                  <Eye className="h-5 w-5 text-[#A0A0A0] hover:text-white transition-colors" />
-                ) : (
-                  <Target className="h-5 w-5 text-[#A0A0A0] hover:text-white transition-colors" />
-                )}
+                <div className="w-full bg-[var(--color-bg-secondary)] rounded-lg h-2 mb-3">
+                  <div 
+                    className="bg-[var(--color-primary)] h-2 rounded-lg transition-all duration-500"
+                    style={{ width: `${data.progressPercent}%` }}
+                  />
+                </div>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  Complete your profile to attract more clients and appear in search results.
+                </p>
               </div>
-            ))}
+              <button 
+                onClick={() => navigate('/dashboard/profile')}
+                className="btn btn-secondary"
+              >
+                Complete Profile
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="card p-4 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: '100ms' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
+                <Target className="h-5 w-5 text-[var(--color-primary)]" />
+              </div>
+              <span className="text-xs text-[var(--color-text-secondary)] font-medium">{data.servicesCount > 0 ? '+12%' : '0%'}</span>
+            </div>
+            <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-1">{data.servicesCount}</h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">Active Services</p>
+          </div>
+
+          <div className="card p-4 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-[var(--color-success)]/10 rounded-lg">
+                <Eye className="h-5 w-5 text-[var(--color-success)]" />
+              </div>
+              <span className="text-xs text-[var(--color-text-secondary)] font-medium">{data.portfoliosCount > 0 ? '+25%' : '0%'}</span>
+            </div>
+            <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-1">{data.portfoliosCount}</h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">Portfolio Items</p>
+          </div>
+
+          <div className="card p-4 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: '300ms' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-[var(--color-accent)]/10 rounded-lg">
+                <MessageSquare className="h-5 w-5 text-[var(--color-accent)]" />
+              </div>
+              <span className="text-xs text-[var(--color-text-secondary)] font-medium">{data.activeClientsCount > 0 ? '+8%' : '0%'}</span>
+            </div>
+            <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-1">{data.activeClientsCount}</h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">Active Clients</p>
+          </div>
+
+          <div className="card p-4 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: '400ms' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-[var(--color-success)]/10 rounded-lg">
+                <MessageSquare className="h-5 w-5 text-[var(--color-success)]" />
+              </div>
+              <span className="text-xs text-[var(--color-text-secondary)] font-medium">{data.responseRate > 0 ? '+5%' : '0%'}</span>
+            </div>
+            <h3 className="text-xl font-bold text-[var(--color-text-primary)] mb-1">{data.responseRate}%</h3>
+            <p className="text-sm text-[var(--color-text-secondary)]">Response Rate</p>
           </div>
         </div>
-      </div>
 
-      {/* Messaging Overlay */}
-      <MessagingOverlay 
-        isOpen={showMessagingOverlay}
-        onClose={() => setShowMessagingOverlay(false)}
-        conversation={selectedConversation}
-      />
+        {/* Recent Activity */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-6">Recent Activity</h2>
+          <div className="card overflow-hidden animate-fade-in-up">
+            <div className="divide-y divide-[var(--color-border)]">
+              {data.recentActivity.map((activity: ActivityItem) => (
+                <div 
+                  key={activity.id} 
+                  className={`p-6 flex items-center justify-between transition-colors ${
+                    activity.type === 'message' ? 'hover:bg-[var(--color-bg-secondary)]/30 cursor-pointer' : 'hover:bg-[var(--color-bg-secondary)]/30'
+                  }`}
+                  onClick={() => {
+                    if (activity.type === 'message') {
+                      const conversation = conversations.find(conv => conv.id === activity.id);
+                      if (conversation) {
+                        setSelectedConversation(conversation);
+                        setShowMessagingOverlay(true);
+                      }
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-3 h-3 rounded-lg ${
+                      activity.type === 'message' ? 'bg-[var(--color-success)]' :
+                      activity.type === 'system' ? 'bg-[var(--color-info)]' : 'bg-[var(--color-warning)]'
+                    }`}></div>
+                    <div>
+                      <p className="text-base font-medium text-[var(--color-text-primary)]">
+                        {activity.type === 'message' ? (
+                          <span className="hover:text-[var(--color-primary)] transition-colors">{activity.name}</span>
+                        ) : (
+                          activity.name
+                        )}
+                      </p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{activity.time}</p>
+                    </div>
+                  </div>
+                  {activity.type === 'message' ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">View chat</span>
+                      <MessageSquare className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" />
+                    </div>
+                  ) : activity.type === 'system' ? (
+                    <Eye className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
+                  ) : (
+                    <Target className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Messaging Overlay */}
+        <MessagingOverlay 
+          isOpen={showMessagingOverlay}
+          onClose={() => setShowMessagingOverlay(false)}
+          conversation={selectedConversation}
+        />
+      </div>
     </>
   );
 }
