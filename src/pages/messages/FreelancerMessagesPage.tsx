@@ -255,7 +255,7 @@ export default function FreelancerMessagesPage() {
         </div>
 
         {/* Chat Area - Slides in from right */}
-        <div className={`flex-1 bg-[#0A0A0A] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
+        <div className={`flex-1 bg-[var(--color-bg-main)] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
           showChat ? 'translate-x-0' : 'translate-x-full'
         } ${showChat ? 'absolute inset-0 z-20 sm:relative sm:z-0' : 'absolute inset-0'}`}>
           {selectedConversation ? (
@@ -310,7 +310,7 @@ export default function FreelancerMessagesPage() {
               </div>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-[#1A1A1A]">
+              <div className="p-4 border-t border-[var(--color-border)]">
                 <div className="flex items-center gap-3">
                   <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
                     <Paperclip className="h-5 w-5 text-[var(--color-text-secondary)]" />

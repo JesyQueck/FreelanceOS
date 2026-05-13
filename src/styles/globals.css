@@ -289,8 +289,8 @@
   }
 
   .loading-cube {
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
     position: relative;
     transform-style: preserve-3d;
     animation: rotateCube 2s ease-in-out infinite;
@@ -298,19 +298,19 @@
 
   .cube-face {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 20px;
+    height: 20px;
     background: var(--color-primary);
     border: 1px solid var(--color-primary-hover);
     opacity: 0.9;
   }
 
-  .cube-face:nth-child(1) { transform: translateZ(20px); }
-  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(20px); }
-  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(20px); }
-  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(20px); }
-  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(20px); }
-  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(20px); }
+  .cube-face:nth-child(1) { transform: translateZ(10px); }
+  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(10px); }
+  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(10px); }
+  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(10px); }
+  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(10px); }
+  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(10px); }
   
   /* Premium Focus States */
   .focus-ring {

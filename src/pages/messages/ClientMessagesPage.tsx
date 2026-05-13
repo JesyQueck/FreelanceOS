@@ -474,26 +474,36 @@ const handleSelectConversation = (conversation: Conversation) => {
           </div>
         </div>
 
-        <div className="flex-1 flex bg-[#0A0A0A] rounded-2xl border border-[#1A1A1A] overflow-hidden relative mx-6 mb-6">
+        <div className="flex-1 flex bg-[var(--color-bg-main)] rounded-2xl border border-[var(--color-border)] overflow-hidden relative mx-6 mb-6">
           {/* Conversations List - Always visible */}
-          <div className={`w-full sm:w-80 bg-[#0A0A0A] flex flex-col transition-transform duration-300 ${
+          <div className={`w-full sm:w-80 bg-[var(--color-bg-main)] flex flex-col transition-transform duration-300 ${
             showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
           } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
-            <div className="p-4 border-b border-[#1A1A1A]">
-              <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Your Conversations</h2>
+            <div className="p-4 border-b border-[var(--color-border)]">
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Your Conversations</h2>
             </div>
             
             <div className="flex-1 overflow-y-auto">
               {conversationsLoading ? (
-                <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
+                <div className="p-6 flex flex-col items-center justify-center">
+                  <div className="loading-cube mb-4">
+                    <div className="cube-face"></div>
+                    <div className="cube-face"></div>
+                    <div className="cube-face"></div>
+                    <div className="cube-face"></div>
+                    <div className="cube-face"></div>
+                    <div className="cube-face"></div>
+                  </div>
+                  <div className="text-[var(--color-text-secondary)] text-sm">Loading conversations...</div>
+                </div>
               ) : conversations.length === 0 ? (
-                <div className="p-6 text-center text-[#A0A0A0]">No conversations yet. Start a conversation with a freelancer!</div>
+                <div className="p-6 text-center text-[var(--color-text-secondary)]">No conversations yet. Start a conversation with a freelancer!</div>
               ) : (
                 conversations.map((conversation: Conversation) => (
                   <div 
                     key={conversation.id} 
                     onClick={() => handleSelectConversation(conversation)}
-                    className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-colors border-b border-[#1A1A1A]/30 last:border-b-0 ${
+                    className={`p-4 hover:bg-[var(--color-bg-secondary)]/50 cursor-pointer transition-colors border-b border-[var(--color-border)]/30 last:border-b-0 ${
                       selectedConversation?.id === conversation.id ? 'bg-[var(--color-primary)]/10' : ''
                     }`}
                   >
@@ -503,10 +513,10 @@ const handleSelectConversation = (conversation: Conversation) => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
-                          <span className="text-xs text-[#A0A0A0]">{formatTimeAgo(conversation.last_message_at)}</span>
+                          <h3 className="text-sm font-medium text-[var(--color-text-primary)] truncate">{getDisplayName(conversation)}</h3>
+                          <span className="text-xs text-[var(--color-text-secondary)]">{formatTimeAgo(conversation.last_message_at)}</span>
                         </div>
-                        <p className="text-xs text-[#A0A0A0] truncate">Click to view messages</p>
+                        <p className="text-xs text-[var(--color-text-secondary)] truncate">Click to view messages</p>
                       </div>
                     </div>
                   </div>
@@ -516,37 +526,37 @@ const handleSelectConversation = (conversation: Conversation) => {
           </div>
 
           {/* Chat Area - Slides in from right */}
-          <div className={`flex-1 bg-[#0A0A0A] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
+          <div className={`flex-1 bg-[var(--color-bg-main)] overflow-hidden flex flex-col min-w-0 transition-transform duration-300 ${
             showChat ? 'translate-x-0' : 'translate-x-full'
           } ${showChat ? 'absolute inset-0 z-20 sm:relative sm:z-0' : 'absolute inset-0'}`}>
             {selectedConversation ? (
               <>
                 {/* Chat Header */}
-                <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
+                <div className="p-4 border-b border-[var(--color-border)] flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <button 
                       onClick={handleBackToList}
-                      className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors"
+                      className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors"
                     >
-                      <ArrowLeft className="h-5 w-5 text-white" />
+                      <ArrowLeft className="h-5 w-5 text-[var(--color-text-primary)]" />
                     </button>
                     <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold">
                       {getInitials(selectedConversation)}
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
+                      <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{getDisplayName(selectedConversation)}</h3>
                       <p className="text-xs text-green-400">Freelancer</p>
                     </div>
                   </div>
-                  <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
-                    <MoreVertical className="h-4 w-4 text-[#A0A0A0]" />
+                  <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
+                    <MoreVertical className="h-4 w-4 text-[var(--color-text-secondary)]" />
                   </button>
                 </div>
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {messages.length === 0 ? (
-                    <div className="text-center text-[#A0A0A0] py-8">No messages yet. Start the conversation!</div>
+                    <div className="text-center text-[var(--color-text-secondary)] py-8">No messages yet. Start the conversation!</div>
                   ) : (
                     <>
                       {messages.map((message) => (
@@ -558,7 +568,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                           }`}>
                             <p className="text-sm leading-relaxed">{message.content}</p>
                             <div className={`flex items-center gap-1 mt-2 text-xs ${
-                              message.sender_id === user?.id ? 'text-black/70' : 'text-[#A0A0A0]'
+                              message.sender_id === user?.id ? 'text-black/70' : 'text-[var(--color-text-secondary)]'
                             }`}>
                               <span>{formatTime(message.created_at)}</span>
                             </div>
@@ -571,10 +581,10 @@ const handleSelectConversation = (conversation: Conversation) => {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t border-[#1A1A1A]">
+                <div className="p-4 border-t border-[var(--color-border)]">
                   <div className="flex items-center gap-3">
-                    <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
-                      <Paperclip className="h-5 w-5 text-[#A0A0A0]" />
+                    <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
+                      <Paperclip className="h-5 w-5 text-[var(--color-text-secondary)]" />
                     </button>
                     <input
                       type="text"
@@ -596,7 +606,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-[#A0A0A0]">
+              <div className="flex-1 flex items-center justify-center text-[var(--color-text-secondary)]">
                 <p>Select a conversation to start messaging</p>
               </div>
             )}

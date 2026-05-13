@@ -421,8 +421,8 @@ export default function ProfilePage() {
   
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-white">Please log in to view your profile.</div>
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+        <div className="text-[var(--color-text-primary)]">Please log in to view your profile.</div>
       </div>
     );
   }
@@ -459,7 +459,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Header */}
-        <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
+        <div className="card p-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Profile Image */}
             <div className="relative">
@@ -478,10 +478,10 @@ export default function ProfilePage() {
               )}
               <button 
                 onClick={() => document.getElementById('profile-image-upload')?.click()}
-                className="absolute bottom-2 right-2 p-2 bg-[#1A1A1A] rounded-lg hover:bg-[#2A2A2A] transition-colors z-10"
+                className="absolute bottom-2 right-2 p-2 bg-[var(--color-bg-secondary)] rounded-lg hover:bg-[var(--color-bg-secondary)] transition-colors z-10"
                 title="Change profile picture"
               >
-                <Camera className="h-4 w-4 text-white" />
+                <Camera className="h-4 w-4 text-[var(--color-text-primary)]" />
               </button>
               <input
                 id="profile-image-upload"
@@ -551,7 +551,7 @@ export default function ProfilePage() {
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full">
                       <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-white mb-2">Edit Bio</h3>
+                        <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">Edit Bio</h3>
                         <textarea
                           value={editingValue}
                           onChange={(e) => setEditingValue(e.target.value.slice(0, 200))}
@@ -560,12 +560,12 @@ export default function ProfilePage() {
                           placeholder="Tell us about yourself and your work"
                           autoFocus
                         />
-                        <p className="text-xs text-[#A0A0A0] mt-1">{editingValue?.length || 0}/200 characters</p>
+                        <p className="text-xs text-[var(--color-text-muted)] mt-1">{editingValue?.length || 0}/200 characters</p>
                       </div>
                       <div className="flex gap-3 justify-end">
                         <button
                           onClick={cancelEditing}
-                          className="px-4 py-2 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-lg text-sm"
+                          className="px-4 py-2 bg-[var(--color-bg-secondary)] hover:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-lg text-sm"
                         >
                           Cancel
                         </button>
@@ -581,7 +581,7 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="flex items-start gap-2">
-                    <p className="text-[#A0A0A0] leading-relaxed flex-1">
+                    <p className="text-[var(--color-text-secondary)] leading-relaxed flex-1">
                       {profile?.bio || 'No bio added yet. Click the edit icon to add your professional bio.'}
                     </p>
                     <button
@@ -1005,14 +1005,14 @@ export default function ProfilePage() {
             ) : (
               <div className="col-span-full">
                 <div className="text-center py-12 px-6">
-                  <div className="w-24 h-24 bg-[#1A1A1A]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#2A2A2A]/50">
-                    <Briefcase className="h-12 w-12 text-[#A0A0A0]" />
+                  <div className="w-24 h-24 bg-[var(--color-background-secondary)]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[var(--color-border-secondary)]/50">
+                    <Briefcase className="h-12 w-12 text-[var(--color-text-secondary)]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">No Portfolio Projects</h3>
-                  <p className="text-[#A0A0A0] mb-6">Showcase your work by adding portfolio projects to your profile.</p>
+                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">No Portfolio Projects</h3>
+                  <p className="text-[var(--color-text-secondary)] mb-6">Showcase your work by adding portfolio projects to your profile.</p>
                   <button 
                     onClick={() => setShowAddPortfolio(true)}
-                    className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
+                    className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-all bg-[var(--color-accent-primary)] rounded-lg hover:bg-[var(--color-accent-secondary)] gap-2"
                   >
                     <Plus className="h-4 w-4" /> Add Your First Project
                   </button>
