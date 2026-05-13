@@ -186,56 +186,66 @@ export default function FreelancerMessagesPage() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-black">
+    <div className="h-full flex flex-col bg-[var(--color-bg-main)]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-white">Freelancer Messages</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Freelancer Messages</h1>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
             <input
               type="text"
               placeholder="Search conversations..."
-              className="pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base"
+              className="pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 w-full sm:w-auto text-base"
             />
           </div>
           <NotificationDropdown />
         </div>
       </div>
 
-      <div className="flex-1 flex bg-[#0A0A0A] rounded-2xl border border-[#1A1A1A] overflow-hidden relative">
+      <div className="flex-1 flex bg-[var(--color-bg-main)] rounded-2xl border border-[var(--color-border)] overflow-hidden relative">
         {/* Conversations List - Always visible */}
-        <div className={`w-full sm:w-80 bg-[#0A0A0A] flex flex-col transition-transform duration-300 ${
+        <div className={`w-full sm:w-80 bg-[var(--color-bg-main)] flex flex-col transition-transform duration-300 ${
           showChat ? 'absolute inset-0 z-10 sm:relative sm:z-0' : 'relative'
         } ${showChat ? 'translate-x-0 sm:translate-x-0' : 'translate-x-0'}`}>
-          <div className="p-4 border-b border-[#1A1A1A]">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider">Client Conversations</h2>
+          <div className="p-4 border-b border-[var(--color-border)]">
+            <h2 className="text-sm font-semibold text-[var(--color-text-primary)] uppercase tracking-wider">Client Conversations</h2>
           </div>
           
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="p-6 text-center text-[#A0A0A0]">Loading conversations...</div>
+              <div className="p-6 flex flex-col items-center justify-center">
+                <div className="loading-cube mb-4">
+                  <div className="cube-face"></div>
+                  <div className="cube-face"></div>
+                  <div className="cube-face"></div>
+                  <div className="cube-face"></div>
+                  <div className="cube-face"></div>
+                  <div className="cube-face"></div>
+                </div>
+                <div className="text-[var(--color-text-secondary)] text-sm">Loading conversations...</div>
+              </div>
             ) : conversations.length === 0 ? (
-              <div className="p-6 text-center text-[#A0A0A0]">No conversations yet. Clients will appear here when they message you!</div>
+              <div className="p-6 text-center text-[var(--color-text-secondary)]">No conversations yet. Clients will appear here when they message you!</div>
             ) : (
               conversations.map((conversation: Conversation) => (
                 <div 
                   key={conversation.id} 
                   onClick={() => handleSelectConversation(conversation)}
-                  className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-colors border-b border-[#1A1A1A]/30 last:border-b-0 ${
-                    selectedConversation?.id === conversation.id ? 'bg-[#FFD700]/10' : ''
+                  className={`p-4 hover:bg-[var(--color-bg-secondary)]/50 cursor-pointer transition-colors border-b border-[var(--color-border)]/30 last:border-b-0 ${
+                    selectedConversation?.id === conversation.id ? 'bg-[var(--color-primary)]/10' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
                       {getInitials(conversation)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-sm font-medium text-white truncate">{getDisplayName(conversation)}</h3>
-                        <span className="text-xs text-[#A0A0A0]">{formatTimeAgo(conversation.last_message_at)}</span>
+                        <h3 className="text-sm font-medium text-[var(--color-text-primary)] truncate">{getDisplayName(conversation)}</h3>
+                        <span className="text-xs text-[var(--color-text-secondary)]">{formatTimeAgo(conversation.last_message_at)}</span>
                       </div>
-                      <p className="text-xs text-[#A0A0A0] truncate">Click to view messages</p>
+                      <p className="text-xs text-[var(--color-text-secondary)] truncate">Click to view messages</p>
                     </div>
                   </div>
                 </div>
@@ -251,43 +261,43 @@ export default function FreelancerMessagesPage() {
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
+              <div className="p-4 border-b border-[var(--color-border)] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={handleBackToList}
-                    className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors"
+                    className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors"
                   >
-                    <ArrowLeft className="h-5 w-5 text-white" />
+                    <ArrowLeft className="h-5 w-5 text-[var(--color-text-primary)]" />
                   </button>
-                  <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold">
                     {getInitials(selectedConversation)}
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-white">{getDisplayName(selectedConversation)}</h3>
+                    <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{getDisplayName(selectedConversation)}</h3>
                     <p className="text-xs text-green-400">Client</p>
                   </div>
                 </div>
-                <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
-                  <MoreVertical className="h-4 w-4 text-[#A0A0A0]" />
+                <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
+                  <MoreVertical className="h-4 w-4 text-[var(--color-text-secondary)]" />
                 </button>
               </div>
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
-                  <div className="text-center text-[#A0A0A0] py-8">No messages yet. Start the conversation!</div>
+                  <div className="text-center text-[var(--color-text-secondary)] py-8">No messages yet. Start the conversation!</div>
                 ) : (
                   <>
                     {messages.map((message) => (
                       <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl ${
                           message.sender_id === user?.id 
-                            ? 'bg-[#FFD700] text-black rounded-br-sm' 
-                            : 'bg-[#1A1A1A] text-white rounded-tl-sm'
+                            ? 'bg-[var(--color-primary)] text-black rounded-br-sm' 
+                            : 'bg-[var(--color-bg-secondary)] text-white rounded-tl-sm'
                         }`}>
                           <p className="text-sm leading-relaxed">{message.content}</p>
                           <div className={`flex items-center gap-1 mt-2 text-xs ${
-                            message.sender_id === user?.id ? 'text-black/70' : 'text-[#A0A0A0]'
+                            message.sender_id === user?.id ? 'text-black/70' : 'text-[var(--color-text-secondary)]'
                           }`}>
                             <span>{formatTime(message.created_at)}</span>
                           </div>
@@ -302,8 +312,8 @@ export default function FreelancerMessagesPage() {
               {/* Message Input */}
               <div className="p-4 border-t border-[#1A1A1A]">
                 <div className="flex items-center gap-3">
-                  <button className="p-3 hover:bg-[#1A1A1A]/50 rounded-xl transition-colors">
-                    <Paperclip className="h-5 w-5 text-[#A0A0A0]" />
+                  <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
+                    <Paperclip className="h-5 w-5 text-[var(--color-text-secondary)]" />
                   </button>
                   <input
                     type="text"
@@ -312,12 +322,12 @@ export default function FreelancerMessagesPage() {
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Type a message..."
                     disabled={sending}
-                    className="flex-1 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 disabled:opacity-50 text-base"
+                    className="flex-1 px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 disabled:opacity-50 text-base"
                   />
                   <button 
                     onClick={handleSendMessage}
                     disabled={sending || !messageInput.trim()}
-                    className="p-3 bg-[#FFD700] hover:bg-[#FFC700] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Send className="h-5 w-5 text-black" />
                   </button>
@@ -325,7 +335,7 @@ export default function FreelancerMessagesPage() {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-[#A0A0A0]">
+            <div className="flex-1 flex items-center justify-center text-[var(--color-text-secondary)]">
               <p>Select a conversation to start messaging</p>
             </div>
           )}

@@ -47,7 +47,7 @@ export default function MobileBottomNav() {
   }
 
   return (
-    <div className="mobile-nav">
+    <div className="mobile-nav md:hidden">
       <div className="flex items-center justify-around h-16 px-2">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;

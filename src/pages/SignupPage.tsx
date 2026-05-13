@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { Mail, Lock, Briefcase, Zap } from "lucide-react";
+import { Mail, Lock, Briefcase, Eye, EyeOff, User, CheckCircle, AlertCircle } from "lucide-react";
 import { signUpFreelancer } from "../utils/supabase";
 
 const initialState = {
@@ -13,17 +13,21 @@ export default function SignupPage() {
   const navigate = useNavigate();
   const [state, setState] = useState(initialState);
   const [isPending, setIsPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    display_name: '',
+    email: '',
+    password: ''
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsPending(true);
     
-    const formData = new FormData(e.currentTarget);
-    const displayName = formData.get('display_name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    console.log('Form data extracted:', { displayName, email, password: '***' });
+    const form = e.currentTarget;
+    const displayName = formData.display_name;
+    const email = formData.email;
+    const password = formData.password;
 
     // Validate display name
     if (!displayName || displayName.trim().length < 2) {
@@ -33,26 +37,20 @@ export default function SignupPage() {
     }
 
     try {
-      console.log('Starting freelancer signup process for:', { email, displayName });
-      
       // Create freelancer account with profile
       const { data: authData, error: authError } = await signUpFreelancer(email, password, displayName);
       
       if (authError) {
-        console.error('Auth error:', authError);
         setState({ message: authError.message, success: false });
         setIsPending(false);
         return;
       }
       
       if (!authData.user) {
-        console.error('No user data returned from auth');
         setState({ message: "Account creation failed. Please try again.", success: false });
         setIsPending(false);
         return;
       }
-      
-      console.log('Freelancer account created successfully:', authData.user.id);
       
       // Check if email confirmation is required (no session)
       if (!authData.session) {
@@ -97,124 +95,197 @@ export default function SignupPage() {
         }
       }, 1500);
     } catch (err) {
-      console.error('Signup process error:', err);
       setState({ message: "An unexpected error occurred. Please try again.", success: false });
     } finally {
       setIsPending(false);
     }
   };
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { strength: 0, label: '', color: '' };
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (password.length >= 10) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const colors = ['', 'text-red-400', 'text-orange-400', 'text-yellow-400', 'text-green-400', 'text-green-300'];
+    
+    return { strength, label: labels[strength], color: colors[strength] };
+  };
+
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-sans antialiased selection:bg-[#FFD700]/30">
-      <div className="w-full max-w-md">
-        {/* Unified Branding Logo */}
-        <div className="flex flex-col items-center mb-10 group animate-in fade-in zoom-in duration-700">
-           <div className="flex items-center gap-3 mb-6">
-              <div className="bg-[#FFD700] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shadow-[#FFD700]/20">
-                <Briefcase className="w-6 h-6 text-black" />
-              </div>
-              <span className="text-white font-bold text-2xl tracking-tight">Freelance<span className="text-[#FFD700]">OS</span></span>
-           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Create your freelancer account</h1>
-          <p className="text-[#A0A0A0] mt-2 text-xs font-medium">Start your professional freelance journey</p>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Premium Header */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="bg-[var(--color-primary)] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shadow-[var(--color-primary)]/20">
+              <Briefcase className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-[var(--color-text-primary)] font-bold text-2xl tracking-tight">Freelance<span className="text-[var(--color-primary)]">OS</span></span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Create your freelancer account</h1>
+          <p className="text-[var(--color-text-secondary)]">Start your professional freelance journey</p>
         </div>
 
         {/* Signup Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Display Name */}
-          <div className="group">
-            <label htmlFor="display_name" className="block text-sm font-medium text-white mb-2">
-              Display Name
-            </label>
-            <input
-              type="text"
-              id="display_name"
-              name="display_name"
-              required
-              className="w-full px-4 py-3 bg-[var(--card)] border border-[var(--border)] rounded-xl text-white placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20 focus:border-[var(--accent)]/50 transition-all duration-200"
-              placeholder="John Doe"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="group">
-            <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
-              <input
-                type="email"
-                id="email"
-                name="email"
-                required
-                className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 transition-all duration-200"
-                placeholder="you@example.com"
-              />
+        <div className="card p-8 animate-scale-in">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Display Name Field */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Display Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+                <input
+                  type="text"
+                  name="display_name"
+                  required
+                  minLength={2}
+                  value={formData.display_name}
+                  onChange={(e) => handleInputChange('display_name', e.target.value)}
+                  placeholder="John Doe"
+                  className="input pl-10 w-full"
+                />
+                {formData.display_name.length >= 2 && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CheckCircle className="h-4 w-4 text-[var(--color-success)]" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Password */}
-          <div className="group">
-            <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
-              <input
-                type="password"
-                id="password"
-                name="password"
-                required
-                minLength={6}
-                className="w-full pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 transition-all duration-200"
-                placeholder="••••••••"
-              />
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="you@freelance.os"
+                  className="input pl-10 w-full"
+                />
+                {formData.email && formData.email.includes('@') && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <CheckCircle className="h-4 w-4 text-[var(--color-success)]" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold py-3 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
-          >
-            {isPending ? (
-              <>
-                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                Creating Account...
-              </>
-            ) : (
-              <>
-                <Zap className="w-4 h-4" />
-                Create Freelancer Account
-              </>
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  minLength={6}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="••••••••••"
+                  className="input pl-10 pr-10 w-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[var(--color-text-secondary)]">Password strength</span>
+                    <span className={`text-xs font-medium ${getPasswordStrength(formData.password).color}`}>
+                      {getPasswordStrength(formData.password).label}
+                    </span>
+                  </div>
+                  <div className="w-full bg-[var(--color-bg-muted)] rounded-full h-1.5">
+                    <div 
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        getPasswordStrength(formData.password).strength <= 2 ? 'bg-red-400' :
+                        getPasswordStrength(formData.password).strength <= 3 ? 'bg-yellow-400' :
+                        getPasswordStrength(formData.password).strength <= 4 ? 'bg-green-400' : 'bg-green-300'
+                      }`}
+                      style={{ width: `${(getPasswordStrength(formData.password).strength / 5) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Status Message */}
+            {state.message && (
+              <div className={`p-3 rounded-xl flex items-center gap-3 ${
+                state.success 
+                  ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20' 
+                  : 'bg-[var(--color-error)]/10 border border-[var(--color-error)]/20'
+              }`}>
+                {state.success ? (
+                  <CheckCircle className="w-5 h-5 text-[var(--color-success)] flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-[var(--color-error)] flex-shrink-0" />
+                )}
+                <p className={`text-sm font-medium ${
+                  state.success ? 'text-[var(--color-success)]' : 'text-[var(--color-error)]'
+                }`}>
+                  {state.message}
+                </p>
+              </div>
             )}
-          </button>
 
-          {/* Status Message */}
-          {state.message && (
-            <div className={`p-3 rounded-lg text-sm ${
-              state.success 
-                ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
-                : 'bg-red-500/10 text-red-400 border border-red-500/20'
-            }`}>
-              {state.message}
-            </div>
-          )}
-        </form>
-
-        {/* Login Link */}
-        <div className="mt-8 text-center">
-          <p className="text-[#A0A0A0] text-sm">
-            Already have a freelancer account?{' '}
-            <Link 
-              to="/login" 
-              className="text-[#FFD700] hover:text-[#FFC700] font-medium transition-colors"
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isPending || !formData.display_name || !formData.email || formData.password.length < 6}
+              className="btn btn-primary w-full py-3 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Sign in
-            </Link>
-          </p>
+              {isPending ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Briefcase className="w-4 h-4" />
+                  Create Account
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Sign In Link */}
+          <div className="mt-6 text-center pt-6 border-t border-[var(--color-border)]">
+            <p className="text-[var(--color-text-secondary)] text-sm">
+              Already have an account?{" "}
+              <Link 
+                to="/login" 
+                className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] font-semibold transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

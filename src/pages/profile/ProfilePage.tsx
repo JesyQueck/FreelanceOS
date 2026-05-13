@@ -429,27 +429,30 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div className="loading-cube">
+            <div className="cube-face"></div>
+            <div className="cube-face"></div>
+            <div className="cube-face"></div>
+            <div className="cube-face"></div>
+            <div className="cube-face"></div>
+            <div className="cube-face"></div>
           </div>
-          <div className="text-white">Loading profile...</div>
+          <div className="text-[var(--color-text-secondary)]">Loading profile...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6">
+    <div className="min-h-screen bg-[var(--color-bg-main)] p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Share Portfolio Button - Top Right */}
         <div className="flex justify-end">
           <button 
             onClick={handleSharePortfolio}
-            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white transition-all bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg hover:bg-[#2A2A2A] hover:border-[#FFD700] gap-2"
+            className="btn btn-secondary gap-2"
           >
             <Share2 className="h-4 w-4" /> Share Portfolio
           </button>
@@ -465,11 +468,11 @@ export default function ProfilePage() {
                   <img
                     src={profile.profile_image}
                     alt={profile.display_name || user.email || 'Profile'}
-                    className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-[#FFD700]"
+                    className="w-32 h-32 rounded-full object-cover shadow-lg border-2 border-[var(--color-primary)]"
                   />
                 </>
               ) : (
-                <div className="w-32 h-32 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
+                <div className="w-32 h-32 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-3xl font-bold shadow-lg">
                   {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
@@ -553,7 +556,7 @@ export default function ProfilePage() {
                           value={editingValue}
                           onChange={(e) => setEditingValue(e.target.value.slice(0, 200))}
                           maxLength={200}
-                          className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-40 resize-none"
+                          className="input placeholder:text-xs h-40 resize-none"
                           placeholder="Tell us about yourself and your work"
                           autoFocus
                         />
@@ -569,7 +572,7 @@ export default function ProfilePage() {
                         <button
                           onClick={saveField}
                           disabled={isSaving}
-                          className="px-4 py-2 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded-lg text-sm disabled:opacity-50 flex items-center gap-2"
+                          className="btn btn-primary gap-2 disabled:opacity-50"
                         >
                           {isSaving ? 'Saving...' : 'Save'}
                         </button>
@@ -595,18 +598,18 @@ export default function ProfilePage() {
               {/* Contact Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-[#FFD700]" />
+                  <Mail className="h-5 w-5 text-[var(--color-primary)]" />
                   <div>
-                    <p className="text-xs text-[#A0A0A0]">Email</p>
-                    <p className="text-sm text-white">{user?.email || 'No email'}</p>
+                    <p className="text-xs text-[var(--color-text-muted)]">Email</p>
+                    <p className="text-sm text-[var(--color-text-primary)]">{user?.email || 'No email'}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-3">
-                  <UserCircle className="h-5 w-5 text-[#FFD700]" />
+                  <UserCircle className="h-5 w-5 text-[var(--color-primary)]" />
                   <div>
-                    <p className="text-xs text-[#A0A0A0]">Member Since</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-[var(--color-text-muted)]">Member Since</p>
+                    <p className="text-sm text-[var(--color-text-primary)]">
                       {profile?.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
                     </p>
                   </div>
@@ -615,16 +618,16 @@ export default function ProfilePage() {
 
               {/* Professional Name */}
               <div className="flex items-center gap-3 mt-4">
-                <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                 <div className="flex-1">
-                  <p className="text-xs text-[#A0A0A0]">Professional Name</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">Professional Name</p>
                   {editingField === 'professional-name' ? (
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
-                        className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="input placeholder:text-xs"
                         placeholder="Enter your professional name"
                         autoFocus
                       />

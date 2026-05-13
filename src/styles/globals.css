@@ -268,6 +268,49 @@
   .animate-slide-in {
     animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Rubik's Cube Style Rotating Loading Animation */
+  @keyframes rotateCube {
+    0% {
+      transform: rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+      transform: rotateX(90deg) rotateY(0deg);
+    }
+    50% {
+      transform: rotateX(90deg) rotateY(90deg);
+    }
+    75% {
+      transform: rotateX(0deg) rotateY(90deg);
+    }
+    100% {
+      transform: rotateX(0deg) rotateY(0deg);
+    }
+  }
+
+  .loading-cube {
+    width: 40px;
+    height: 40px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotateCube 2s ease-in-out infinite;
+  }
+
+  .cube-face {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary-hover);
+    opacity: 0.9;
+  }
+
+  .cube-face:nth-child(1) { transform: translateZ(20px); }
+  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(20px); }
+  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(20px); }
+  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(20px); }
+  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(20px); }
+  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(20px); }
   
   /* Premium Focus States */
   .focus-ring {

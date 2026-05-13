@@ -119,10 +119,13 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex gap-1">
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        <div className="loading-cube">
+          <div className="cube-face"></div>
+          <div className="cube-face"></div>
+          <div className="cube-face"></div>
+          <div className="cube-face"></div>
+          <div className="cube-face"></div>
+          <div className="cube-face"></div>
         </div>
       </div>
     );
@@ -132,16 +135,16 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-[#A0A0A0]">Manage your account preferences and notification settings</p>
+        <h1 className="text-3xl font-bold text-[var(--color-text-primary)] mb-2">Settings</h1>
+        <p className="text-[var(--color-text-secondary)]">Manage your account preferences and notification settings</p>
       </div>
 
       {/* Feedback Message */}
       {feedback && (
-        <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${
           feedback.type === 'success' 
-            ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
-            : 'bg-red-500/10 border border-red-500/30 text-red-400'
+            ? 'bg-[var(--color-success)]/10 border border-[var(--color-success)]/20 text-[var(--color-success)]' 
+            : 'bg-[var(--color-error)]/10 border border-[var(--color-error)]/20 text-[var(--color-error)]'
         }`}>
           {feedback.type === 'success' ? (
             <CheckCircle className="h-5 w-5 flex-shrink-0" />
@@ -153,22 +156,22 @@ export default function SettingsPage() {
       )}
 
       {/* Notifications */}
-      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
+      <div className="card p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Bell className="h-6 w-6 text-[#FFD700]" />
-          <h2 className="text-xl font-semibold text-white">Notifications</h2>
+          <Bell className="h-6 w-6 text-[var(--color-primary)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Notifications</h2>
         </div>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Email Notifications</h3>
-              <p className="text-xs text-[#A0A0A0]">Receive email updates about new messages</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Email Notifications</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Receive email updates about new messages</p>
             </div>
             <button
               onClick={() => updatePreference('notifications', 'email', !preferences.notifications.email)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.notifications.email ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.notifications.email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -179,15 +182,15 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Push Notifications</h3>
-              <p className="text-xs text-[#A0A0A0]">Receive browser push notifications</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Push Notifications</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Receive browser push notifications</p>
             </div>
             <button
               onClick={() => updatePreference('notifications', 'push', !preferences.notifications.push)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.notifications.push ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.notifications.push ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -198,15 +201,15 @@ export default function SettingsPage() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Sound Effects</h3>
-              <p className="text-xs text-[#A0A0A0]">Play sound for new messages</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Sound Effects</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Play sound for new messages</p>
             </div>
             <button
               onClick={() => updatePreference('notifications', 'sound', !preferences.notifications.sound)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.notifications.sound ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.notifications.sound ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -219,13 +222,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <h3 className="text-sm font-medium text-white">Desktop Notifications</h3>
-              <p className="text-xs text-[#A0A0A0]">Show desktop notifications</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Desktop Notifications</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Show desktop notifications</p>
             </div>
             <button
               onClick={() => updatePreference('notifications', 'desktop', !preferences.notifications.desktop)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.notifications.desktop ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.notifications.desktop ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -239,22 +242,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Appearance */}
-      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
+      <div className="card p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Sun className="h-6 w-6 text-[#FFD700]" />
-          <h2 className="text-xl font-semibold text-white">Appearance</h2>
+          <Sun className="h-6 w-6 text-[var(--color-primary)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Appearance</h2>
         </div>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Theme</h3>
-              <p className="text-xs text-[#A0A0A0]">Choose your preferred theme</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Theme</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Choose your preferred theme</p>
             </div>
             <select
               value={preferences.appearance.theme}
               onChange={(e) => updatePreference('appearance', 'theme', e.target.value)}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
+              className="input"
             >
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -264,13 +267,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <h3 className="text-sm font-medium text-white">Language</h3>
-              <p className="text-xs text-[#A0A0A0]">Select your preferred language</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Language</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Select your preferred language</p>
             </div>
             <select
               value={preferences.appearance.language}
               onChange={(e) => updatePreference('appearance', 'language', e.target.value)}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
+              className="input"
             >
               <option value="en">English</option>
               <option value="es">Español</option>
@@ -282,22 +285,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Privacy */}
-      <div className="bg-[#0A0A0A] rounded-xl border border-[#1A1A1A] p-6">
+      <div className="card p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Shield className="h-6 w-6 text-[#FFD700]" />
-          <h2 className="text-xl font-semibold text-white">Privacy</h2>
+          <Shield className="h-6 w-6 text-[var(--color-primary)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Privacy</h2>
         </div>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Profile Visibility</h3>
-              <p className="text-xs text-[#A0A0A0]">Control who can see your profile</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Profile Visibility</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Control who can see your profile</p>
             </div>
             <select
               value={preferences.privacy.profileVisibility}
               onChange={(e) => updatePreference('privacy', 'profileVisibility', e.target.value)}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20"
+              className="input"
             >
               <option value="public">Public</option>
               <option value="private">Private</option>
@@ -305,15 +308,15 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A]/30">
+          <div className="flex items-center justify-between py-3 border-b border-[var(--color-border)]/30">
             <div>
-              <h3 className="text-sm font-medium text-white">Online Status</h3>
-              <p className="text-xs text-[#A0A0A0]">Show when you're online</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Online Status</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Show when you're online</p>
             </div>
             <button
               onClick={() => updatePreference('privacy', 'showOnlineStatus', !preferences.privacy.showOnlineStatus)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.privacy.showOnlineStatus ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.privacy.showOnlineStatus ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -326,13 +329,13 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between py-3">
             <div>
-              <h3 className="text-sm font-medium text-white">Last Seen</h3>
-              <p className="text-xs text-[#A0A0A0]">Show last seen timestamp</p>
+              <h3 className="text-sm font-medium text-[var(--color-text-primary)]">Last Seen</h3>
+              <p className="text-xs text-[var(--color-text-secondary)]">Show last seen timestamp</p>
             </div>
             <button
               onClick={() => updatePreference('privacy', 'showLastSeen', !preferences.privacy.showLastSeen)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                preferences.privacy.showLastSeen ? 'bg-[#FFD700]' : 'bg-[#1A1A1A]'
+                preferences.privacy.showLastSeen ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bg-secondary)]'
               }`}
             >
               <span
@@ -350,7 +353,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSavePreferences}
           disabled={saving}
-          className="px-6 py-3 bg-[#FFD700] hover:bg-[#FFC700] disabled:bg-[#FFD700]/50 disabled:cursor-not-allowed text-black font-medium rounded-lg transition-colors"
+          className="btn btn-primary disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Preferences'}
         </button>

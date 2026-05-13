@@ -376,8 +376,8 @@ const handleSelectConversation = (conversation: Conversation) => {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-[#FFD700]/20 text-white'
-                    : 'text-[#A0A0A0] hover:bg-[#0A0A0A]/50 hover:text-white'
+                    ? 'bg-[var(--color-primary)]/20 text-white'
+                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)]/50 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -408,7 +408,7 @@ const handleSelectConversation = (conversation: Conversation) => {
         {/* User Profile Section */}
         <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold">
               {userLoading ? (
                 <div className="flex gap-1">
                   <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -435,7 +435,7 @@ const handleSelectConversation = (conversation: Conversation) => {
       </aside>
 
       {/* MOBILE NAVBAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5 group">
             <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
@@ -467,7 +467,7 @@ const handleSelectConversation = (conversation: Conversation) => {
               <input
                 type="text"
                 placeholder="Search conversations..."
-                className="pl-10 pr-4 py-3 bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 w-full sm:w-auto text-base"
+                className="pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 w-full sm:w-auto text-base"
               />
             </div>
             <NotificationDropdown />
@@ -494,11 +494,11 @@ const handleSelectConversation = (conversation: Conversation) => {
                     key={conversation.id} 
                     onClick={() => handleSelectConversation(conversation)}
                     className={`p-4 hover:bg-[#1A1A1A]/50 cursor-pointer transition-colors border-b border-[#1A1A1A]/30 last:border-b-0 ${
-                      selectedConversation?.id === conversation.id ? 'bg-[#FFD700]/10' : ''
+                      selectedConversation?.id === conversation.id ? 'bg-[var(--color-primary)]/10' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold flex-shrink-0">
                         {getInitials(conversation)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -530,7 +530,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                     >
                       <ArrowLeft className="h-5 w-5 text-white" />
                     </button>
-                    <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center text-black text-sm font-semibold">
+                    <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold">
                       {getInitials(selectedConversation)}
                     </div>
                     <div>
@@ -553,8 +553,8 @@ const handleSelectConversation = (conversation: Conversation) => {
                         <div key={message.id} className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
                           <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl ${
                             message.sender_id === user?.id 
-                              ? 'bg-[#FFD700] text-black rounded-br-sm' 
-                              : 'bg-[#1A1A1A] text-white rounded-tl-sm'
+                            ? 'bg-[var(--color-primary)] text-black rounded-br-sm' 
+                            : 'bg-[var(--color-bg-secondary)] text-white rounded-tl-sm'
                           }`}>
                             <p className="text-sm leading-relaxed">{message.content}</p>
                             <div className={`flex items-center gap-1 mt-2 text-xs ${
@@ -583,12 +583,12 @@ const handleSelectConversation = (conversation: Conversation) => {
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
                       disabled={sending}
-                      className="flex-1 px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 disabled:opacity-50 text-base"
+                      className="flex-1 px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 disabled:opacity-50 text-base"
                     />
                     <button 
                       onClick={handleSendMessage}
                       disabled={sending || !messageInput.trim()}
-                      className="p-3 bg-[#FFD700] hover:bg-[#FFC700] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-3 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Send className="h-5 w-5 text-black" />
                     </button>

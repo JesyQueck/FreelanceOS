@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Briefcase, Mail, Lock, ArrowRight } from "lucide-react";
+import { Briefcase, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { validateFreelancerAccess } from "../utils/supabase";
 
 const initialState = {
@@ -11,6 +11,7 @@ const initialState = {
 export default function LoginPage() {
   const [state, setState] = useState(initialState);
   const [isPending, setIsPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,93 +59,105 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 font-sans antialiased selection:bg-[#FFD700]/30">
-      <div className="w-full max-w-md">
-        {/* Unified Branding Logo */}
-        <div className="flex flex-col items-center mb-10 group animate-in fade-in zoom-in duration-700">
-           <div className="flex items-center gap-3 mb-6">
-              <div className="bg-[#FFD700] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shadow-[#FFD700]/20">
-                <Briefcase className="w-6 h-6 text-black" />
-              </div>
-              <span className="text-white font-bold text-2xl tracking-tight">Freelance<span className="text-[#FFD700]">OS</span></span>
-           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
-          <p className="text-[#A0A0A0] mt-2 text-xs font-medium">Continue your professional journey</p>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {/* Premium Background with Dot Grid */}
+      <div className="fixed inset-0 dot-grid pointer-events-none" />
+      
+      {/* Subtle Blur Elements */}
+      <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
+      <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Premium Header */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="bg-[var(--color-primary)] w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shadow-[var(--color-primary)]/20">
+              <Briefcase className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-[var(--color-text-primary)] font-bold text-2xl tracking-tight">Freelance<span className="text-[var(--color-primary)]">OS</span></span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
+          <p className="text-[var(--color-text-secondary)]">Continue your professional journey</p>
         </div>
 
-        <div className="bg-[#0A0A0A] p-10 rounded-2xl border border-[#1A1A1A] shadow-sm relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#FFD700]/5 blur-[80px] rounded-full" />
-          
-          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-            <div className="space-y-5">
-              <div>
-                <label className="block text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.2em] mb-2.5 ml-1">Email Address</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#A0A0A0] group-focus-within:text-[#FFD700] transition-colors">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="alex@freelance.os"
-                    required
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 hover:border-[#2A2A2A] transition-all text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-2.5 ml-1">
-                  <label className="block text-[9px] font-bold text-[#A0A0A0] uppercase tracking-[0.2em]">Password</label>
-                  <Link to="#" className="text-[10px] font-bold text-[#FFD700] hover:text-[#FFC700] transition-colors uppercase tracking-widest">Reset?</Link>
-                </div>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#A0A0A0] group-focus-within:text-[#FFD700] transition-colors">
-                    <Lock className="h-4 w-4" />
-                  </div>
-                  <input
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20 focus:border-[#FFD700]/50 hover:border-[#2A2A2A] transition-all text-sm"
-                  />
-                </div>
+        {/* Login Form */}
+        <div className="card p-8 animate-scale-in">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="you@freelance.os"
+                  required
+                  className="input pl-10 w-full"
+                />
               </div>
             </div>
 
+            {/* Password Field */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)]">Password</label>
+                <Link to="#" className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-muted)]" />
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••"
+                  required
+                  className="input pl-10 pr-10 w-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error Message */}
             {state?.message && !state.success && (
-              <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl animate-in shake duration-300">
-                <p className="text-[10px] text-red-500 font-semibold text-center">{state.message}</p>
+              <div className="p-3 bg-[var(--color-error)]/10 border border-[var(--color-error)]/20 rounded-xl">
+                <p className="text-sm text-[var(--color-error)] font-medium">{state.message}</p>
               </div>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-[#FFD700] text-black font-semibold py-4 rounded-2xl shadow-lg shadow-[#FFD700]/20 hover:bg-[#FFC700] transition-all duration-500 disabled:opacity-50 flex items-center justify-center group text-sm uppercase tracking-wide"
+              className="btn btn-primary w-full py-3 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isPending ? (
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  Enter Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  Sign In
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          <p className="text-center mt-10 text-[#A0A0A0] text-[10px] font-medium">
-            Not a member? {" "}
-            <Link to="/signup" className="text-white font-semibold hover:text-[#FFD700] transition-colors underline-offset-4 hover:underline">
-              Request Access
-            </Link>
-          </p>
+          {/* Sign Up Link */}
+          <div className="mt-6 text-center pt-6 border-t border-[var(--color-border)]">
+            <p className="text-[var(--color-text-secondary)] text-sm">
+              Not a member?{" "}
+              <Link to="/signup" className="text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] font-semibold transition-colors">
+                Create your account
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
