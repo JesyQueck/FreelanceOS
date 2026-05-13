@@ -657,18 +657,35 @@ export default function ProfilePage() {
 
               {/* Freelancer-specific profile information */}
               {role === 'freelancer' && freelancerProfile && (
-                <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A]">
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                <div className="mt-6 p-4 bg-[var(--color-bg-card)] rounded-lg border border-[var(--color-border)]">
+                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                     Professional Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                    <div>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-1">Hourly Rate</p>
+                      {editingField === 'hourly-rate' ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="input placeholder:text-xs"
+                            placeholder="Enter your hourly rate"
+                            autoFocus
+                          />
+                          <div className="flex gap-1">
+                            <button
+                              onClick={cancelEditing}
+                              className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
+                            >
+                              <X className="h-3 w-3 text-[var(--color-text-muted)]" />
                             </button>
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -676,27 +693,27 @@ export default function ProfilePage() {
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <p className="text-sm text-white font-medium">
+                          <p className="text-sm text-[var(--color-text-primary)] font-medium">
                             {freelancerProfile.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
                           </p>
                           <button
                             onClick={() => startEditing('hourly-rate', freelancerProfile.hourly_rate?.toString() || '')}
-                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
                             title="Edit hourly rate"
                           >
-                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                            <Edit className="h-3 w-3 text-[var(--color-text-muted)]" />
                           </button>
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-xs text-[#A0A0A0] mb-1">Experience Level</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-1">Experience Level</p>
                       {editingField === 'experience-level' ? (
                         <div className="flex items-center gap-2">
                           <select
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-light)] rounded px-2 py-1 text-[var(--color-text-primary)] text-sm placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                             autoFocus
                           >
                             <option value="beginner">Beginner</option>
