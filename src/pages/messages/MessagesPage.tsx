@@ -7,6 +7,7 @@ import { supabase } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import ToastContainer from "../../components/ToastContainer";
 import { useNotifications } from "../../contexts/NotificationContext";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function MessagesPage() {
   const { user } = useAuth();
@@ -232,16 +233,8 @@ export default function MessagesPage() {
             
             <div className="flex-1 overflow-y-auto">
               {loading ? (
-                <div className="p-6 flex flex-col items-center justify-center">
-                  <div className="loading-cube mb-4">
-                    <div className="cube-face"></div>
-                    <div className="cube-face"></div>
-                    <div className="cube-face"></div>
-                    <div className="cube-face"></div>
-                    <div className="cube-face"></div>
-                    <div className="cube-face"></div>
-                  </div>
-                  <div className="text-[var(--color-text-secondary)] text-sm">Loading conversations...</div>
+                <div className="p-6">
+                  <LoadingSpinner size="small" text="Loading conversations..." />
                 </div>
               ) : conversations.length === 0 ? (
                 <div className="p-6 text-center text-[var(--color-text-secondary)]">No conversations yet</div>

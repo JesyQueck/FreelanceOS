@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Bell, Sun, Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getUserProfile, supabase } from "../../utils/supabase";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 interface UserPreferences {
   notifications: {
@@ -119,14 +120,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="loading-cube">
-          <div className="cube-face"></div>
-          <div className="cube-face"></div>
-          <div className="cube-face"></div>
-          <div className="cube-face"></div>
-          <div className="cube-face"></div>
-          <div className="cube-face"></div>
-        </div>
+        <LoadingSpinner showText={false} />
       </div>
     );
   }

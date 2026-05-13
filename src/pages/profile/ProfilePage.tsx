@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { UserCircle, Mail, Briefcase, Edit, Camera, X, Save, Plus, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { createOrUpdateUserProfile, UserProfile, PortfolioItem, getPortfolioItems, createPortfolioItem, deletePortfolioItem, ensureUserHasSlug, getFreelancerProfile, calculateProfileCompletion } from "../../utils/supabase";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function ProfilePage() {
   const { user, role } = useAuth();
@@ -316,16 +317,16 @@ export default function ProfilePage() {
     if (profileCompletion < 80) {
       const errorMessage = document.createElement('div');
       errorMessage.innerHTML = `
-        <div style="position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+        <div style="position: fixed; top: 20px; right: 20px; background: var(--color-error); color: var(--color-text-primary); padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 24px; height: 24px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+            <div style="width: 24px; height: 24px; background: var(--color-text-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-error)" stroke-width="2">
                 <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
               </svg>
             </div>
             <div>
               <div style="font-weight: 600; margin-bottom: 4px;">Profile Incomplete</div>
-              <div style="font-size: 12px; opacity: 0.9;">Complete your profile to ${80}% before sharing your portfolio. Current: ${profileCompletion}%</div>
+              <div style="font-size: 14px;">Please complete your profile before sharing your portfolio. You're currently at ${profileCompletion}% completion.</div>
             </div>
           </div>
         </div>
@@ -358,16 +359,16 @@ export default function ProfilePage() {
       // Show success message with URL
       const successMessage = document.createElement('div');
       successMessage.innerHTML = `
-        <div style="position: fixed; top: 20px; right: 20px; background: #FFD700; color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+        <div style="position: fixed; top: 20px; right: 20px; background: var(--color-primary); color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="width: 24px; height: 24px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
             </div>
             <div>
-              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio URL Copied!</div>
-              <div style="font-size: 12px; opacity: 0.9;">${portfolioUrl}</div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio Link Copied!</div>
+              <div style="font-size: 14px;">Share this link with clients: ${portfolioUrl}</div>
             </div>
           </div>
         </div>
@@ -393,16 +394,16 @@ export default function ProfilePage() {
       // Show fallback success message
       const fallbackMessage = document.createElement('div');
       fallbackMessage.innerHTML = `
-        <div style="position: fixed; top: 20px; right: 20px; background: #FFD700; color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
+        <div style="position: fixed; top: 20px; right: 20px; background: var(--color-primary); color: black; padding: 16px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 400px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <div style="width: 24px; height: 24px; background: black; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
             </div>
             <div>
-              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio URL Copied!</div>
-              <div style="font-size: 12px; opacity: 0.9;">${portfolioUrl}</div>
+              <div style="font-weight: 600; margin-bottom: 4px;">Portfolio Link Copied!</div>
+              <div style="font-size: 14px;">Share this link with clients: ${portfolioUrl}</div>
             </div>
           </div>
         </div>
@@ -430,17 +431,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="loading-cube">
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-          </div>
-          <div className="text-[var(--color-text-secondary)]">Loading profile...</div>
-        </div>
+        <LoadingSpinner text="Loading profile..." />
       </div>
     );
   }
@@ -501,21 +492,21 @@ export default function ProfilePage() {
                       type="text"
                       value={editingValue}
                       onChange={(e) => setEditingValue(e.target.value)}
-                      className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-1 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                      className="input px-3 py-1"
                       placeholder="Enter your display name"
                       autoFocus
                     />
                     <div className="flex gap-1">
                       <button
                         onClick={cancelEditing}
-                        className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                        className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
                       >
-                        <X className="h-3 w-3 text-[#A0A0A0]" />
+                        <X className="h-3 w-3 text-[var(--color-text-secondary)]" />
                       </button>
                       <button
                         onClick={saveField}
                         disabled={isSaving}
-                        className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
+                        className="p-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-black rounded transition-colors disabled:opacity-50"
                       >
                         {isSaving ? (
                           <div className="flex gap-1">
@@ -672,23 +663,6 @@ export default function ProfilePage() {
                     Professional Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-[#A0A0A0] mb-1">Hourly Rate</p>
-                      {editingField === 'hourly-rate' ? (
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={editingValue}
-                            onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
-                            placeholder="50"
-                            autoFocus
-                          />
-                          <div className="flex gap-1">
-                            <button
-                              onClick={cancelEditing}
-                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
-                            >
                               <X className="h-3 w-3 text-[#A0A0A0]" />
                             </button>
                             <button

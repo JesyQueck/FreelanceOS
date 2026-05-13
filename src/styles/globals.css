@@ -269,48 +269,128 @@
     animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Rubik's Cube Style Rotating Loading Animation */
-  @keyframes rotateCube {
-    0% {
-      transform: rotateX(0deg) rotateY(0deg);
-    }
-    25% {
-      transform: rotateX(90deg) rotateY(0deg);
+  /* 4-Box Jumping Horizontally Animation */
+  @keyframes jumpHorizontal {
+    0%, 100% {
+      transform: translateY(0);
     }
     50% {
-      transform: rotateX(90deg) rotateY(90deg);
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes moveHorizontal {
+    0% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(8px);
+    }
+    50% {
+      transform: translateX(16px);
     }
     75% {
-      transform: rotateX(0deg) rotateY(90deg);
+      transform: translateX(24px);
     }
     100% {
-      transform: rotateX(0deg) rotateY(0deg);
+      transform: translateX(32px);
     }
   }
 
-  .loading-cube {
-    width: 20px;
-    height: 20px;
+  .loading-jumping-boxes {
+    display: flex;
+    gap: 4px;
     position: relative;
-    transform-style: preserve-3d;
-    animation: rotateCube 2s ease-in-out infinite;
+    height: 12px;
+    width: 60px;
   }
 
-  .cube-face {
-    position: absolute;
-    width: 20px;
-    height: 20px;
+  .loading-jumping-boxes-small {
+    display: flex;
+    gap: 3px;
+    position: relative;
+    height: 8px;
+    width: 40px;
+  }
+
+  .loading-jumping-boxes-large {
+    display: flex;
+    gap: 6px;
+    position: relative;
+    height: 16px;
+    width: 80px;
+  }
+
+  .jumping-box {
+    width: 8px;
+    height: 8px;
     background: var(--color-primary);
-    border: 1px solid var(--color-primary-hover);
-    opacity: 0.9;
+    border-radius: 2px;
+    position: absolute;
+    animation: jumpHorizontal 0.8s ease-in-out infinite;
   }
 
-  .cube-face:nth-child(1) { transform: translateZ(10px); }
-  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(10px); }
-  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(10px); }
-  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(10px); }
-  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(10px); }
-  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(10px); }
+  .loading-jumping-boxes-small .jumping-box {
+    width: 6px;
+    height: 6px;
+  }
+
+  .loading-jumping-boxes-large .jumping-box {
+    width: 10px;
+    height: 10px;
+  }
+
+  .jumping-box:nth-child(1) {
+    left: 0;
+    animation-delay: 0s;
+  }
+
+  .jumping-box:nth-child(2) {
+    left: 16px;
+    animation-delay: 0.1s;
+  }
+
+  .jumping-box:nth-child(3) {
+    left: 32px;
+    animation-delay: 0.2s;
+  }
+
+  .jumping-box:nth-child(4) {
+    left: 48px;
+    animation-delay: 0.3s;
+  }
+
+  .loading-jumping-boxes-small .jumping-box:nth-child(1) {
+    left: 0;
+  }
+
+  .loading-jumping-boxes-small .jumping-box:nth-child(2) {
+    left: 11px;
+  }
+
+  .loading-jumping-boxes-small .jumping-box:nth-child(3) {
+    left: 22px;
+  }
+
+  .loading-jumping-boxes-small .jumping-box:nth-child(4) {
+    left: 33px;
+  }
+
+  .loading-jumping-boxes-large .jumping-box:nth-child(1) {
+    left: 0;
+  }
+
+  .loading-jumping-boxes-large .jumping-box:nth-child(2) {
+    left: 21px;
+  }
+
+  .loading-jumping-boxes-large .jumping-box:nth-child(3) {
+    left: 42px;
+  }
+
+  .loading-jumping-boxes-large .jumping-box:nth-child(4) {
+    left: 63px;
+  }
   
   /* Premium Focus States */
   .focus-ring {

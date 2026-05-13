@@ -24,7 +24,6 @@ export default function SignupPage() {
     e.preventDefault();
     setIsPending(true);
     
-    const form = e.currentTarget;
     const displayName = formData.display_name;
     const email = formData.email;
     const password = formData.password;

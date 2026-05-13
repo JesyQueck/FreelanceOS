@@ -5,6 +5,7 @@ import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, check
 import { supabase } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 // Helper function to get relative time
 const getRelativeTime = (dateString: string) => {
@@ -143,31 +144,24 @@ export default function PublicFreelancerProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-          <div className="text-white">Loading freelancer profile...</div>
-        </div>
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+        <LoadingSpinner text="Loading freelancer profile..." />
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-white">Freelancer not found</div>
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+        <div className="text-[var(--color-text-primary)]">Freelancer not found</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[var(--color-bg-main)]">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-6">
           <div className="flex items-center gap-2">
             <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
@@ -177,22 +171,22 @@ export default function PublicFreelancerProfile() {
           </div>
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-bg-secondary)] rounded-lg transition-colors"
           >
-            <ArrowLeft className="h-5 w-5 text-white" />
+            <ArrowLeft className="h-5 w-5 text-[var(--color-text-primary)]" />
           </button>
         </div>
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden lg:flex fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[#1A1A1A]">
+      <div className="hidden lg:flex fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center">
             <div className="flex items-center gap-2">
-              <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
+              <div className="bg-[var(--color-primary)] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
               </div>
-              <span className="font-bold text-sm text-white">FreelanceOS</span>
+              <span className="font-bold text-sm text-[var(--color-text-primary)]">FreelanceOS</span>
             </div>
           </div>
         </div>
@@ -201,7 +195,7 @@ export default function PublicFreelancerProfile() {
       {/* Main Content */}
       <div className="container mx-auto px-4 pt-24 lg:pt-12 pb-6 lg:pb-12">
         {/* Hero Section */}
-        <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-10 border border-[#1A1A1A] shadow-xl mb-8">
+        <div className="card p-6 lg:p-10 border border-[var(--color-border)] shadow-xl mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Profile Image */}
             <div className="lg:col-span-1 flex justify-center lg:justify-start">

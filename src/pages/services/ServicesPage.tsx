@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Target, Clock, DollarSign, Edit, Trash2, X, Save } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getServices, createService, updateService, deleteService, Service } from "../../utils/supabase";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function ServicesPage() {
   const { user } = useAuth();
@@ -114,10 +115,10 @@ export default function ServicesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Services</h1>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Services</h1>
         <button 
           onClick={() => setShowAddService(true)}
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
+          className="btn btn-primary gap-2"
         >
           <Plus className="h-4 w-4" /> Add Service
         </button>
@@ -126,15 +127,15 @@ export default function ServicesPage() {
       {/* Add Service Modal */}
       {showAddService && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="card p-6 border border-[var(--color-border)] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#FFD700]/20 rounded-lg flex items-center justify-center">
-                  <Plus className="h-5 w-5 text-[#FFD700]" />
+                <div className="w-10 h-10 bg-[var(--color-primary)]/20 rounded-lg flex items-center justify-center">
+                  <Plus className="h-5 w-5 text-[var(--color-primary)]" />
                 </div>
                 <div>
-                  <h4 className="text-white font-semibold">Add New Service</h4>
-                  <p className="text-[#A0A0A0] text-sm">Create a new service offering</p>
+                  <h4 className="text-[var(--color-text-primary)] font-semibold">Add New Service</h4>
+                  <p className="text-[var(--color-text-secondary)] text-sm">Create a new service offering</p>
                 </div>
               </div>
               <button
@@ -148,26 +149,26 @@ export default function ServicesPage() {
                     status: 'draft'
                   });
                 }}
-                className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+                className="p-2 hover:bg-[var(--color-bg-secondary)] rounded-lg transition-colors"
               >
-                <X className="h-5 w-5 text-[#A0A0A0]" />
+                <X className="h-5 w-5 text-[var(--color-text-secondary)]" />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Service Title *</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Service Title *</label>
                 <input
                   type="text"
                   value={newService.title}
                   onChange={(e) => setNewService(prev => ({ ...prev, title: e.target.value.slice(0, 50) }))}
                   maxLength={50}
-                  className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent transition-all"
+                  className="input w-full"
                   placeholder="Enter service title"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{newService.title?.length || 0}/50 characters</p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">{newService.title?.length || 0}/50 characters</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Description</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Description</label>
                 <textarea
                   value={newService.description}
                   onChange={(e) => setNewService(prev => ({ ...prev, description: e.target.value.slice(0, 150) }))}
@@ -175,11 +176,11 @@ export default function ServicesPage() {
                   className="input w-full h-32 resize-none"
                   placeholder="Describe your service and what you deliver"
                 />
-                <p className="text-xs text-[#A0A0A0] mt-1">{newService.description?.length || 0}/150 characters</p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">{newService.description?.length || 0}/150 characters</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">Price</label>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Price</label>
                   <input
                     type="text"
                     value={newService.price}
@@ -189,7 +190,7 @@ export default function ServicesPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">Timeline</label>
+                  <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Timeline</label>
                   <input
                     type="text"
                     value={newService.timeline}
@@ -200,7 +201,7 @@ export default function ServicesPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-white mb-2">Status</label>
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Status</label>
                 <select
                   value={newService.status}
                   onChange={(e) => setNewService(prev => ({ ...prev, status: e.target.value as Service['status'] }))}
@@ -243,7 +244,7 @@ export default function ServicesPage() {
       {/* Edit Service Modal */}
       {editingService && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="card p-6 border border-[var(--color-border)] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[var(--color-primary)]/20 rounded-lg flex items-center justify-center">
@@ -356,15 +357,7 @@ export default function ServicesPage() {
       {/* Services Grid */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="loading-cube mb-4">
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-            <div className="cube-face"></div>
-          </div>
-          <p className="text-[var(--color-text-secondary)]">Loading services...</p>
+          <LoadingSpinner text="Loading services..." />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
