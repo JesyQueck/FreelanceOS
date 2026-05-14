@@ -496,7 +496,7 @@ export default function PublicFreelancerProfile() {
                             <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                               <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                             </div>
-                            <span className="text-[var(--color-text-muted)] text-xs">No Image</span>
+                            <span className="text-[var(--color-text-muted)] text-xs lg:text-sm">No Image</span>
                           </div>
                         </div>
                       )}

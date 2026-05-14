@@ -104,7 +104,7 @@ export default function DiscoverFreelancers() {
               <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 flex items-center justify-center">
                 <Briefcase className="h-4 w-4 text-white" />
               </div>
-              <span className="font-bold text-[var(--color-text-primary)]">Discover Freelancers</span>
+              <span className="font-bold text-lg text-[var(--color-text-primary)]">Discover Freelancers</span>
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function DiscoverFreelancers() {
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[var(--color-success)] rounded-full border-2 border-[var(--color-bg-card)]"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-[var(--color-text-primary)] font-semibold truncate">
+                      <h3 className="text-[var(--color-text-primary)] font-semibold text-base truncate">
                         {freelancer.display_name || 'Freelancer'}
                       </h3>
                       <p className="text-[var(--color-text-secondary)] text-sm">Freelancer</p>
