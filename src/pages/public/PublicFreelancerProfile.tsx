@@ -144,7 +144,7 @@ export default function PublicFreelancerProfile() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="min-h-screen bg-[var(--color-bg-main)] p-6">
         <LoadingSpinner text="Loading freelancer profile..." />
       </div>
     );
@@ -164,10 +164,10 @@ export default function PublicFreelancerProfile() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-6">
           <div className="flex items-center gap-2">
-            <div className="bg-[#FFD700] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
             </div>
-            <span className="font-bold text-sm text-white">FreelanceOS</span>
+            <span className="font-bold text-sm text-[var(--color-text-primary)]">FreelanceOS</span>
           </div>
           <button
             onClick={() => navigate(-1)}
@@ -205,15 +205,15 @@ export default function PublicFreelancerProfile() {
                     <img
                       src={profile.profile_image}
                       alt={profile.display_name || user?.email || 'Profile'}
-                      className="w-32 h-32 lg:w-40 lg:h-40 rounded-full object-cover shadow-2xl border-3 border-[#FFD700] transition-transform duration-300 group-hover:scale-105"
+                      className="w-32 h-32 lg:w-40 lg:h-40 rounded-full object-cover shadow-2xl border-3 border-[var(--color-primary)] transition-transform duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute -bottom-1 -right-1 bg-[#FFD700] rounded-full p-1.5 shadow-lg">
+                    <div className="absolute -bottom-1 -right-1 bg-[var(--color-primary)] rounded-full p-1.5 shadow-lg">
                       <CheckCircle2 className="h-5 w-5 text-black" />
                     </div>
                   </div>
                 ) : (
-                  <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#1A1A1A] flex items-center justify-center border-3 border-[#FFD700] shadow-2xl">
-                    <UserCircle className="h-14 w-14 lg:h-18 lg:w-18 text-[#A0A0A0]" />
+                  <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[var(--color-bg-card)] flex items-center justify-center border-3 border-[var(--color-primary)] shadow-2xl">
+                    <UserCircle className="h-14 w-14 lg:h-18 lg:w-18 text-[var(--color-text-muted)]" />
                   </div>
                 )}
               </div>
@@ -223,11 +223,11 @@ export default function PublicFreelancerProfile() {
             <div className="lg:col-span-3 space-y-4 lg:space-y-5">
               {/* Name and Status */}
               <div className="text-center lg:text-left">
-                <h1 className="text-xl lg:text-2xl font-bold text-white mb-2">
+                <h1 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] mb-2">
                   {profile.name || profile.display_name}
                 </h1>
                 <div className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 mb-3">
-                  <span className="px-3 py-1.5 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30">
+                  <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
                     Freelancer
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -239,22 +239,22 @@ export default function PublicFreelancerProfile() {
 
               {/* Contact Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 lg:gap-4">
-                <div className="flex items-center gap-3 bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
-                  <div className="bg-[#FFD700]/10 p-2 rounded-lg">
-                    <Mail className="h-5 w-5 text-[#FFD700]" />
+                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+                  <div className="bg-[var(--color-primary)]/10 p-2 rounded-lg">
+                    <Mail className="h-5 w-5 text-[var(--color-primary)]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#A0A0A0] mb-0.5 uppercase tracking-wide">Email</p>
-                    <p className="text-xs text-white font-medium truncate">{profile.email || 'Not provided'}</p>
+                    <p className="text-[10px] text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Email</p>
+                    <p className="text-xs text-[var(--color-text-primary)] font-medium truncate">{profile.email || 'Not provided'}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
-                  <div className="bg-[#FFD700]/10 p-2 rounded-lg">
-                    <UserCircle className="h-5 w-5 text-[#FFD700]" />
+                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+                  <div className="bg-[var(--color-primary)]/10 p-2 rounded-lg">
+                    <UserCircle className="h-5 w-5 text-[var(--color-primary)]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#A0A0A0] mb-0.5 uppercase tracking-wide">Member Since</p>
-                    <p className="text-xs text-white font-medium">
+                    <p className="text-[10px] text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Member Since</p>
+                    <p className="text-xs text-[var(--color-text-primary)] font-medium">
                       {profile.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
                     </p>
                   </div>
@@ -263,22 +263,22 @@ export default function PublicFreelancerProfile() {
 
               {/* Bio */}
               {profile.bio && (
-                <div className="bg-[#1A1A1A]/50 rounded-xl p-4 border border-[#2A2A2A]/50">
-                  <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-[#FFD700]" />
+                <div className="bg-[var(--color-bg-card)]/50 rounded-xl p-4 border border-[var(--color-border)]/50">
+                  <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-[var(--color-primary)]" />
                     About
                   </h3>
-                  <p className="text-xs text-[#A0A0A0] leading-relaxed min-h-[60px]">{profile.bio}</p>
+                  <p className="text-xs text-[var(--color-text-muted)] leading-relaxed min-h-[60px]">{profile.bio}</p>
                 </div>
               )}
 
               {/* Action Button */}
-              <div className="mt-4 pt-4 border-t border-[#1A1A1A]">
+              <div className="mt-4 pt-4 border-t border-[var(--color-border)]">
                 <div className="flex justify-center">
                   <button
                     onClick={handleMessageFreelancer}
                     disabled={messageLoading}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FFD700] text-black font-bold text-sm rounded-lg hover:bg-[#FFC700] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-black font-bold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
                   >
                     {messageLoading ? (
                       <div className="flex gap-1.5">
@@ -300,39 +300,39 @@ export default function PublicFreelancerProfile() {
         </div>
 
         {/* Professional Information - From Freelancer Profile */}
-        <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-8 border border-[#1A1A1A] shadow-xl mb-6">
-          <h2 className="text-lg lg:text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-[#FFD700]" />
+        <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
+          <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
+            <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
             Professional Information
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
-              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Hourly Rate</p>
-              <p className="text-sm text-white font-medium">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Hourly Rate</p>
+              <p className="text-sm text-[var(--color-text-primary)] font-medium">
                 {freelancerProfile?.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
               </p>
             </div>
-            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
-              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Experience Level</p>
-              <p className="text-sm text-white font-medium capitalize">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Experience Level</p>
+              <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
                 {freelancerProfile?.experience_level || 'Not set'}
               </p>
             </div>
-            <div className="bg-[#1A1A1A]/30 rounded-xl p-3 border border-[#2A2A2A]/30">
-              <p className="text-[10px] text-[#A0A0A0] mb-1 uppercase tracking-wide">Availability</p>
-              <p className="text-sm text-white font-medium capitalize">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Availability</p>
+              <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
                 {freelancerProfile?.availability || 'Not set'}
               </p>
             </div>
           </div>
           {freelancerProfile && freelancerProfile.skills && freelancerProfile.skills.length > 0 && (
             <div className="mt-4">
-              <p className="text-[10px] text-[#A0A0A0] mb-2 uppercase tracking-wide">Skills</p>
+              <p className="text-[10px] text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">Skills</p>
               <div className="flex flex-wrap gap-2">
                 {freelancerProfile.skills.map((skill: string, index: number) => (
                   <span
                     key={index}
-                    className="px-2.5 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30"
+                    className="px-2.5 py-1 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30"
                   >
                     {skill}
                   </span>
@@ -344,28 +344,28 @@ export default function PublicFreelancerProfile() {
 
         {/* Services Section */}
         {services.length > 0 && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-8 border border-[#1A1A1A] shadow-xl mb-6">
+          <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg lg:text-xl font-bold text-white flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-[#FFD700]" />
+              <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                 Services
               </h2>
-              <span className="px-3 py-1.5 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30">
+              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
                 {services.length} Services Available
               </span>
             </div>
             {/* Desktop: Grid Layout */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-[#1A1A1A] rounded-xl p-4 lg:p-5 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 group flex flex-col h-full">
+                <div key={service.id} className="bg-[var(--color-bg-card)] rounded-xl p-4 lg:p-5 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 group flex flex-col h-full">
                   <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 lg:p-3 bg-[#FFD700]/10 rounded-xl">
-                      <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[#FFD700]" />
+                    <div className="p-2 lg:p-3 bg-[var(--color-primary)]/10 rounded-xl">
+                      <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[var(--color-primary)]" />
                     </div>
                   </div>
-                  <h3 className="text-base lg:text-lg font-semibold text-white mb-2 lg:mb-3 group-hover:text-[#FFD700] transition-colors">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
+                  <h3 className="text-base lg:text-lg font-semibold text-[var(--color-text-primary)] mb-2 lg:mb-3 group-hover:text-[var(--color-primary)] transition-colors">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                   <div className="flex-grow">
-                    <p className="text-xs lg:text-sm text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
+                    <p className="text-xs lg:text-sm text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
                   </div>
                   <div className="space-y-2 lg:space-y-3 mt-auto pt-3 lg:pt-4">
                     {service.price && (
