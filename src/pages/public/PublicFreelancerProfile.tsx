@@ -406,9 +406,9 @@ export default function PublicFreelancerProfile() {
             </div>
             {/* Mobile: Horizontal Scroll Tray */}
             <div ref={servicesContainerRef} className="lg:hidden overflow-x-auto -mx-4 px-4">
-              <div className="flex gap-4 pb-4">
+              <div className="flex gap-4">
                 {services.map((service) => (
-                  <div key={service.id} data-service-card className="flex-shrink-0 w-[85vw] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
+                  <div key={service.id} data-service-card className="flex-shrink-0 w-[70vw] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
