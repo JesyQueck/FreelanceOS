@@ -47,6 +47,7 @@ export default function PublicFreelancerProfile() {
     const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
   const servicesContainerRef = useRef<HTMLDivElement>(null);
+  const portfolioContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -116,6 +117,28 @@ export default function PublicFreelancerProfile() {
       });
     }
   }, [services]);
+
+  // Equalize card heights for mobile portfolio
+  useEffect(() => {
+    if (portfolioContainerRef.current && portfolioItems.length > 0) {
+      const cards = portfolioContainerRef.current.querySelectorAll('[data-portfolio-card]');
+      let maxHeight = 0;
+      
+      cards.forEach((card) => {
+        const cardEl = card as HTMLElement;
+        cardEl.style.height = 'auto';
+        const height = cardEl.offsetHeight;
+        if (height > maxHeight) {
+          maxHeight = height;
+        }
+      });
+      
+      cards.forEach((card) => {
+        const cardEl = card as HTMLElement;
+        cardEl.style.height = `${maxHeight}px`;
+      });
+    }
+  }, [portfolioItems]);
 
   const handleMessageFreelancer = async () => {
     if (!user) {
@@ -406,9 +429,9 @@ export default function PublicFreelancerProfile() {
             </div>
             {/* Mobile: Horizontal Scroll Tray */}
             <div ref={servicesContainerRef} className="lg:hidden overflow-x-auto -mx-4 px-4">
-              <div className="flex gap-4">
+              <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} data-service-card className="flex-shrink-0 w-[70vw] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
+                  <div key={service.id} data-service-card className="flex-shrink-0 w-[80vw] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
@@ -441,6 +464,7 @@ export default function PublicFreelancerProfile() {
                     </div>
                   </div>
                 ))}
+                <div className="flex-shrink-0 w-0.5"></div>
               </div>
             </div>
           </div>
@@ -499,10 +523,10 @@ export default function PublicFreelancerProfile() {
               ))}
             </div>
             {/* Mobile: Horizontal Scroll Tray */}
-            <div className="lg:hidden overflow-x-auto -mx-6 px-6">
+            <div ref={portfolioContainerRef} className="lg:hidden overflow-x-auto -mx-4 px-4">
               <div className="flex gap-4 pb-4">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="group flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
+                  <div key={item.id} data-portfolio-card className="group flex-shrink-0 w-[80vw] bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 flex flex-col">
                     <div className="aspect-video bg-[var(--color-bg-secondary)]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img
@@ -522,7 +546,7 @@ export default function PublicFreelancerProfile() {
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-lg group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h4>
+                      <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 text-lg group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h4>
                       <div className="flex-grow">
                         <p className="text-[var(--color-text-muted)] text-sm leading-relaxed">{item.description || 'No description provided'}</p>
                       </div>
@@ -542,6 +566,7 @@ export default function PublicFreelancerProfile() {
                     </div>
                   </div>
                 ))}
+                <div className="flex-shrink-0 w-0.5"></div>
               </div>
             </div>
           </div>
