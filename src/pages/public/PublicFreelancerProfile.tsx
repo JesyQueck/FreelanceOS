@@ -401,21 +401,21 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-white mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
+                    <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                     <div className="flex-grow">
-                      <p className="text-xs text-[#A0A0A0] leading-relaxed">{service.description || 'No description provided'}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
                     </div>
                     <div className="space-y-2 mt-auto pt-3">
                       {service.price && (
                         <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-[#FFD700]" />
-                          <span className="text-sm font-medium text-[#FFD700]">{service.price}</span>
+                          <DollarSign className="h-4 w-4 text-[var(--color-primary)]" />
+                          <span className="text-sm font-medium text-[var(--color-primary)]">{service.price}</span>
                         </div>
                       )}
                       {service.timeline && (
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-[#A0A0A0]" />
-                          <span className="text-xs text-[#A0A0A0]">{service.timeline}</span>
+                          <Clock className="h-4 w-4 text-[var(--color-primary)]" />
+                          <span className="text-xs text-[var(--color-text-muted)]">{service.timeline}</span>
                         </div>
                       )}
                     </div>
@@ -428,21 +428,21 @@ export default function PublicFreelancerProfile() {
 
         {/* Portfolio Section */}
         {portfolioItems.length > 0 && (
-          <div className="bg-[#0A0A0A] rounded-3xl p-6 lg:p-8 border border-[#1A1A1A] shadow-xl mb-6">
+          <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg lg:text-xl font-bold text-white flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-[#FFD700]" />
+              <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                 Portfolio
               </h2>
-              <span className="px-3 py-1.5 bg-[#FFD700]/20 text-[#FFD700] rounded-full text-xs font-medium border border-[#FFD700]/30">
+              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
                 {portfolioItems.length} Projects
               </span>
             </div>
             {/* Desktop: Grid Layout */}
             <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
               {portfolioItems.map((item) => (
-                <div key={item.id} className="group relative bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300">
-                  <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                <div key={item.id} className="group relative bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300">
+                  <div className="aspect-video bg-[var(--color-bg-secondary)]/50 relative overflow-hidden">
                     {item.image_url ? (
                       <img
                         src={item.image_url}
@@ -450,25 +450,25 @@ export default function PublicFreelancerProfile() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-card)] to-[var(--color-bg-secondary)]">
                         <div className="text-center">
-                          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                            <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[#FFD700]" />
+                          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                            <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[var(--color-primary)]" />
                           </div>
-                          <span className="text-[#A0A0A0] text-[10px] lg:text-xs">No Image</span>
+                          <span className="text-[var(--color-text-muted)] text-[10px] lg:text-xs">No Image</span>
                         </div>
                       </div>
                     )}
                   </div>
                   <div className="p-4 lg:p-5">
-                    <h4 className="text-white font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[#FFD700] transition-colors">{item.title.length > 80 ? `${item.title.substring(0, 80)}...` : item.title}</h4>
-                    <p className="text-[#A0A0A0] text-xs lg:text-sm mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                    <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[var(--color-primary)] transition-colors">{item.title.length > 80 ? `${item.title.substring(0, 80)}...` : item.title}</h4>
+                    <p className="text-[var(--color-text-muted)] text-xs lg:text-sm mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                     {item.external_link && (
                       <a
                         href={item.external_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors text-xs lg:text-sm"
+                        className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-xs lg:text-sm"
                       >
                         <ExternalLink className="h-3 w-3 lg:h-4 lg:w-4" />
                         View Project
@@ -482,8 +482,8 @@ export default function PublicFreelancerProfile() {
             <div className="lg:hidden overflow-x-auto -mx-6 px-6">
               <div className="flex gap-4 pb-4">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
-                    <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                  <div key={item.id} className="flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
+                    <div className="aspect-video bg-[var(--color-bg-secondary)]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img
                           src={item.image_url}
@@ -491,20 +491,20 @@ export default function PublicFreelancerProfile() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-card)] to-[var(--color-bg-secondary)]">
                           <div className="text-center">
-                            <div className="w-10 h-10 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                              <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                            <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                              <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                             </div>
-                            <span className="text-[#A0A0A0] text-[10px]">No Image</span>
+                            <span className="text-[var(--color-text-muted)] text-[10px]">No Image</span>
                           </div>
                         </div>
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className="text-white font-semibold mb-2 line-clamp-1 text-base group-hover:text-[#FFD700] transition-colors">{item.title}</h4>
+                      <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-base group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h4>
                       <div className="flex-grow">
-                        <p className="text-[#A0A0A0] text-xs leading-relaxed">{item.description || 'No description provided'}</p>
+                        <p className="text-[var(--color-text-muted)] text-xs leading-relaxed">{item.description || 'No description provided'}</p>
                       </div>
                       <div className="mt-auto pt-3">
                         {item.external_link && (
@@ -512,7 +512,7 @@ export default function PublicFreelancerProfile() {
                             href={item.external_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] transition-colors text-xs"
+                            className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-xs"
                           >
                             <ExternalLink className="h-3 w-3" />
                             View Project
