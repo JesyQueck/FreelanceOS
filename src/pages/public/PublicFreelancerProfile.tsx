@@ -230,10 +230,7 @@ export default function PublicFreelancerProfile() {
                   <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-sm font-medium border border-[var(--color-primary)]/30">
                     Freelancer
                   </span>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span className="text-sm text-green-500">Verified</span>
-                  </div>
+                  <span className="text-sm text-green-500">Verified</span>
                 </div>
               </div>
 

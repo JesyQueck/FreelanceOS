@@ -450,7 +450,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Header */}
-        <div className="card p-6">
+        <div className="bg-[var(--color-bg-main)] p-6 border border-[var(--color-border)] shadow-xl rounded-3xl">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Profile Image */}
             <div className="relative">
