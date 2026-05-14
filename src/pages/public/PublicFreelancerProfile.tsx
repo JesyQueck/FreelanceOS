@@ -370,14 +370,14 @@ export default function PublicFreelancerProfile() {
                   <div className="space-y-2 lg:space-y-3 mt-auto pt-3 lg:pt-4">
                     {service.price && (
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-[#FFD700]" />
-                        <span className="text-base lg:text-lg font-bold text-[#FFD700]">{service.price}</span>
+                        <DollarSign className="h-4 w-4 lg:h-5 lg:w-5 text-[var(--color-primary)]" />
+                        <span className="text-base lg:text-lg font-bold text-[var(--color-primary)]">{service.price}</span>
                       </div>
                     )}
                     {service.timeline && (
                       <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-[#A0A0A0]" />
-                        <span className="text-xs lg:text-sm text-[#A0A0A0]">{service.timeline}</span>
+                        <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-[var(--color-primary)]" />
+                        <span className="text-xs lg:text-sm text-[var(--color-text-muted)]">{service.timeline}</span>
                       </div>
                     )}
                   </div>
@@ -388,15 +388,15 @@ export default function PublicFreelancerProfile() {
             <div className="lg:hidden overflow-x-auto -mx-6 px-6">
               <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} className="flex-shrink-0 w-72 bg-[#1A1A1A] rounded-xl p-4 border border-[#2A2A2A] hover:border-[#FFD700]/50 transition-all min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
+                  <div key={service.id} className="flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
                     <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 bg-[#FFD700]/10 rounded-lg">
-                        <Briefcase className="h-5 w-5 text-[#FFD700]" />
+                      <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
+                        <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                       </div>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                         service.status === 'active'
-                          ? 'bg-[#FFD700]/20 text-[#FFD700] border border-[#FFD700]/30'
-                          : 'bg-[#1A1A1A]/10 text-[#A0A0A0] border border-[#2A2A2A]/20'
+                          ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border border-[var(--color-primary)]/30'
+                          : 'bg-[var(--color-bg-card)]/10 text-[var(--color-text-muted)] border border-[var(--color-border)]/20'
                         }`}>
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
