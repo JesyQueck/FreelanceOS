@@ -95,6 +95,28 @@ export default function PublicFreelancerProfile() {
     fetchProfileData();
   }, [username]);
 
+  // Equalize card heights for mobile services
+  useEffect(() => {
+    if (servicesContainerRef.current && services.length > 0) {
+      const cards = servicesContainerRef.current.querySelectorAll('[data-service-card]');
+      let maxHeight = 0;
+      
+      cards.forEach((card) => {
+        const cardEl = card as HTMLElement;
+        cardEl.style.height = 'auto';
+        const height = cardEl.offsetHeight;
+        if (height > maxHeight) {
+          maxHeight = height;
+        }
+      });
+      
+      cards.forEach((card) => {
+        const cardEl = card as HTMLElement;
+        cardEl.style.height = `${maxHeight}px`;
+      });
+    }
+  }, [services]);
+
   const handleMessageFreelancer = async () => {
     if (!user) {
       setShowClientAuthModal(true);
@@ -383,10 +405,10 @@ export default function PublicFreelancerProfile() {
               ))}
             </div>
             {/* Mobile: Horizontal Scroll Tray */}
-            <div className="lg:hidden overflow-x-auto px-4 -mx-4">
+            <div ref={servicesContainerRef} className="lg:hidden overflow-x-auto -mx-4 px-4">
               <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} className="flex-shrink-0 w-[calc(100vw-2rem)] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
+                  <div key={service.id} data-service-card className="flex-shrink-0 w-[85vw] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
