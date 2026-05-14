@@ -195,7 +195,7 @@ export default function PublicFreelancerProfile() {
       {/* Main Content */}
       <div className="container mx-auto px-4 pt-20 lg:pt-24 pb-4 lg:pb-12">
         {/* Hero Section */}
-        <div className="bg-[var(--color-bg-card)] p-4 lg:p-10 border border-[var(--color-border)] shadow-xl mb-6 rounded-3xl">
+        <div className="bg-[var(--color-bg-main)] p-4 lg:p-10 border border-[var(--color-border)] shadow-xl mb-6 rounded-3xl">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Profile Image */}
             <div className="lg:col-span-1 flex justify-center lg:justify-start">
