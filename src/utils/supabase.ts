@@ -1695,7 +1695,7 @@ interface ConversationRecord {
 }
 
 // Conversation logic for client-freelancer messaging
-export const checkOrCreateConversation = async (userId1: string, userId2: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
+export const checkOrCreateConversation = async (userId1: string, userId2: string, freelancerName?: string): Promise<{ success: boolean; conversationId?: string; error?: string }> => {
   try {
     // Get the client ID for userId1 (assuming userId1 is the client)
     const { data: clientData, error: clientError } = await supabase
@@ -1822,6 +1822,23 @@ export const checkOrCreateConversation = async (userId1: string, userId2: string
 
     if (!newConversation) {
       return { success: false, error: 'Failed to create conversation' };
+    }
+
+    // Create initial greeting message if freelancer name is provided
+    if (freelancerName) {
+      try {
+        await supabase
+          .from('messages')
+          .insert({
+            conversation_id: newConversation.id,
+            sender_id: userId1,
+            content: `Hi ${freelancerName}`,
+            created_at: new Date().toISOString()
+          });
+      } catch (err) {
+        console.error('Error creating initial message:', err);
+        // Don't fail the conversation creation if message fails
+      }
     }
 
     return { success: true, conversationId: newConversation.id };

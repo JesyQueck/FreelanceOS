@@ -37,7 +37,7 @@ export default function DiscoverFreelancers() {
     setFilteredFreelancers(filtered);
   }, [searchTerm, freelancers]);
 
-  const handleMessageFreelancer = async (freelancerId: string, _username: string) => {
+  const handleMessageFreelancer = async (freelancerId: string, username: string) => {
     if (!user) {
       // Store freelancer_id temporarily and redirect to client login
       localStorage.setItem('pending_freelancer_id', freelancerId);
@@ -54,8 +54,12 @@ export default function DiscoverFreelancers() {
     }
 
     try {
+      // Find freelancer's display name
+      const freelancer = freelancers.find(f => f.id === freelancerId);
+      const freelancerName = freelancer?.display_name || username;
+
       // Check if conversation already exists or create new one
-      const result = await checkOrCreateConversation(user.id, freelancerId);
+      const result = await checkOrCreateConversation(user.id, freelancerId, freelancerName);
       
       if (result.success && result.conversationId) {
         // Navigate to the conversation

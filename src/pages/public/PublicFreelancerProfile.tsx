@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, DollarSign, Clock } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, checkOrCreateConversation, getFreelancerProfile, UserProfile, PortfolioItem, Service, ensureClientProfileExists } from '../../utils/supabase';
-import { supabase } from '../../utils/supabase';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -44,7 +43,6 @@ export default function PublicFreelancerProfile() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-    const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
   const servicesContainerRef = useRef<HTMLDivElement>(null);
   const portfolioContainerRef = useRef<HTMLDivElement>(null);
@@ -142,6 +140,10 @@ export default function PublicFreelancerProfile() {
 
   const handleMessageFreelancer = async () => {
     if (!user) {
+      // Store freelancer info for auto-conversation creation after auth
+      localStorage.setItem('pending_freelancer_id', profile?.id || '');
+      localStorage.setItem('pending_freelancer_name', profile?.display_name || '');
+      localStorage.setItem('pending_freelancer_username', username || '');
       setShowClientAuthModal(true);
       return;
     }
@@ -150,42 +152,13 @@ export default function PublicFreelancerProfile() {
       return;
     }
 
-    setMessageLoading(true);
-    try {
-      // Ensure client profile exists (handles email confirmation case)
-      const profileResult = await ensureClientProfileExists(user.id, user.email || '', user.email?.split('@')[0] || 'Client');
-      
-      if (!profileResult.success) {
-        console.error('Failed to ensure client profile exists:', profileResult.error);
-        // Continue anyway - the error might be non-critical
-      }
+    // Store freelancer info for auto-conversation creation
+    localStorage.setItem('pending_freelancer_id', profile.id || '');
+    localStorage.setItem('pending_freelancer_name', profile.display_name || '');
+    localStorage.setItem('pending_freelancer_username', username || '');
 
-      // Now check if client profile exists and proceed with conversation
-      const { data: clientProfile, error: clientError } = await supabase
-        .from('client_profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (clientError || !clientProfile) {
-        // If profile still doesn't exist, show signup modal
-        setShowClientAuthModal(true);
-        return;
-      }
-
-      // User has client profile, proceed with conversation
-      const result = await checkOrCreateConversation(user!.id, profile.id!);
-      if (result.success && result.conversationId) {
-        navigate(`/messages/${result.conversationId}`);
-      } else {
-        alert(result.error || 'Failed to start conversation');
-      }
-    } catch (err) {
-      console.error('Error starting conversation:', err);
-      alert('Failed to start conversation');
-    } finally {
-      setMessageLoading(false);
-    }
+    // Redirect to client messages page
+    navigate('/messages');
   };
 
   if (loading) {
@@ -320,21 +293,10 @@ export default function PublicFreelancerProfile() {
                 <div className="flex justify-center">
                   <button
                     onClick={handleMessageFreelancer}
-                    disabled={messageLoading}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-black font-bold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-black font-bold text-sm rounded-lg hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-lg hover:shadow-xl min-w-[200px]"
                   >
-                    {messageLoading ? (
-                      <div className="flex gap-1.5">
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      </div>
-                    ) : (
-                      <>
-                        <MessageCircle className="h-4 w-4" />
-                        Message Freelancer
-                      </>
-                    )}
+                    <MessageCircle className="h-4 w-4" />
+                    Message Freelancer
                   </button>
                 </div>
               </div>

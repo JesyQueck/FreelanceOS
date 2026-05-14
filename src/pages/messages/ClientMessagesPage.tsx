@@ -179,7 +179,7 @@ export default function ClientMessagesPage() {
             try {
               const profile = await getPublicUserProfile(freelancerUsername);
               if (profile) {
-                const result = await checkOrCreateConversation(user.id, profile.id!);
+                const result = await checkOrCreateConversation(user.id, profile.id!, profile.display_name || profile.username || '');
                 if (result.success && result.conversationId) {
                   // Create a temporary conversation object for immediate display
                   const tempConversation = {
