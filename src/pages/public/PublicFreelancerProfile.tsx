@@ -46,6 +46,7 @@ export default function PublicFreelancerProfile() {
   const [loading, setLoading] = useState(true);
     const [messageLoading, setMessageLoading] = useState(false);
   const [showClientAuthModal, setShowClientAuthModal] = useState(false);
+  const servicesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -213,7 +214,7 @@ export default function PublicFreelancerProfile() {
                   </div>
                 ) : (
                   <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[var(--color-bg-card)] flex items-center justify-center border-3 border-[var(--color-primary)] shadow-2xl">
-                    <UserCircle className="h-14 w-14 lg:h-18 lg:w-18 text-[var(--color-text-muted)]" />
+                    <UserCircle className="h-14 w-14 lg:h-[4.5rem] lg:w-[4.5rem] text-[var(--color-text-muted)]" />
                   </div>
                 )}
               </div>
@@ -382,10 +383,10 @@ export default function PublicFreelancerProfile() {
               ))}
             </div>
             {/* Mobile: Horizontal Scroll Tray */}
-            <div className="lg:hidden overflow-x-auto -mx-6 px-6">
+            <div className="lg:hidden overflow-x-auto px-4 -mx-4">
               <div className="flex gap-4 pb-4">
                 {services.map((service) => (
-                  <div key={service.id} className="flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
+                  <div key={service.id} className="flex-shrink-0 w-[calc(100vw-2rem)] bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
@@ -398,7 +399,7 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">{service.title}</h3>
                     <div className="flex-grow">
                       <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
                     </div>
@@ -479,7 +480,7 @@ export default function PublicFreelancerProfile() {
             <div className="lg:hidden overflow-x-auto -mx-6 px-6">
               <div className="flex gap-4 pb-4">
                 {portfolioItems.map((item) => (
-                  <div key={item.id} className="flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
+                  <div key={item.id} className="group flex-shrink-0 w-72 bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-all duration-300 min-h-[16rem] sm:min-h-[18rem] md:min-h-[20rem] lg:min-h-[14rem] xl:min-h-[16rem] flex flex-col">
                     <div className="aspect-video bg-[var(--color-bg-secondary)]/50 relative overflow-hidden">
                       {item.image_url ? (
                         <img
