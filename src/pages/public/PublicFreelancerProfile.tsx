@@ -193,9 +193,9 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pt-20 lg:pt-12 pb-4 lg:pb-12">
+      <div className="container mx-auto px-4 pt-20 lg:pt-24 pb-4 lg:pb-12">
         {/* Hero Section */}
-        <div className="card p-4 lg:p-10 border border-[var(--color-border)] shadow-xl mb-6">
+        <div className="bg-[var(--color-bg-card)] p-4 lg:p-10 border border-[var(--color-border)] shadow-xl mb-6 rounded-3xl">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Profile Image */}
             <div className="lg:col-span-1 flex justify-center lg:justify-start">
@@ -223,7 +223,7 @@ export default function PublicFreelancerProfile() {
             <div className="lg:col-span-3 space-y-4 lg:space-y-5">
               {/* Name and Status */}
               <div className="text-center lg:text-left">
-                <h1 className="text-2xl lg:text-3xl font-bold text-[var(--color-text-primary)] mb-2">
+                <h1 className="text-3xl lg:text-4xl font-bold text-[var(--color-text-primary)] mb-2">
                   {profile.name || profile.display_name}
                 </h1>
                 <div className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 mb-3">
