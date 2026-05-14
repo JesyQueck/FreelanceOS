@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { UserCircle, Briefcase, Search, MessageCircle, ExternalLink } from 'lucide-react';
 import { getAllPublicFreelancers, checkOrCreateConversation, UserProfile } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function DiscoverFreelancers() {
   const { user, role } = useAuth();
@@ -67,22 +68,8 @@ export default function DiscoverFreelancers() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
-        {/* Premium Background with Dot Grid */}
-        <div className="fixed inset-0 dot-grid pointer-events-none" />
-        
-        {/* Subtle Blur Elements */}
-        <div className="fixed top-20 right-20 w-96 h-96 bg-[var(--color-primary)] subtle-blur rounded-full pointer-events-none" />
-        <div className="fixed bottom-20 left-20 w-64 h-64 bg-[var(--color-accent)] subtle-blur rounded-full pointer-events-none" />
-        
-        <div className="flex flex-col items-center">
-          <div className="flex gap-2 mb-4 animate-fade-in-up">
-            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-          <div className="text-[var(--color-text-secondary)]">Discovering freelancers...</div>
-        </div>
+      <div className="p-6">
+        <LoadingSpinner text="Discovering freelancers..." />
       </div>
     );
   }

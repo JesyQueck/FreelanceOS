@@ -144,7 +144,7 @@ export default function PublicFreelancerProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+      <div className="p-6">
         <LoadingSpinner text="Loading freelancer profile..." />
       </div>
     );

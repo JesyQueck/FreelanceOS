@@ -430,7 +430,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+      <div className="p-6">
         <LoadingSpinner text="Loading profile..." />
       </div>
     );
@@ -723,14 +723,14 @@ export default function ProfilePage() {
                           <div className="flex gap-1">
                             <button
                               onClick={cancelEditing}
-                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                              className="p-1 hover:bg-[var(--color-border-light)] rounded transition-colors"
                             >
-                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                              <X className="h-3 w-3 text-[var(--color-text-muted)]" />
                             </button>
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -738,27 +738,27 @@ export default function ProfilePage() {
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <p className="text-sm text-white font-medium capitalize">
+                          <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
                             {freelancerProfile.experience_level || 'Not set'}
                           </p>
                           <button
                             onClick={() => startEditing('experience-level', freelancerProfile.experience_level || '')}
-                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
                             title="Edit experience level"
                           >
-                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                            <Edit className="h-3 w-3 text-[var(--color-text-muted)]" />
                           </button>
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-xs text-[#A0A0A0] mb-1">Availability</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mb-1">Availability</p>
                       {editingField === 'availability' ? (
                         <div className="flex items-center gap-2">
                           <select
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="bg-[#2A2A2A] border border-[#3A3A3A] rounded px-2 py-1 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                            className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-light)] rounded px-2 py-1 text-[var(--color-text-primary)] text-sm placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                             autoFocus
                           >
                             <option value="available">Available</option>
@@ -768,14 +768,14 @@ export default function ProfilePage() {
                           <div className="flex gap-1">
                             <button
                               onClick={cancelEditing}
-                              className="p-1 hover:bg-[#3A3A3A] rounded transition-colors"
+                              className="p-1 hover:bg-[var(--color-border-light)] rounded transition-colors"
                             >
-                              <X className="h-3 w-3 text-[#A0A0A0]" />
+                              <X className="h-3 w-3 text-[var(--color-text-muted)]" />
                             </button>
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="p-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded transition-colors disabled:opacity-50"
+                              className="p-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-black rounded transition-colors disabled:opacity-50"
                             >
                               <Save className="h-3 w-3 text-black" />
                             </button>
@@ -783,15 +783,15 @@ export default function ProfilePage() {
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <p className="text-sm text-white font-medium capitalize">
+                          <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
                             {freelancerProfile.availability || 'Not set'}
                           </p>
                           <button
                             onClick={() => startEditing('availability', freelancerProfile.availability || '')}
-                            className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                            className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
                             title="Edit availability"
                           >
-                            <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                            <Edit className="h-3 w-3 text-[var(--color-text-muted)]" />
                           </button>
                         </div>
                       )}
@@ -800,13 +800,13 @@ export default function ProfilePage() {
                   {freelancerProfile && (
                     <div className="mt-4">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-[#A0A0A0]">Skills</p>
+                        <p className="text-xs text-[var(--color-text-muted)]">Skills</p>
                         <button
                           onClick={() => startEditing('skills', freelancerProfile.skills?.join(', ') || '')}
-                          className="p-1 hover:bg-[#2A2A2A] rounded transition-colors"
+                          className="p-1 hover:bg-[var(--color-bg-secondary)] rounded transition-colors"
                           title="Edit skills"
                         >
-                          <Edit className="h-3 w-3 text-[#A0A0A0]" />
+                          <Edit className="h-3 w-3 text-[var(--color-text-muted)]" />
                         </button>
                       </div>
                       {editingField === 'skills' ? (
@@ -814,21 +814,21 @@ export default function ProfilePage() {
                           <textarea
                             value={editingValue}
                             onChange={(e) => setEditingValue(e.target.value)}
-                            className="w-full bg-[#2A2A2A] border border-[#3A3A3A] rounded-lg px-3 py-2 text-white text-sm placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-24 resize-none"
+                            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-light)] rounded-lg px-3 py-2 text-[var(--color-text-primary)] text-sm placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent h-24 resize-none"
                             placeholder="Enter your skills separated by commas (e.g., JavaScript, React, Node.js)"
                             autoFocus
                           />
                           <div className="flex gap-2 mt-2">
                             <button
                               onClick={cancelEditing}
-                              className="px-3 py-1 bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded text-sm"
+                              className="px-3 py-1 bg-[var(--color-bg-card)] hover:bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded text-sm"
                             >
                               Cancel
                             </button>
                             <button
                               onClick={saveFreelancerField}
                               disabled={isSaving}
-                              className="px-3 py-1 bg-[#FFD700] hover:bg-[#FFC700] text-black rounded text-sm disabled:opacity-50"
+                              className="px-3 py-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-black rounded text-sm disabled:opacity-50"
                             >
                               {isSaving ? 'Saving...' : 'Save Skills'}
                             </button>
@@ -837,16 +837,16 @@ export default function ProfilePage() {
                       ) : freelancerProfile.skills && freelancerProfile.skills.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {freelancerProfile.skills.map((skill: string, index: number) => (
-                            <span 
+                            <span
                               key={index}
-                              className="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] rounded text-xs font-medium"
+                              className="px-3 py-1 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded text-xs font-medium"
                             >
                               {skill}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-[#A0A0A0] text-sm">No skills added yet. Click the edit icon to add your skills.</p>
+                        <p className="text-[var(--color-text-muted)] text-sm">No skills added yet. Click the edit icon to add your skills.</p>
                       )}
                     </div>
                   )}
@@ -857,12 +857,12 @@ export default function ProfilePage() {
         </div>
 
         {/* Portfolio Section */}
-        <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-sm">
+        <div className="bg-[var(--color-bg-main)] rounded-2xl p-6 border border-[var(--color-border)] shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Portfolio</h2>
-            <button 
+            <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">Portfolio</h2>
+            <button
                 onClick={() => setShowAddPortfolio(true)}
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[#FFD700] rounded-lg hover:bg-[#FFC700] gap-2"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-black transition-all bg-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary-hover)] gap-2"
               >
                 <Plus className="h-4 w-4" /> Add Project
               </button>
@@ -871,58 +871,58 @@ export default function ProfilePage() {
           {/* Add Portfolio Modal */}
           {showAddPortfolio && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-[#0A0A0A] rounded-2xl p-6 border border-[#1A1A1A] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-[var(--color-bg-main)] rounded-2xl p-6 border border-[var(--color-border)] shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-white">Add Portfolio Project</h3>
+                  <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Add Portfolio Project</h3>
                   <button
                     onClick={() => setShowAddPortfolio(false)}
-                    className="p-2 hover:bg-[#1A1A1A] rounded-lg transition-colors"
+                    className="p-2 hover:bg-[var(--color-bg-card)] rounded-lg transition-colors"
                   >
-                    <X className="h-5 w-5 text-[#A0A0A0]" />
+                    <X className="h-5 w-5 text-[var(--color-text-muted)]" />
                   </button>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Project Title *</label>
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Project Title *</label>
                     <input
                       type="text"
                       value={newPortfolio.title}
                       onChange={(e) => setNewPortfolio(prev => ({ ...prev, title: e.target.value.slice(0, 80) }))}
                       maxLength={80}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                      className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text-primary)] placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                       placeholder="Enter project title"
                     />
-                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.title?.length || 0}/80 characters</p>
+                    <p className="text-xs text-[var(--color-text-muted)] mt-1">{newPortfolio.title?.length || 0}/80 characters</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Description</label>
+                    <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Description</label>
                     <textarea
                       value={newPortfolio.description}
                       onChange={(e) => setNewPortfolio(prev => ({ ...prev, description: e.target.value.slice(0, 150) }))}
                       maxLength={150}
-                      className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent h-32 resize-none"
+                      className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text-primary)] placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent h-32 resize-none"
                       placeholder="Describe your project and what you accomplished"
                     />
-                    <p className="text-xs text-[#A0A0A0] mt-1">{newPortfolio.description?.length || 0}/150 characters</p>
+                    <p className="text-xs text-[var(--color-text-muted)] mt-1">{newPortfolio.description?.length || 0}/150 characters</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">Image URL</label>
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Image URL</label>
                       <input
                         type="url"
                         value={newPortfolio.image_url}
                         onChange={(e) => setNewPortfolio(prev => ({ ...prev, image_url: e.target.value }))}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text-primary)] placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                         placeholder="https://example.com/image.jpg"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">Project Link</label>
+                      <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">Project Link</label>
                       <input
                         type="url"
                         value={newPortfolio.external_link}
                         onChange={(e) => setNewPortfolio(prev => ({ ...prev, external_link: e.target.value }))}
-                        className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-4 py-3 text-white placeholder:text-xs placeholder:text-[#A0A0A0] focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-transparent"
+                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text-primary)] placeholder:text-xs placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                         placeholder="https://example.com/project"
                       />
                     </div>
@@ -931,14 +931,14 @@ export default function ProfilePage() {
                 <div className="flex justify-end gap-3 mt-6">
                   <button
                     onClick={() => setShowAddPortfolio(false)}
-                    className="px-4 py-2 text-sm font-medium text-[#A0A0A0] hover:text-white transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleAddPortfolio}
                     disabled={isSaving || !newPortfolio.title?.trim()}
-                    className="px-4 py-2 text-sm font-medium text-black bg-[#FFD700] rounded-lg hover:bg-[#FFC700] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-sm font-medium text-black bg-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSaving ? 'Adding...' : 'Add Project'}
                   </button>
@@ -951,21 +951,21 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioItems.length > 0 ? (
               portfolioItems.map((item) => (
-                <div key={item.id} className="group relative bg-[#1A1A1A]/50 rounded-xl overflow-hidden border border-[#2A2A2A]/50 hover:border-[#FFD700]/50 transition-all duration-300">
-                  <div className="aspect-video bg-[#2A2A2A]/50 relative overflow-hidden">
+                <div key={item.id} className="group relative bg-[var(--color-bg-card)]/50 rounded-xl overflow-hidden border border-[var(--color-border)]/50 hover:border-[var(--color-primary)]/50 transition-all duration-300">
+                  <div className="aspect-video bg-[var(--color-bg-secondary)]/50 relative overflow-hidden">
                     {item.image_url ? (
-                      <img 
-                        src={item.image_url} 
-                        alt={item.title} 
+                      <img
+                        src={item.image_url}
+                        alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A]">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-bg-card)] to-[var(--color-bg-secondary)]">
                         <div className="text-center">
-                          <div className="w-16 h-16 bg-[#FFD700]/10 rounded-lg flex items-center justify-center mx-auto mb-3">
-                            <Briefcase className="h-8 w-8 text-[#FFD700]" />
+                          <div className="w-16 h-16 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <Briefcase className="h-8 w-8 text-[var(--color-primary)]" />
                           </div>
-                          <span className="text-[#A0A0A0] text-sm">No Image</span>
+                          <span className="text-[var(--color-text-muted)] text-sm">No Image</span>
                         </div>
                       </div>
                     )}
@@ -977,14 +977,14 @@ export default function ProfilePage() {
                     </button>
                   </div>
                   <div className="p-5">
-                    <h4 className="text-white font-semibold mb-2 line-clamp-1">{item.title}</h4>
-                    <p className="text-[#A0A0A0] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                    <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1">{item.title}</h4>
+                    <p className="text-[var(--color-text-muted)] text-sm mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                     {item.external_link && (
                       <a
                         href={item.external_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[#FFD700] hover:text-[#FFC700] text-sm transition-colors"
+                        className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] text-sm transition-colors"
                       >
                         <ExternalLink className="h-4 w-4" />
                         View Project
@@ -996,14 +996,14 @@ export default function ProfilePage() {
             ) : (
               <div className="col-span-full">
                 <div className="text-center py-12 px-6">
-                  <div className="w-24 h-24 bg-[var(--color-background-secondary)]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[var(--color-border-secondary)]/50">
-                    <Briefcase className="h-12 w-12 text-[var(--color-text-secondary)]" />
+                  <div className="w-24 h-24 bg-[var(--color-bg-secondary)]/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[var(--color-border)]/50">
+                    <Briefcase className="h-12 w-12 text-[var(--color-text-muted)]" />
                   </div>
                   <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">No Portfolio Projects</h3>
-                  <p className="text-[var(--color-text-secondary)] mb-6">Showcase your work by adding portfolio projects to your profile.</p>
-                  <button 
+                  <p className="text-[var(--color-text-muted)] mb-6">Showcase your work by adding portfolio projects to your profile.</p>
+                  <button
                     onClick={() => setShowAddPortfolio(true)}
-                    className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-all bg-[var(--color-accent-primary)] rounded-lg hover:bg-[var(--color-accent-secondary)] gap-2"
+                    className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] transition-all bg-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary-hover)] gap-2"
                   >
                     <Plus className="h-4 w-4" /> Add Your First Project
                   </button>

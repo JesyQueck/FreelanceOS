@@ -114,15 +114,17 @@ export default function ServicesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Services</h1>
-        <button 
-          onClick={() => setShowAddService(true)}
-          className="btn btn-primary gap-2"
-        >
-          <Plus className="h-4 w-4" /> Add Service
-        </button>
-      </div>
+      {!loading && (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Services</h1>
+          <button
+            onClick={() => setShowAddService(true)}
+            className="btn btn-primary gap-2"
+          >
+            <Plus className="h-4 w-4" /> Add Service
+          </button>
+        </div>
+      )}
 
       {/* Add Service Modal */}
       {showAddService && (
@@ -356,7 +358,7 @@ export default function ServicesPage() {
 
       {/* Services Grid */}
       {loading ? (
-        <div className="text-center py-12">
+        <div className="p-6">
           <LoadingSpinner text="Loading services..." />
         </div>
       ) : (

@@ -119,8 +119,8 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner showText={false} />
+      <div className="p-6">
+        <LoadingSpinner text="Loading settings..." />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { MessageSquare, Target, Eye, Plus, Sparkles } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { getServicesCount, getPortfoliosCount, getConversationsCount, getActiveClientsCount, getUserProfile, getFreelancerProfile, getRecentActivity, ActivityItem, getConversations, Conversation, calculateProfileCompletion } from "../../utils/supabase";
 import MessagingOverlay from "../../components/MessagingOverlay";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 interface DashboardData {
   displayName: string;
@@ -118,12 +119,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex gap-2 animate-fade-in-up">
-          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-        </div>
+      <div className="p-6">
+        <LoadingSpinner text="Loading dashboard..." />
       </div>
     );
   }

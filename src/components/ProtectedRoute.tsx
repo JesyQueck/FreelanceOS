@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import LoadingSpinner from './LoadingSpinner'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -12,15 +13,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="flex gap-1 mb-4">
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-          <div className="text-[#A0A0A0]">Loading...</div>
-        </div>
+      <div className="p-6">
+        <LoadingSpinner text="Loading..." />
       </div>
     )
   }
