@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { onAuthStateChange } from '../utils/supabase'
+import { onAuthStateChange, supabase } from '../utils/supabase'
 import { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface User {
@@ -68,8 +68,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
     try {
-      const { supabase } = await import('../utils/supabase')
-      
       // Get role from users table - this is the correct approach
       const { data: userData, error } = await supabase
         .from('users')
@@ -142,7 +140,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initializeAuth = async () => {
       try {
         // Use a single auth call to prevent lock conflicts
-        const { supabase } = await import('../utils/supabase')
         const { data: { session } } = await supabase.auth.getSession()
         
         if (mounted && session?.user) {
