@@ -162,7 +162,7 @@ export default function PublicFreelancerProfile() {
     <div className="min-h-screen bg-[var(--color-bg-main)]">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
-        <div className="flex items-center justify-between px-4 py-6">
+        <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
@@ -193,9 +193,9 @@ export default function PublicFreelancerProfile() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pt-24 lg:pt-12 pb-6 lg:pb-12">
+      <div className="container mx-auto px-4 pt-20 lg:pt-12 pb-4 lg:pb-12">
         {/* Hero Section */}
-        <div className="card p-6 lg:p-10 border border-[var(--color-border)] shadow-xl mb-8">
+        <div className="card p-4 lg:p-10 border border-[var(--color-border)] shadow-xl mb-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-10">
             {/* Profile Image */}
             <div className="lg:col-span-1 flex justify-center lg:justify-start">
@@ -300,7 +300,7 @@ export default function PublicFreelancerProfile() {
         </div>
 
         {/* Professional Information - From Freelancer Profile */}
-        <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
+        <div className="bg-[var(--color-bg-main)] rounded-3xl p-4 lg:p-8 border border-[var(--color-border)] shadow-xl mb-4">
           <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
             <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
             Professional Information
@@ -344,7 +344,7 @@ export default function PublicFreelancerProfile() {
 
         {/* Services Section */}
         {services.length > 0 && (
-          <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
+          <div className="bg-[var(--color-bg-main)] rounded-3xl p-4 lg:p-8 border border-[var(--color-border)] shadow-xl mb-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
@@ -428,7 +428,7 @@ export default function PublicFreelancerProfile() {
 
         {/* Portfolio Section */}
         {portfolioItems.length > 0 && (
-          <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
+          <div className="bg-[var(--color-bg-main)] rounded-3xl p-4 lg:p-8 border border-[var(--color-border)] shadow-xl mb-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
