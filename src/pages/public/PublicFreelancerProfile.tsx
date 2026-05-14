@@ -223,38 +223,38 @@ export default function PublicFreelancerProfile() {
             <div className="lg:col-span-3 space-y-4 lg:space-y-5">
               {/* Name and Status */}
               <div className="text-center lg:text-left">
-                <h1 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] mb-2">
+                <h1 className="text-2xl lg:text-3xl font-bold text-[var(--color-text-primary)] mb-2">
                   {profile.name || profile.display_name}
                 </h1>
                 <div className="flex flex-col lg:flex-row items-center lg:items-start gap-2 lg:gap-3 mb-3">
-                  <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
+                  <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-sm font-medium border border-[var(--color-primary)]/30">
                     Freelancer
                   </span>
                   <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span className="text-xs text-green-500">Verified</span>
+                    <span className="text-sm text-green-500">Verified</span>
                   </div>
                 </div>
               </div>
 
               {/* Contact Information */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 lg:gap-4">
-                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-4 border border-[var(--color-border)]/30">
                   <div className="bg-[var(--color-primary)]/10 p-2 rounded-lg">
                     <Mail className="h-5 w-5 text-[var(--color-primary)]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Email</p>
-                    <p className="text-xs text-[var(--color-text-primary)] font-medium truncate">{profile.email || 'Not provided'}</p>
+                    <p className="text-xs text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Email</p>
+                    <p className="text-sm text-[var(--color-text-primary)] font-medium truncate">{profile.email || 'Not provided'}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
+                <div className="flex items-center gap-3 bg-[var(--color-bg-card)]/30 rounded-xl p-4 border border-[var(--color-border)]/30">
                   <div className="bg-[var(--color-primary)]/10 p-2 rounded-lg">
                     <UserCircle className="h-5 w-5 text-[var(--color-primary)]" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Member Since</p>
-                    <p className="text-xs text-[var(--color-text-primary)] font-medium">
+                    <p className="text-xs text-[var(--color-text-muted)] mb-0.5 uppercase tracking-wide">Member Since</p>
+                    <p className="text-sm text-[var(--color-text-primary)] font-medium">
                       {profile.created_at ? getRelativeTime(profile.created_at) : 'Unknown'}
                     </p>
                   </div>
@@ -264,11 +264,11 @@ export default function PublicFreelancerProfile() {
               {/* Bio */}
               {profile.bio && (
                 <div className="bg-[var(--color-bg-card)]/50 rounded-xl p-4 border border-[var(--color-border)]/50">
-                  <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 flex items-center gap-2">
+                  <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-2 flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-[var(--color-primary)]" />
                     About
                   </h3>
-                  <p className="text-xs text-[var(--color-text-muted)] leading-relaxed min-h-[60px]">{profile.bio}</p>
+                  <p className="text-sm text-[var(--color-text-muted)] leading-relaxed min-h-[60px]">{profile.bio}</p>
                 </div>
               )}
 
@@ -301,38 +301,38 @@ export default function PublicFreelancerProfile() {
 
         {/* Professional Information - From Freelancer Profile */}
         <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
-          <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
+          <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] mb-6 flex items-center gap-2">
             <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
             Professional Information
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
-              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Hourly Rate</p>
-              <p className="text-sm text-[var(--color-text-primary)] font-medium">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-4 border border-[var(--color-border)]/30">
+              <p className="text-xs text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Hourly Rate</p>
+              <p className="text-base text-[var(--color-text-primary)] font-medium">
                 {freelancerProfile?.hourly_rate ? `$${freelancerProfile.hourly_rate}/hr` : 'Not set'}
               </p>
             </div>
-            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
-              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Experience Level</p>
-              <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-4 border border-[var(--color-border)]/30">
+              <p className="text-xs text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Experience Level</p>
+              <p className="text-base text-[var(--color-text-primary)] font-medium capitalize">
                 {freelancerProfile?.experience_level || 'Not set'}
               </p>
             </div>
-            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-3 border border-[var(--color-border)]/30">
-              <p className="text-[10px] text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Availability</p>
-              <p className="text-sm text-[var(--color-text-primary)] font-medium capitalize">
+            <div className="bg-[var(--color-bg-card)]/30 rounded-xl p-4 border border-[var(--color-border)]/30">
+              <p className="text-xs text-[var(--color-text-muted)] mb-1 uppercase tracking-wide">Availability</p>
+              <p className="text-base text-[var(--color-text-primary)] font-medium capitalize">
                 {freelancerProfile?.availability || 'Not set'}
               </p>
             </div>
           </div>
           {freelancerProfile && freelancerProfile.skills && freelancerProfile.skills.length > 0 && (
             <div className="mt-4">
-              <p className="text-[10px] text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">Skills</p>
+              <p className="text-xs text-[var(--color-text-muted)] mb-2 uppercase tracking-wide">Skills</p>
               <div className="flex flex-wrap gap-2">
                 {freelancerProfile.skills.map((skill: string, index: number) => (
                   <span
                     key={index}
-                    className="px-2.5 py-1 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30"
+                    className="px-2.5 py-1 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-sm font-medium border border-[var(--color-primary)]/30"
                   >
                     {skill}
                   </span>
@@ -346,11 +346,11 @@ export default function PublicFreelancerProfile() {
         {services.length > 0 && (
           <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                 Services
               </h2>
-              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
+              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-sm font-medium border border-[var(--color-primary)]/30">
                 {services.length} Services Available
               </span>
             </div>
@@ -363,9 +363,9 @@ export default function PublicFreelancerProfile() {
                       <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[var(--color-primary)]" />
                     </div>
                   </div>
-                  <h3 className="text-base lg:text-lg font-semibold text-[var(--color-text-primary)] mb-2 lg:mb-3 group-hover:text-[var(--color-primary)] transition-colors">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
+                  <h3 className="text-lg lg:text-xl font-semibold text-[var(--color-text-primary)] mb-2 lg:mb-3 group-hover:text-[var(--color-primary)] transition-colors">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                   <div className="flex-grow">
-                    <p className="text-xs lg:text-sm text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
+                    <p className="text-sm lg:text-base text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
                   </div>
                   <div className="space-y-2 lg:space-y-3 mt-auto pt-3 lg:pt-4">
                     {service.price && (
@@ -377,7 +377,7 @@ export default function PublicFreelancerProfile() {
                     {service.timeline && (
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 lg:h-5 lg:w-5 text-[var(--color-primary)]" />
-                        <span className="text-xs lg:text-sm text-[var(--color-text-muted)]">{service.timeline}</span>
+                        <span className="text-sm lg:text-base text-[var(--color-text-muted)]">{service.timeline}</span>
                       </div>
                     )}
                   </div>
@@ -393,7 +393,7 @@ export default function PublicFreelancerProfile() {
                       <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
                         <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                       </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      <span className={`px-2 py-1 text-sm font-medium rounded-full ${
                         service.status === 'active'
                           ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] border border-[var(--color-primary)]/30'
                           : 'bg-[var(--color-bg-card)]/10 text-[var(--color-text-muted)] border border-[var(--color-border)]/20'
@@ -401,21 +401,21 @@ export default function PublicFreelancerProfile() {
                         {service.status === 'active' ? 'Available' : 'Draft'}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-[var(--color-text-primary)] mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2 truncate">{service.title.length > 50 ? `${service.title.substring(0, 50)}...` : service.title}</h3>
                     <div className="flex-grow">
-                      <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
+                      <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">{service.description || 'No description provided'}</p>
                     </div>
                     <div className="space-y-2 mt-auto pt-3">
                       {service.price && (
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4 text-[var(--color-primary)]" />
-                          <span className="text-sm font-medium text-[var(--color-primary)]">{service.price}</span>
+                          <span className="text-base font-medium text-[var(--color-primary)]">{service.price}</span>
                         </div>
                       )}
                       {service.timeline && (
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-[var(--color-primary)]" />
-                          <span className="text-xs text-[var(--color-text-muted)]">{service.timeline}</span>
+                          <span className="text-sm text-[var(--color-text-muted)]">{service.timeline}</span>
                         </div>
                       )}
                     </div>
@@ -430,11 +430,11 @@ export default function PublicFreelancerProfile() {
         {portfolioItems.length > 0 && (
           <div className="bg-[var(--color-bg-main)] rounded-3xl p-6 lg:p-8 border border-[var(--color-border)] shadow-xl mb-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg lg:text-xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
+              <h2 className="text-xl lg:text-2xl font-bold text-[var(--color-text-primary)] flex items-center gap-2">
                 <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                 Portfolio
               </h2>
-              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-xs font-medium border border-[var(--color-primary)]/30">
+              <span className="px-3 py-1.5 bg-[var(--color-primary)]/20 text-[var(--color-primary)] rounded-full text-sm font-medium border border-[var(--color-primary)]/30">
                 {portfolioItems.length} Projects
               </span>
             </div>
@@ -455,20 +455,20 @@ export default function PublicFreelancerProfile() {
                           <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                             <Briefcase className="h-5 w-5 lg:h-6 lg:w-6 text-[var(--color-primary)]" />
                           </div>
-                          <span className="text-[var(--color-text-muted)] text-[10px] lg:text-xs">No Image</span>
+                          <span className="text-[var(--color-text-muted)] text-xs lg:text-sm">No Image</span>
                         </div>
                       </div>
                     )}
                   </div>
                   <div className="p-4 lg:p-5">
-                    <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-sm lg:text-base group-hover:text-[var(--color-primary)] transition-colors">{item.title.length > 80 ? `${item.title.substring(0, 80)}...` : item.title}</h4>
-                    <p className="text-[var(--color-text-muted)] text-xs lg:text-sm mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
+                    <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-base lg:text-lg group-hover:text-[var(--color-primary)] transition-colors">{item.title.length > 80 ? `${item.title.substring(0, 80)}...` : item.title}</h4>
+                    <p className="text-[var(--color-text-muted)] text-sm lg:text-base mb-3 lg:mb-4 line-clamp-2">{item.description || 'No description provided'}</p>
                     {item.external_link && (
                       <a
                         href={item.external_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-xs lg:text-sm"
+                        className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-sm lg:text-base"
                       >
                         <ExternalLink className="h-3 w-3 lg:h-4 lg:w-4" />
                         View Project
@@ -496,15 +496,15 @@ export default function PublicFreelancerProfile() {
                             <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
                               <Briefcase className="h-5 w-5 text-[var(--color-primary)]" />
                             </div>
-                            <span className="text-[var(--color-text-muted)] text-[10px]">No Image</span>
+                            <span className="text-[var(--color-text-muted)] text-xs">No Image</span>
                           </div>
                         </div>
                       )}
                     </div>
                     <div className="p-4">
-                      <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-base group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h4>
+                      <h4 className="text-[var(--color-text-primary)] font-semibold mb-2 line-clamp-1 text-lg group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h4>
                       <div className="flex-grow">
-                        <p className="text-[var(--color-text-muted)] text-xs leading-relaxed">{item.description || 'No description provided'}</p>
+                        <p className="text-[var(--color-text-muted)] text-sm leading-relaxed">{item.description || 'No description provided'}</p>
                       </div>
                       <div className="mt-auto pt-3">
                         {item.external_link && (
@@ -512,7 +512,7 @@ export default function PublicFreelancerProfile() {
                             href={item.external_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-xs"
+                            className="inline-flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors text-sm"
                           >
                             <ExternalLink className="h-3 w-3" />
                             View Project
