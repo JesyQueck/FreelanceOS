@@ -116,52 +116,52 @@ export default function DiscoverFreelancers() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredFreelancers.map((freelancer) => (
-            <div key={freelancer.id} className="card p-6 hover:scale-[1.02] animate-slide-in" style={{ animationDelay: `${Math.random() * 200}ms` }}>
+            <div key={freelancer.id} className="card p-4 hover:scale-[1.02] animate-slide-in flex flex-col" style={{ animationDelay: `${Math.random() * 200}ms` }}>
               {/* Profile Header */}
-              <div className="flex items-center gap-4 mb-4">
-                <div className="relative">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative flex-shrink-0">
                   {freelancer.profile_image ? (
                     <img
                       src={freelancer.profile_image}
                       alt={freelancer.display_name || 'Freelancer'}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-[var(--color-bg-card)]"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[var(--color-bg-card)]"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-[var(--color-primary)]/20">
+                    <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-[var(--color-primary)]/20">
                       {freelancer.display_name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                   )}
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[var(--color-success)] rounded-full border-2 border-[var(--color-bg-card)]"></div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[var(--color-success)] rounded-full border-2 border-[var(--color-bg-card)]"></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-[var(--color-text-primary)] font-semibold text-base truncate">
+                  <h3 className="text-[var(--color-text-primary)] font-semibold text-sm truncate">
                     {freelancer.display_name || 'Freelancer'}
                   </h3>
-                  <p className="text-[var(--color-text-secondary)] text-sm">Freelancer</p>
+                  <p className="text-[var(--color-text-secondary)] text-xs">Freelancer</p>
                 </div>
               </div>
 
               {/* Bio Preview */}
               {freelancer.bio && (
-                <p className="text-[var(--color-text-secondary)] text-sm mb-4 line-clamp-2 leading-relaxed">
+                <p className="text-[var(--color-text-secondary)] text-xs mb-3 line-clamp-3 leading-relaxed flex-1">
                   {freelancer.bio}
                 </p>
               )}
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-auto">
                 <Link
                   to={`/freelancer/${freelancer.username}`}
-                  className="btn btn-secondary flex-1 text-sm"
+                  className="btn btn-secondary flex-1 text-xs min-w-0 py-2"
                 >
-                  <ExternalLink className="h-4 w-4" />
+                  <ExternalLink className="h-3 w-3" />
                   View Profile
                 </Link>
                 <button
                   onClick={() => handleMessageFreelancer(freelancer.id!, freelancer.username!)}
-                  className="btn btn-primary flex-1 text-sm"
+                  className="btn btn-primary flex-1 text-xs min-w-0 py-2"
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-3 w-3" />
                   Message
                 </button>
               </div>

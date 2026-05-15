@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './styles/globals.css'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
@@ -14,7 +14,6 @@ import ServicesPage from './pages/services/ServicesPage'
 import RoleBasedMessages from './components/RoleBasedMessages'
 import SettingsPage from './pages/dashboard/SettingsPage'
 import PublicFreelancerProfile from './pages/public/PublicFreelancerProfile'
-import DiscoverFreelancers from './pages/public/DiscoverFreelancers'
 import ClientLayout from './pages/client/ClientLayout'
 import ClientMessagesPageContent from './pages/client/ClientMessagesPage'
 import DiscoverFreelancersContent from './pages/client/DiscoverFreelancers'
@@ -30,7 +29,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/freelancer/:username" element={<PublicFreelancerProfile />} />
-              <Route path="/discover" element={<DiscoverFreelancers />} />
+              <Route path="/discover" element={<Navigate to="/client-dashboard/discover" replace />} />
               <Route path="/messages" element={
                 <ProtectedRoute>
                   <RoleBasedMessages />

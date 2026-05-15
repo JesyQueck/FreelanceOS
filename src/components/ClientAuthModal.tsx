@@ -3,12 +3,6 @@ import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
 import { signUpClient, signIn, supabase, checkOrCreateConversation } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
-interface ConversationResult {
-  success: boolean
-  conversation_id?: string | null
-  error?: string | null
-}
-
 interface ClientAuthModalProps {
   isOpen: boolean
   onClose: () => void
@@ -97,23 +91,6 @@ export default function ClientAuthModal({
     }
   }, [])
 
-  const createConversation = useCallback(async (userId: string, freelancerId: string): Promise<ConversationResult> => {
-    try {
-      // Get freelancer name from localStorage
-      const freelancerName = localStorage.getItem('pending_freelancer_name') || '';
-      
-      const result = await checkOrCreateConversation(userId, freelancerId, freelancerName);
-
-      return {
-        success: result.success,
-        conversation_id: result.conversationId,
-        error: result.error
-      };
-    } catch (err) {
-      console.error('Error creating conversation:', err)
-      return { success: false, error: 'Failed to create conversation' }
-    }
-  }, [])
 
   const handleConversationCreation = useCallback(async (): Promise<void> => {
     if (!user?.id) {
@@ -127,15 +104,16 @@ export default function ClientAuthModal({
       return
     }
 
-    const result = await createConversation(user.id, freelancerId)
+    const freelancerName = localStorage.getItem('pending_freelancer_name') || '';
+    const result = await checkOrCreateConversation(user.id, freelancerId, freelancerName || undefined)
     
-    if (result.success && result.conversation_id) {
-      window.location.href = `/client-dashboard/messages?conversation=${result.conversation_id}`
+    if (result.success && result.conversationId) {
+      window.location.href = `/client-dashboard/messages?conversation=${result.conversationId}`
     } else {
       console.error('Failed to create conversation:', result.error)
       onAuthSuccess()
     }
-  }, [user?.id, freelancerUsername, getFreelancerId, createConversation, onAuthSuccess])
+  }, [user?.id, freelancerUsername, getFreelancerId, onAuthSuccess])
 
   const handleAuthSuccess = useCallback(async () => {
     storeAuthIntent()
