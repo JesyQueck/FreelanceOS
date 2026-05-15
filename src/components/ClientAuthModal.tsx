@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { X, Mail, Lock, User, UserPlus, LogIn } from 'lucide-react'
-import { signUpClient, signIn, supabase } from '../utils/supabase'
+import { signUpClient, signIn, supabase, checkOrCreateConversation } from '../utils/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 interface ConversationResult {
@@ -99,12 +99,16 @@ export default function ClientAuthModal({
 
   const createConversation = useCallback(async (userId: string, freelancerId: string): Promise<ConversationResult> => {
     try {
-      const result = await (supabase.rpc as any)('check_or_create_conversation', {
-        user_id: userId,
-        freelancer_id: freelancerId
-      }) as ConversationResult
+      // Get freelancer name from localStorage
+      const freelancerName = localStorage.getItem('pending_freelancer_name') || '';
+      
+      const result = await checkOrCreateConversation(userId, freelancerId, freelancerName);
 
-      return result
+      return {
+        success: result.success,
+        conversation_id: result.conversationId,
+        error: result.error
+      };
     } catch (err) {
       console.error('Error creating conversation:', err)
       return { success: false, error: 'Failed to create conversation' }
@@ -341,7 +345,7 @@ export default function ClientAuthModal({
                     value={loginData.email}
                     onChange={handleLoginInputChange('email')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Enter your email"
                     autoComplete="email"
                   />
@@ -360,7 +364,7 @@ export default function ClientAuthModal({
                     value={loginData.password}
                     onChange={handleLoginInputChange('password')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Enter your password"
                     autoComplete="current-password"
                   />
@@ -389,7 +393,7 @@ export default function ClientAuthModal({
                     value={signupData.fullName}
                     onChange={handleSignupInputChange('fullName')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Enter your full name"
                     autoComplete="name"
                   />
@@ -408,7 +412,7 @@ export default function ClientAuthModal({
                     value={signupData.email}
                     onChange={handleSignupInputChange('email')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Enter your email"
                     autoComplete="email"
                   />
@@ -427,7 +431,7 @@ export default function ClientAuthModal({
                     value={signupData.password}
                     onChange={handleSignupInputChange('password')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Create a password (min. 6 characters)"
                     autoComplete="new-password"
                   />
@@ -446,7 +450,7 @@ export default function ClientAuthModal({
                     value={signupData.confirmPassword}
                     onChange={handleSignupInputChange('confirmPassword')}
                     required
-                    className="input"
+                    className="input pl-10 py-3 w-full"
                     placeholder="Confirm your password"
                     autoComplete="new-password"
                   />

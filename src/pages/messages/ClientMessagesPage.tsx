@@ -19,6 +19,7 @@ import { supabase } from "../../utils/supabase";
 import NotificationDropdown from "../../components/NotificationDropdown";
 import ToastContainer from "../../components/ToastContainer";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import MobileBottomNav from "../../components/MobileBottomNav";
 import { useNotifications } from "../../contexts/NotificationContext";
 
 export default function ClientMessagesPage() {
@@ -609,6 +610,9 @@ const handleSelectConversation = (conversation: Conversation) => {
         {/* Toast Container */}
         <ToastContainer />
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }

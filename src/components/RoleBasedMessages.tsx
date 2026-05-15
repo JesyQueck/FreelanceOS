@@ -16,7 +16,8 @@ export default function RoleBasedMessages() {
   } else if (role === 'freelancer') {
     return <FreelancerMessagesPage />;
   } else {
-    // Default to freelancer messages if role is not set
-    return <FreelancerMessagesPage />;
+    // If role is not set, redirect to client login to re-authenticate
+    console.log('Role not detected, redirecting to client login');
+    return <Navigate to="/client-login" replace />;
   }
 }

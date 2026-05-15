@@ -139,26 +139,12 @@ export default function PublicFreelancerProfile() {
   }, [portfolioItems]);
 
   const handleMessageFreelancer = async () => {
-    if (!user) {
-      // Store freelancer info for auto-conversation creation after auth
-      localStorage.setItem('pending_freelancer_id', profile?.id || '');
-      localStorage.setItem('pending_freelancer_name', profile?.display_name || '');
-      localStorage.setItem('pending_freelancer_username', username || '');
-      setShowClientAuthModal(true);
-      return;
-    }
-
-    if (!profile) {
-      return;
-    }
-
-    // Store freelancer info for auto-conversation creation
-    localStorage.setItem('pending_freelancer_id', profile.id || '');
-    localStorage.setItem('pending_freelancer_name', profile.display_name || '');
+    // Always show client auth modal - only clients can message freelancers
+    // Store freelancer info for auto-conversation creation after auth
+    localStorage.setItem('pending_freelancer_id', profile?.id || '');
+    localStorage.setItem('pending_freelancer_name', profile?.display_name || '');
     localStorage.setItem('pending_freelancer_username', username || '');
-
-    // Redirect to client messages page
-    navigate('/messages');
+    setShowClientAuthModal(true);
   };
 
   if (loading) {
