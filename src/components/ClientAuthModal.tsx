@@ -130,7 +130,7 @@ export default function ClientAuthModal({
     const result = await createConversation(user.id, freelancerId)
     
     if (result.success && result.conversation_id) {
-      window.location.href = `/messages/${result.conversation_id}`
+      window.location.href = `/client-dashboard/messages?conversation=${result.conversation_id}`
     } else {
       console.error('Failed to create conversation:', result.error)
       onAuthSuccess()

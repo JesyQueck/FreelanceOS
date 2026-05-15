@@ -13,9 +13,11 @@ import EditProfilePage from './pages/profile/EditProfilePage'
 import ServicesPage from './pages/services/ServicesPage'
 import RoleBasedMessages from './components/RoleBasedMessages'
 import SettingsPage from './pages/dashboard/SettingsPage'
-import ClientMessagesPage from './pages/messages/ClientMessagesPage'
 import PublicFreelancerProfile from './pages/public/PublicFreelancerProfile'
 import DiscoverFreelancers from './pages/public/DiscoverFreelancers'
+import ClientLayout from './pages/client/ClientLayout'
+import ClientMessagesPageContent from './pages/client/ClientMessagesPage'
+import DiscoverFreelancersContent from './pages/client/DiscoverFreelancers'
 
 function App() {
   return (
@@ -52,12 +54,16 @@ function App() {
                 <Route path="settings" element={<SettingsPage />} />
               </Route>
               
-              {/* Client Dashboard - uses ClientMessagesPage as main interface */}
+              {/* Client Dashboard - uses ClientLayout */}
               <Route path="/client-dashboard" element={
                 <ClientRoute>
-                  <ClientMessagesPage />
+                  <ClientLayout />
                 </ClientRoute>
-              } />
+              }>
+                <Route index element={<ClientMessagesPageContent />} />
+                <Route path="messages" element={<ClientMessagesPageContent />} />
+                <Route path="discover" element={<DiscoverFreelancersContent />} />
+              </Route>
             </Routes>
           </Router>
         </NotificationProvider>

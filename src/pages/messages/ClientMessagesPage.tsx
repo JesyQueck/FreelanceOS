@@ -40,8 +40,8 @@ export default function ClientMessagesPage() {
   // Show loading while determining role
   if (loading || role === null) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      <div className="min-h-screen bg-[var(--color-bg-main)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-text-primary)]"></div>
       </div>
     );
   }
@@ -346,21 +346,21 @@ const handleSelectConversation = (conversation: Conversation) => {
 };
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
+    <div className="flex h-screen bg-[var(--color-bg-main)] text-[var(--color-text-primary)] overflow-hidden font-sans">
       
       {/* MOBILE OVERLAY */}
       {sidebarOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+          className="lg:hidden fixed inset-0 bg-[var(--color-bg-main)]/50 backdrop-blur-sm z-30"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* DESKTOP SIDEBAR - Always Visible */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[#1A1A1A] lg:bg-[#0A0A0A]/50 lg:backdrop-blur-xl lg:flex-shrink-0">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[var(--color-border)] lg:bg-[var(--color-bg-secondary)]/50 lg:backdrop-blur-xl lg:flex-shrink-0">
         <div className="h-20 flex items-center px-6 border-b border-transparent">
           <div className="flex items-center gap-2.5 group">
-            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-5 w-5 text-black" />
             </div>
             <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
@@ -368,7 +368,7 @@ const handleSelectConversation = (conversation: Conversation) => {
         </div>
         
         <div className="px-4 py-4">
-          <p className="px-3 text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">
+          <p className="px-3 text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
             Client Portal
           </p>
           <nav className="space-y-1">
@@ -378,8 +378,8 @@ const handleSelectConversation = (conversation: Conversation) => {
                 to={item.href}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors group ${
                   location.pathname === item.href
-                    ? 'bg-[var(--color-primary)]/20 text-white'
-                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)]/50 hover:text-white'
+                    ? 'bg-[var(--color-primary)]/20 text-[var(--color-text-primary)]'
+                    : 'text-[var(--color-text-muted)] hover:bg-[var(--color-bg-secondary)]/50 hover:text-[var(--color-text-primary)]'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -395,7 +395,7 @@ const handleSelectConversation = (conversation: Conversation) => {
             <nav className="space-y-1">
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[#A0A0A0] hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[var(--color-text-secondary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors group"
               >
                 <div className="flex items-center gap-3">
                   <LogOut className="h-4 w-4 group-hover:scale-110 transition-transform" />
@@ -408,7 +408,7 @@ const handleSelectConversation = (conversation: Conversation) => {
         </div>
 
         {/* User Profile Section */}
-        <div className="mt-auto p-4 border-t border-[#1A1A1A]/60">
+        <div className="mt-auto p-4 border-t border-[var(--color-border)]/60">
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-black text-sm font-semibold">
               {userLoading ? (
@@ -422,15 +422,15 @@ const handleSelectConversation = (conversation: Conversation) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
                 {userLoading ? 'Loading...' : displayName}
               </p>
-              <p className="text-xs text-[#A0A0A0] truncate">
+              <p className="text-xs text-[var(--color-text-secondary)] truncate">
                 {userLoading ? 'Loading...' : userEmail}
               </p>
             </div>
-            <button className="p-1.5 rounded-lg hover:bg-[#0A0A0A]/50 transition-colors">
-              <Bell className="h-4 w-4 text-[#A0A0A0]" />
+            <button className="p-1.5 rounded-lg hover:bg-[var(--color-bg-secondary)]/50 transition-colors">
+              <Bell className="h-4 w-4 text-[var(--color-text-secondary)]" />
             </button>
           </div>
         </div>
@@ -440,7 +440,7 @@ const handleSelectConversation = (conversation: Conversation) => {
       <header className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--color-bg-main)]/80 backdrop-blur-xl border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5 group">
-            <div className="bg-[#FFD700] p-1.5 rounded-lg shadow-sm shadow-[#FFD700]/20 group-hover:shadow-[#FFD700]/40 transition-shadow">
+            <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-4 w-5 text-black" />
             </div>
             <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
@@ -450,9 +450,9 @@ const handleSelectConversation = (conversation: Conversation) => {
             <NotificationDropdown />
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg bg-red-500/50 hover:bg-red-500/70 transition-colors"
+              className="p-2 rounded-lg bg-[var(--color-error)]/50 hover:bg-[var(--color-error)]/70 transition-colors"
             >
-              <LogOut className="h-5 w-5 text-white" />
+              <LogOut className="h-5 w-5 text-[var(--color-text-primary)]" />
             </button>
           </div>
         </div>
@@ -462,14 +462,14 @@ const handleSelectConversation = (conversation: Conversation) => {
       <main className="flex-1 flex flex-col lg:ml-0 pt-16 lg:pt-0 min-h-screen lg:min-h-0">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6">
-          <h1 className="text-2xl font-bold text-white">Client Messages</h1>
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">Client Messages</h1>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A0A0A0]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-text-secondary)]" />
               <input
                 type="text"
                 placeholder="Search conversations..."
-                className="pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 w-full sm:w-auto text-base"
+                className="pl-10 pr-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 w-full sm:w-auto text-base"
               />
             </div>
             <NotificationDropdown />
@@ -539,7 +539,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{getDisplayName(selectedConversation)}</h3>
-                      <p className="text-xs text-green-400">Freelancer</p>
+                      <p className="text-xs text-[var(--color-success)]">Freelancer</p>
                     </div>
                   </div>
                   <button className="p-3 hover:bg-[var(--color-bg-secondary)]/50 rounded-xl transition-colors">
@@ -558,7 +558,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                           <div className={`max-w-[85%] sm:max-w-md px-4 py-3 rounded-2xl ${
                             message.sender_id === user?.id 
                             ? 'bg-[var(--color-primary)] text-black rounded-br-sm' 
-                            : 'bg-[var(--color-bg-secondary)] text-white rounded-tl-sm'
+                            : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] rounded-tl-sm'
                           }`}>
                             <p className="text-sm leading-relaxed">{message.content}</p>
                             <div className={`flex items-center gap-1 mt-2 text-xs ${
@@ -587,7 +587,7 @@ const handleSelectConversation = (conversation: Conversation) => {
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
                       disabled={sending}
-                      className="flex-1 px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 disabled:opacity-50 text-base"
+                      className="flex-1 px-4 py-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)]/50 disabled:opacity-50 text-base"
                     />
                     <button 
                       onClick={handleSendMessage}

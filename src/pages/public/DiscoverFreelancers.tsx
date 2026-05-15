@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { UserCircle, Briefcase, Search, MessageCircle, ExternalLink } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserCircle, Briefcase, Search, MessageCircle, ExternalLink, Bell, LogOut } from 'lucide-react';
 import { getAllPublicFreelancers, checkOrCreateConversation, UserProfile } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import MobileBottomNav from '../../components/MobileBottomNav';
+import NotificationDropdown from '../../components/NotificationDropdown';
 
 export default function DiscoverFreelancers() {
   const { user, role } = useAuth();
+  const navigate = useNavigate();
   const [freelancers, setFreelancers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredFreelancers, setFilteredFreelancers] = useState<UserProfile[]>([]);
+
+  const handleLogout = async () => {
+    const { signOut } = await import('../../utils/supabase');
+    await signOut();
+    navigate('/login');
+  };
 
   useEffect(() => {
     const fetchFreelancers = async () => {
@@ -96,7 +105,17 @@ export default function DiscoverFreelancers() {
             </div>
             <span className="font-bold text-sm text-[var(--color-text-primary)]">Discover</span>
           </div>
-          <div className="w-9"></div> {/* Spacer for balance */}
+          <div className="flex items-center gap-2">
+            <NotificationDropdown />
+            {user && (
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg bg-red-500/50 hover:bg-red-500/70 transition-colors"
+              >
+                <LogOut className="h-4 w-4 text-white" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -109,6 +128,17 @@ export default function DiscoverFreelancers() {
                 <Briefcase className="h-4 w-4 text-white" />
               </div>
               <span className="font-bold text-lg text-[var(--color-text-primary)]">Discover Freelancers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <NotificationDropdown />
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-lg bg-red-500/50 hover:bg-red-500/70 transition-colors"
+                >
+                  <LogOut className="h-5 w-5 text-white" />
+                </button>
+              )}
             </div>
           </div>
         </div>
