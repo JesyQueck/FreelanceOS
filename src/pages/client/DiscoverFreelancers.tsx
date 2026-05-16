@@ -14,17 +14,20 @@ export default function DiscoverFreelancers() {
 
   const handleMessageFreelancer = async (freelancerId: string, username: string) => {
     if (!user) {
-      // Store freelancer_id temporarily and redirect to client login
+      // Store freelancer info and redirect to discover page with auth modal trigger
       localStorage.setItem('pending_freelancer_id', freelancerId);
-      window.location.href = '/client-login';
+      localStorage.setItem('pending_freelancer_name', username);
+      // Redirect to freelancer profile to trigger auth modal
+      window.location.href = `/freelancer/${username}`;
       return;
     }
 
     // Check if user has client role using unified system
     if (role !== 'client') {
-      // Store freelancer_id temporarily and redirect to client login
+      // Store freelancer info and redirect to freelancer profile
       localStorage.setItem('pending_freelancer_id', freelancerId);
-      window.location.href = '/client-login';
+      localStorage.setItem('pending_freelancer_name', username);
+      window.location.href = `/freelancer/${username}`;
       return;
     }
 

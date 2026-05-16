@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserCircle, Mail, Briefcase, MessageCircle, ArrowLeft, ExternalLink, CheckCircle2, DollarSign, Clock } from 'lucide-react';
-import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, getFreelancerProfile, UserProfile, PortfolioItem, Service } from '../../utils/supabase';
+import { getPublicUserProfile, getPublicPortfolioItems, getPublicServices, getFreelancerProfile, UserProfile, PortfolioItem, Service, checkOrCreateConversation } from '../../utils/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ClientAuthModal from '../../components/ClientAuthModal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -34,7 +34,7 @@ const getRelativeTime = (dateString: string) => {
 
 export default function PublicFreelancerProfile() {
   const { username } = useParams<{ username: string }>();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const navigate = useNavigate();
   const mountedRef = useRef(true);
   
@@ -139,12 +139,32 @@ export default function PublicFreelancerProfile() {
   }, [portfolioItems]);
 
   const handleMessageFreelancer = async () => {
-    // Always show client auth modal - only clients can message freelancers
-    // Store freelancer info for auto-conversation creation after auth
-    localStorage.setItem('pending_freelancer_id', profile?.id || '');
-    localStorage.setItem('pending_freelancer_name', profile?.display_name || '');
-    localStorage.setItem('pending_freelancer_username', username || '');
-    setShowClientAuthModal(true);
+    // Check if user is already authenticated as a client
+    if (user && role === 'client') {
+      // User is already a client, directly create conversation
+      try {
+        const result = await checkOrCreateConversation(user.id, profile?.id!, profile?.display_name || profile?.username || '');
+        if (result.success && result.conversationId) {
+          // Redirect to the conversation
+          window.location.href = `/client-dashboard/messages?conversation=${result.conversationId}`;
+        } else {
+          console.error('Failed to create conversation:', result.error);
+        }
+      } catch (error) {
+        console.error('Error creating conversation:', error);
+      }
+    } else if (user && role !== 'client') {
+      // User is logged in but not a client (e.g., freelancer)
+      // Show error message or redirect
+      alert('Only clients can message freelancers. Please log in as a client to message this freelancer.');
+    } else {
+      // User is not authenticated, show auth modal
+      // Store freelancer info for auto-conversation creation after auth
+      localStorage.setItem('pending_freelancer_id', profile?.id || '');
+      localStorage.setItem('pending_freelancer_name', profile?.display_name || '');
+      localStorage.setItem('pending_freelancer_username', username || '');
+      setShowClientAuthModal(true);
+    }
   };
 
   if (loading) {
