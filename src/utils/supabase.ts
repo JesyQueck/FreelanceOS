@@ -1103,63 +1103,56 @@ export const getConversationsByRole = async (userId: string, role: 'freelancer' 
         `)
         .eq('freelancer_id', userId)
         .order('last_message_at', { ascending: false });
-      
+
       if (error) {
         console.error('Error fetching freelancer conversations:', error);
         return [];
       }
-      
+
       conversations = data || [];
-      
+
       // Get freelancer info separately for display
       const { data: freelancerInfo } = await getUserDataSafe(userId, 'username, display_name');
-      
-      // Enrich conversations with client info (only if client_id exists)
-      const enrichedConversations = await Promise.all(
-        conversations.map(async (conv) => {
-          let clientInfo = null;
-          
-          // Only fetch client info if we have a client_id
-          if (conv.client_id) {
-            let clientData = null;
-            try {
-              const result = await supabase
-                .from('client_profiles')
-                .select('full_name, email, user_id')
-                .eq('id', conv.client_id)
-                .single();
-              clientData = result.data;
-            } catch (error) {
-              // Client not found or other error
-              clientData = null;
-            }
-            
-            clientInfo = clientData;
-          }
-          
-          return {
-            ...conv,
-            freelancer_user: freelancerInfo.exists ? [{
-              username: freelancerInfo.data.username || `freelancer-${userId.substring(0, 8)}`,
-              display_name: freelancerInfo.data.display_name || freelancerInfo.data.username || 'Freelancer'
-            }] : [{
-              username: `freelancer-${userId.substring(0, 8)}`,
-              display_name: 'Freelancer'
-            }],
-            client_user: clientInfo ? [{
-              username: clientInfo.full_name?.replace(/\s+/g, '-').toLowerCase() || 'client',
-              display_name: clientInfo.full_name || 'Client',
-              full_name: clientInfo.full_name,
-              email: clientInfo.email,
-              user_id: clientInfo.user_id
-            }] : [{
-              username: `client-${conv.client_id?.substring(0, 8) || 'unknown'}`,
-              display_name: 'Unknown Client'
-            }]
-          };
-        })
-      );
-      
+
+      // Fetch client user data separately from users table
+      const clientIds = conversations.map(conv => conv.client_id).filter(Boolean);
+      const uniqueClientIds = [...new Set(clientIds)];
+
+      let clientDataMap: Record<string, { username: string; display_name: string }> = {};
+
+      if (uniqueClientIds.length > 0) {
+        const { data: clientData, error: clientError } = await supabase
+          .from('users')
+          .select('id, username, display_name')
+          .in('id', uniqueClientIds);
+
+        if (!clientError && clientData) {
+          clientDataMap = clientData.reduce((acc, client) => {
+            acc[client.id] = {
+              username: client.username || '',
+              display_name: client.display_name || ''
+            };
+            return acc;
+          }, {} as Record<string, { username: string; display_name: string }>);
+        }
+      }
+
+      // Enrich conversations with client info
+      const enrichedConversations = conversations.map((conv) => ({
+        ...conv,
+        freelancer_user: freelancerInfo.exists ? [{
+          username: freelancerInfo.data.username || `freelancer-${userId.substring(0, 8)}`,
+          display_name: freelancerInfo.data.display_name || freelancerInfo.data.username || 'Freelancer'
+        }] : [{
+          username: `freelancer-${userId.substring(0, 8)}`,
+          display_name: 'Freelancer'
+        }],
+        client_user: conv.client_id && clientDataMap[conv.client_id] ? [clientDataMap[conv.client_id]] : [{
+          username: `client-${conv.client_id?.substring(0, 8) || 'unknown'}`,
+          display_name: 'Unknown Client'
+        }]
+      }));
+
       // Cache the result
       conversationCache.set(cacheKey, { data: enrichedConversations, timestamp: Date.now() });
       return enrichedConversations;
@@ -1251,36 +1244,43 @@ export const getConversations = async (userId: string): Promise<Conversation[]> 
     `)
     .or(`freelancer_id.eq.${userId},client_id.eq.${userId}`)
     .order('last_message_at', { ascending: false });
-  
+
   if (error) {
     console.error('Error fetching conversations:', error);
     return [];
   }
-  
-  // For client conversations, we need to get client info separately
-  const conversationsWithClientInfo = await Promise.all(
-    (data || []).map(async (conv) => {
-      if (conv.client_id) {
-        // This is a client conversation, get client info from clients table
-        const { data: clientData } = await supabase
-          .from('clients')
-          .select('full_name, email')
-          .eq('id', conv.client_id)
-          .single();
-        
-        return {
-          ...conv,
-          client_user: clientData ? [{
-            username: clientData.full_name.replace(/\s+/g, '-').toLowerCase(),
-            display_name: clientData.full_name
-          }] : []
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // Fetch client user data separately
+  const clientIds = data.map(conv => conv.client_id).filter(Boolean);
+  const uniqueClientIds = [...new Set(clientIds)];
+
+  let clientDataMap: Record<string, { username: string; display_name: string }> = {};
+
+  if (uniqueClientIds.length > 0) {
+    const { data: clientData, error: clientError } = await supabase
+      .from('users')
+      .select('id, username, display_name')
+      .in('id', uniqueClientIds);
+
+    if (!clientError && clientData) {
+      clientDataMap = clientData.reduce((acc, client) => {
+        acc[client.id] = {
+          username: client.username || '',
+          display_name: client.display_name || ''
         };
-      }
-      return conv;
-    })
-  );
-  
-  return conversationsWithClientInfo;
+        return acc;
+      }, {} as Record<string, { username: string; display_name: string }>);
+    }
+  }
+
+  return data?.map((conv: any): Conversation => ({
+    ...conv,
+    client_user: conv.client_id && clientDataMap[conv.client_id] ? [clientDataMap[conv.client_id]] : []
+  })) || [];
 };
 
 export const getMessages = async (conversationId: string): Promise<Message[]> => {

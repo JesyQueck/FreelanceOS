@@ -98,6 +98,10 @@ export default function MessagingOverlay({ isOpen, onClose, conversation }: Mess
 
   const getDisplayName = (conv: Conversation) => {
     // For freelancer side, show client info
+    if (conv.client_user && conv.client_user.length > 0) {
+      const client = conv.client_user[0];
+      return client.display_name || client.username || 'Client';
+    }
     if (conv.client_id && conv.client_id !== user?.id) {
       return conv.client_id;
     }

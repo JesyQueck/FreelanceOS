@@ -98,10 +98,10 @@ export default function DashboardLayout() {
       )}
 
       {/* DESKTOP SIDEBAR - Always Visible */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[var(--color-border)] lg:bg-[var(--color-bg-card)]/80 lg:backdrop-blur-xl lg:flex-shrink-0">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-[var(--color-border)] lg:bg-[var(--color-bg-card)]/80 lg:backdrop-blur-xl lg:flex-shrink-0 overflow-hidden">
         <div className="h-20 flex items-center px-6 border-b border-[var(--color-border)]">
-          <Link 
-            className="flex items-center gap-2.5 group" 
+          <Link
+            className="flex items-center gap-2.5 group"
             to="/dashboard"
           >
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
@@ -110,12 +110,12 @@ export default function DashboardLayout() {
             <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
           </Link>
         </div>
-        
-        <div className="px-4 py-4">
+
+        <div className="px-4 py-4 flex-1 overflow-hidden">
           <p className="px-3 text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
             Overview
           </p>
-          <nav className="space-y-1">
+          <nav className="space-y-1 overflow-y-auto">
             {navigation.map((item) => (
               <Link
                 key={item.name}
