@@ -1552,13 +1552,48 @@ export const getRecentActivity = async (userId: string): Promise<ActivityItem[]>
     return [];
   }
   
-  return data?.map((conv: any): ActivityItem => ({
-    id: conv.id,
-    name: conv.client_id ? 'Client Message' : 'System Update',
-    message: 'New conversation started',
-    time: formatTimeAgo(conv.updated_at),
-    type: conv.client_id ? 'message' : 'system'
-  })) || [];
+  if (!data || data.length === 0) {
+    return [];
+  }
+  
+  // Fetch client user data for each conversation
+  const clientIds = data.map(conv => conv.client_id).filter(Boolean);
+  const uniqueClientIds = [...new Set(clientIds)];
+  
+  let clientDataMap: Record<string, { display_name: string; email: string }> = {};
+  
+  if (uniqueClientIds.length > 0) {
+    const { data: clientData, error: clientError } = await supabase
+      .from('users')
+      .select('id, display_name, email')
+      .in('id', uniqueClientIds);
+    
+    if (!clientError && clientData) {
+      clientDataMap = clientData.reduce((acc, client) => {
+        acc[client.id] = {
+          display_name: client.display_name || '',
+          email: client.email || ''
+        };
+        return acc;
+      }, {} as Record<string, { display_name: string; email: string }>);
+    }
+  }
+  
+  return data?.map((conv: any): ActivityItem => {
+    let clientName = 'Client';
+    if (conv.client_id && clientDataMap[conv.client_id]) {
+      const client = clientDataMap[conv.client_id];
+      clientName = client.display_name || client.email?.split('@')[0] || 'Client';
+    }
+    
+    return {
+      id: conv.id,
+      name: conv.client_id ? `Message from ${clientName}` : 'System Update',
+      message: 'New conversation started',
+      time: formatTimeAgo(conv.updated_at),
+      type: conv.client_id ? 'message' : 'system'
+    };
+  }) || [];
 };
 
 export interface ActivityItem {

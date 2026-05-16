@@ -304,7 +304,7 @@ export default function DashboardLayout() {
 
       {/* MAIN CONTENT - Takes remaining space after sidebar */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto pt-20 lg:pt-6 p-4 lg:p-6 pb-20 lg:pb-6">
+        <div className="flex-1 pt-20 lg:pt-6 p-4 lg:p-6 pb-20 lg:pb-6">
           <Outlet />
         </div>
       </main>

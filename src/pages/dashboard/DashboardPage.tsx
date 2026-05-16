@@ -250,53 +250,51 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-6">Recent Activity</h2>
-          <div className="card overflow-hidden animate-fade-in-up">
-            <div className="divide-y divide-[var(--color-border)]">
-              {data.recentActivity.map((activity: ActivityItem) => (
-                <div 
-                  key={activity.id} 
-                  className={`p-6 flex items-center justify-between transition-colors ${
-                    activity.type === 'message' ? 'hover:bg-[var(--color-bg-secondary)]/30 cursor-pointer' : 'hover:bg-[var(--color-bg-secondary)]/30'
-                  }`}
-                  onClick={() => {
-                    if (activity.type === 'message') {
-                      const conversation = conversations.find(conv => conv.id === activity.id);
-                      if (conversation) {
-                        setSelectedConversation(conversation);
-                        setShowMessagingOverlay(true);
-                      }
+          <div className="space-y-4 animate-fade-in-up">
+            {data.recentActivity.map((activity: ActivityItem) => (
+              <div 
+                key={activity.id} 
+                className={`card p-6 flex items-center justify-between transition-colors ${
+                  activity.type === 'message' ? 'hover:bg-[var(--color-bg-secondary)]/30 cursor-pointer' : 'hover:bg-[var(--color-bg-secondary)]/30'
+                }`}
+                onClick={() => {
+                  if (activity.type === 'message') {
+                    const conversation = conversations.find(conv => conv.id === activity.id);
+                    if (conversation) {
+                      setSelectedConversation(conversation);
+                      setShowMessagingOverlay(true);
                     }
-                  }}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-lg ${
-                      activity.type === 'message' ? 'bg-[var(--color-success)]' :
-                      activity.type === 'system' ? 'bg-[var(--color-info)]' : 'bg-[var(--color-warning)]'
-                    }`}></div>
-                    <div>
-                      <p className="text-base font-medium text-[var(--color-text-primary)]">
-                        {activity.type === 'message' ? (
-                          <span className="hover:text-[var(--color-primary)] transition-colors">{activity.name}</span>
-                        ) : (
-                          activity.name
-                        )}
-                      </p>
-                      <p className="text-sm text-[var(--color-text-secondary)]">{activity.time}</p>
-                    </div>
+                  }
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-3 h-3 rounded-lg ${
+                    activity.type === 'message' ? 'bg-[var(--color-success)]' :
+                    activity.type === 'system' ? 'bg-[var(--color-info)]' : 'bg-[var(--color-warning)]'
+                  }`}></div>
+                  <div>
+                    <p className="text-base font-medium text-[var(--color-text-primary)]">
+                      {activity.type === 'message' ? (
+                        <span className="hover:text-[var(--color-primary)] transition-colors">{activity.name}</span>
+                      ) : (
+                        activity.name
+                      )}
+                    </p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">{activity.time}</p>
                   </div>
-                  {activity.type === 'message' ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">View chat</span>
-                      <MessageSquare className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" />
-                    </div>
-                  ) : activity.type === 'system' ? (
-                    <Eye className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
-                  ) : (
-                    <Target className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
-                  )}
                 </div>
-              ))}
-            </div>
+                {activity.type === 'message' ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors">View chat</span>
+                    <MessageSquare className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors" />
+                  </div>
+                ) : activity.type === 'system' ? (
+                  <Eye className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
+                ) : (
+                  <Target className="h-5 w-5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors" />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
