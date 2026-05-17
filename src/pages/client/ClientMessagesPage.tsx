@@ -123,18 +123,55 @@ export default function ClientMessagesPage() {
           // Normal conversation loading
           const conversationsData = await getClientConversations(user.id);
           setConversations(conversationsData);
-          if (conversationsData.length > 0) {
-            // Check if there's a specific conversation ID in URL
-            if (conversationIdParam) {
-              const targetConversation = conversationsData.find(conv => conv.id === conversationIdParam);
-              if (targetConversation) {
-                setSelectedConversation(targetConversation);
-                setShowChat(true);
-                const messagesData = await getMessages(targetConversation.id!);
-                setMessages(messagesData);
+
+          // Check if there's a specific conversation ID in URL
+          if (conversationIdParam) {
+            const targetConversation = conversationsData.find(conv => conv.id === conversationIdParam);
+            if (targetConversation) {
+              setSelectedConversation(targetConversation);
+              setShowChat(true);
+              const messagesData = await getMessages(targetConversation.id!);
+              setMessages(messagesData);
+            } else {
+              // Conversation not found in list, might be newly created
+              // Try to fetch it directly
+              try {
+                const { data: conversationData } = await supabase
+                  .from('conversations')
+                  .select('id, freelancer_id, client_id, created_at, last_message_at')
+                  .eq('id', conversationIdParam)
+                  .single();
+
+                if (conversationData) {
+                  // Fetch freelancer data
+                  const { data: freelancerData } = await supabase
+                    .from('users')
+                    .select('username, display_name')
+                    .eq('id', conversationData.freelancer_id)
+                    .single();
+
+                  const tempConversation = {
+                    ...conversationData,
+                    freelancer_user: freelancerData ? [{
+                      username: freelancerData.username,
+                      display_name: freelancerData.display_name || freelancerData.username
+                    }] : [{
+                      username: `freelancer-${conversationData.freelancer_id.substring(0, 8)}`,
+                      display_name: 'Unknown Freelancer'
+                    }],
+                    client_user: []
+                  };
+
+                  setConversations(prev => [...prev, tempConversation]);
+                  setSelectedConversation(tempConversation);
+                  setShowChat(true);
+                  const messagesData = await getMessages(conversationIdParam);
+                  setMessages(messagesData);
+                }
+              } catch (error) {
+                console.error('Error fetching conversation by ID:', error);
               }
             }
-            // Don't auto-select any conversation - wait for user to click
           }
         } catch (error) {
           console.error('Error fetching client conversations:', error);
