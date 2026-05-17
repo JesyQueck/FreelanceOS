@@ -192,7 +192,7 @@ export default function PublicFreelancerProfile() {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
               <Briefcase className="h-4 w-4" />
             </div>
-            <span className="font-bold text-sm text-[var(--color-text-primary)]">FreelanceOS</span>
+            <span className="font-bold text-sm text-[var(--color-text-primary)]">Hirelancer</span>
           </div>
           <button
             onClick={() => navigate(-1)}
@@ -211,7 +211,7 @@ export default function PublicFreelancerProfile() {
               <div className="bg-[var(--color-primary)] p-1.5 rounded-lg text-black shadow-sm flex items-center justify-center">
                 <Briefcase className="h-4 w-4" />
               </div>
-              <span className="font-bold text-sm text-[var(--color-text-primary)]">FreelanceOS</span>
+              <span className="font-bold text-sm text-[var(--color-text-primary)]">Hirelancer</span>
             </div>
           </div>
         </div>

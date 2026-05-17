@@ -107,7 +107,7 @@ export default function DashboardLayout() {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
+            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">Hirelancer</span>
           </Link>
         </div>
 
@@ -196,7 +196,7 @@ export default function DashboardLayout() {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
+            <span className="font-bold text-lg tracking-tight text-[var(--color-text-primary)]">Hirelancer</span>
           </Link>
         </div>
         
@@ -281,7 +281,7 @@ export default function DashboardLayout() {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-sm tracking-tight text-[var(--color-text-primary)]">FreelanceOS</span>
+            <span className="font-bold text-sm tracking-tight text-[var(--color-text-primary)]">Hirelancer</span>
           </Link>
           
           <div className="flex items-center gap-2">

@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- App Icon - H + L geometric combination -->
+  <rect x="0" y="0" width="64" height="64" rx="16" fill="#22C55E"/>
+  
+  <!-- H shape -->
+  <rect x="16" y="16" width="8" height="32" rx="4" fill="#0B0F1A"/>
+  <rect x="40" y="16" width="8" height="32" rx="4" fill="#0B0F1A"/>
+  <rect x="24" y="28" width="16" height="8" rx="4" fill="#0B0F1A"/>
+  
+  <!-- L shape integrated (bottom right corner) -->
+  <rect x="40" y="36" width="8" height="12" rx="4" fill="#0B0F1A"/>
+</svg>

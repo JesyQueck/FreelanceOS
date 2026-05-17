@@ -20,7 +20,7 @@ export default function LandingPage() {
               <Briefcase className="w-4 h-4" />
             </div>
             <span className="font-bold text-base tracking-tight text-[var(--color-text-primary)]">
-              FreelanceOS
+              Hirelancer
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-[var(--color-text-secondary)]">
@@ -269,9 +269,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-[var(--color-primary)]" />
-            <span className="font-semibold text-[var(--color-text-primary)] font-bold">FreelanceOS</span>
+            <span className="font-semibold text-[var(--color-text-primary)] font-bold">Hirelancer</span>
           </div>
-          <p>© 2026 FreelanceOS. Designed for world-class talent.</p>
+          <p>© 2026 Hirelancer. Designed for world-class talent.</p>
           <div className="flex gap-6">
             <Link to="#" className="hover:text-[var(--color-text-primary)] transition-colors">Twitter</Link>
             <Link to="#" className="hover:text-[var(--color-text-primary)] transition-colors">Dribbble</Link>

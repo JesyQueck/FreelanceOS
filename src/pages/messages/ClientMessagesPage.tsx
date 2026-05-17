@@ -363,7 +363,7 @@ const handleSelectConversation = (conversation: Conversation) => {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-5 w-5 text-black" />
             </div>
-            <span className="font-bold text-lg tracking-tight">FreelanceOS</span>
+            <span className="font-bold text-lg tracking-tight">Hirelancer</span>
           </div>
         </div>
         
@@ -443,7 +443,7 @@ const handleSelectConversation = (conversation: Conversation) => {
             <div className="bg-[var(--color-primary)] p-1.5 rounded-lg shadow-sm shadow-[var(--color-primary)]/20 group-hover:shadow-[var(--color-primary)]/40 transition-shadow">
               <Briefcase className="h-4 w-5 text-black" />
             </div>
-            <span className="font-bold text-sm tracking-tight">FreelanceOS</span>
+            <span className="font-bold text-sm tracking-tight">Hirelancer</span>
           </div>
           
           <div className="flex items-center gap-2">
